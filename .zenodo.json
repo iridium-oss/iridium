@@ -1,0 +1,36 @@
+{
+    "title": "IRIDIUM: Real-Time Urban Mobility Platform for Digital Twin Assembly and Federated Learning",
+    "description": "IRIDIUM is a real-time urban mobility prediction and optimization platform for Azerbaijani cities. It utilizes federated machine learning, a dynamic digital twin of the transport network, and modules for congestion forecasting, multimodal routing, mobility equity scoring, and anomaly detection.",
+    "license": "EUPL-1.2",
+    "upload_type": "software",
+    "creators": [
+        {
+            "name": "Laitinen Imanov, Olaf Yunus",
+            "affiliation": "IRIDIUM Project"
+        },
+        {
+            "name": "Sadiqzade, Amina",
+            "affiliation": "IRIDIUM Project"
+        },
+        {
+            "name": "Ismayilova, Malahat",
+            "affiliation": "IRIDIUM Project"
+        },
+        {
+            "name": "Ibadullayev, Aslan",
+            "affiliation": "IRIDIUM Project"
+        },
+        {
+            "name": "Bagirova, Fidan",
+            "affiliation": "IRIDIUM Project"
+        }
+    ],
+    "keywords": [
+        "urban mobility",
+        "federated learning",
+        "digital twin",
+        "Azerbaijan",
+        "Baku",
+        "traffic forecasting"
+    ]
+}
