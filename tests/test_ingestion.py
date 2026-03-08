@@ -22,9 +22,12 @@ def test_validate_batch_ok():
 
 
 def test_validate_batch_invalid_speed():
-    batch = IngestionEventBatch(
-        sensor_events=[SensorEvent(segment_id="e1", timestamp=datetime.utcnow(), speed_kmh=300)]
+    # Use model_construct so invalid speed_kmh (300) bypasses Pydantic validation;
+    # validate_batch() then catches it via its own range check.
+    invalid_ev = SensorEvent.model_construct(
+        segment_id="e1", timestamp=datetime.utcnow(), speed_kmh=300
     )
+    batch = IngestionEventBatch.model_construct(sensor_events=[invalid_ev])
     ok, errors = validate_batch(batch)
     assert ok is False
     assert len(errors) >= 1
