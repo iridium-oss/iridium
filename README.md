@@ -6,8 +6,8 @@
 [![Docs](https://github.com/iridium-oss/iridium/actions/workflows/docs.yml/badge.svg)](https://github.com/iridium-oss/iridium/actions/workflows/docs.yml)
 [![GitHub issues](https://img.shields.io/github/issues/iridium-oss/iridium)](https://github.com/iridium-oss/iridium/issues)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/iridium-oss/iridium)](https://github.com/iridium-oss/iridium/pulls)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14995540.svg)](https://doi.org/10.5281/zenodo.14995540)
-[![arXiv](https://img.shields.io/badge/arXiv-2403.00000-B31B1B.svg)](https://arxiv.org/abs/2403.00000)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18915211.svg)](https://doi.org/10.5281/zenodo.18915211)
+[![arXiv](https://img.shields.io/badge/arXiv-submit/7340933-B31B1B.svg)](https://arxiv.org/abs/submit/7340933)
 
 
 
@@ -104,8 +104,8 @@ where $T(r)$ is travel time, $C(r)$ cost, $E(r)$ emissions proxy, and $P(r)$ tra
 | Artifact | Status |
 |----------|--------|
 | CITATION.cff | Present at repo root; use for citation. |
-| Zenodo DOI | Published; see [https://doi.org/10.5281/zenodo.14995540](https://doi.org/10.5281/zenodo.14995540). |
-| arXiv preprint | Submitted; see [https://arxiv.org/abs/2403.00000](https://arxiv.org/abs/2403.00000). |
+| Zenodo DOI | Published; see [https://doi.org/10.5281/zenodo.18915211](https://doi.org/10.5281/zenodo.18915211). |
+| arXiv preprint | Under submission; see [submit/7340933](https://arxiv.org/abs/submit/7340933). |
 
 Citation: [docs/citation.md](docs/citation.md).
 

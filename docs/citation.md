@@ -13,7 +13,15 @@ IRIDIUM Project (2026). IRIDIUM: Real-Time Urban Mobility Prediction and Optimiz
 Version 0.2.0. https://github.com/iridium-oss/iridium. License: EUPL-1.2.
 ```
 
-Adjust the version and year to match the release you used. If you obtained a specific version from Zenodo, cite the Zenodo DOI instead.
+Adjust the version and year to match the release you used. If you obtained a specific version from Zenodo, cite the Zenodo DOI instead (10.5281/zenodo.18915211).
+
+## Preferred Citation (Paper/Preprint)
+
+When citing the academic paper:
+
+```
+O. Y. Laitinen Imanov et al. (2026). "IRIDIUM: A Provenance-Aware Urban Mobility Platform for Digital Twin Assembly, Multimodal Analytics, and Federated Learning in Azerbaijani Cities." arXiv:submit/7340933.
+```
 
 ## Authors
 

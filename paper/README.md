@@ -60,4 +60,4 @@ Output: **arxiv/iridium_preprint_source.zip**. Upload to arXiv; compile with pdf
 ## What Is Intentionally Excluded
 
 - No fabricated benchmarks, metrics, or synthetic results in the main path. The paper reports only what the repository supports: API behavior, data-status semantics, source-status composition, latency, and real weather integration.
-- arXiv identifier is assigned and the badge is present in the root README.
+- arXiv identifier is assigned (submit/7340933) and the badge is present in the root README.
