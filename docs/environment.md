@@ -34,7 +34,7 @@ Environment variables are grouped by subsystem. Copy `.env.example` to `.env` an
 | PROMETHEUS_PORT | Prometheus metrics port | No | 9090 | No |
 | GRAFANA_URL | Grafana URL | No | (empty) | No |
 
-Sensitivity: **Yes** means the value may contain secrets; do not log or expose in responses. Use optional DOI or arXiv metadata variables only when real identifiers exist; see docs/zenodo-release.md and docs/preprint-readiness.md.
+Sensitivity: **Yes** means the value may contain secrets; do not log or expose in responses. Use optional DOI or arXiv metadata variables only when real identifiers exist.
 
 ## Subsystem grouping
 

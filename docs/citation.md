@@ -9,11 +9,11 @@ The repository root contains a [CITATION.cff](https://citation-file-format.githu
 When citing the software:
 
 ```
-IRIDIUM Project (2026). IRIDIUM: Real-Time Urban Mobility Prediction and Optimization Platform. 
+IRIDIUM Project (2026). IRIDIUM: Real-Time Urban Mobility Prediction and Optimization Platform.
 Version 0.2.0. https://github.com/iridium-oss/iridium. License: EUPL-1.2.
 ```
 
-Adjust the version and year to match the release you used. If you obtained a specific version from Zenodo, cite the Zenodo DOI instead once it is published (see docs/zenodo-release.md).
+Adjust the version and year to match the release you used. If you obtained a specific version from Zenodo, cite the Zenodo DOI instead.
 
 ## Authors
 

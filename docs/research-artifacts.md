@@ -15,7 +15,7 @@ This document lists research-related artifacts in the IRIDIUM repository and how
 ## Versioning and Citation
 
 - These documents are versioned with the software. To cite a specific state, cite the repository release (or Zenodo DOI) that contains that state.
-- No separate DOI is assigned to individual documents unless published elsewhere (e.g. as a preprint or paper). For a preprint or paper that describes IRIDIUM, see docs/preprint-readiness.md and docs/preprint-checklist.md.
+- No separate DOI is assigned to individual documents unless published elsewhere (e.g. as a preprint or paper).
 
 ## Reproducibility
 

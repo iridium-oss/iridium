@@ -1,0 +1,9 @@
+# Template chooser: blank issue disabled so all issues use a form.
+# Order: 01-bug_report, 02-feature_request, 03-documentation, 04-research_task (GitHub alphanumeric).
+blank_issues_enabled: false
+
+# Optional: direct users to discussions or external support
+# contact_links:
+#   - name: Discussions
+#     url: https://github.com/iridium-oss/iridium/discussions
+#     about: Ask questions or propose ideas here.

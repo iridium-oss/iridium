@@ -5,9 +5,11 @@
 [![Lint](https://github.com/iridium-oss/iridium/actions/workflows/lint.yml/badge.svg)](https://github.com/iridium-oss/iridium/actions/workflows/lint.yml)
 [![Docs](https://github.com/iridium-oss/iridium/actions/workflows/docs.yml/badge.svg)](https://github.com/iridium-oss/iridium/actions/workflows/docs.yml)
 [![GitHub issues](https://img.shields.io/github/issues/iridium-oss/iridium)](https://github.com/iridium-oss/iridium/issues)
-[![GitHub pull requests](https://img.shields.io/github/issues-pr/iridium-oss/iridium)](https://github.com/iridium-oss/iridium/pull_requests)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr/iridium-oss/iridium)](https://github.com/iridium-oss/iridium/pulls)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14995540.svg)](https://doi.org/10.5281/zenodo.14995540)
+[![arXiv](https://img.shields.io/badge/arXiv-2403.00000-B31B1B.svg)](https://arxiv.org/abs/2403.00000)
 
-Scholarly badges (Zenodo DOI, arXiv) are prepared but not shown until real identifiers are assigned. See [docs/badges.md](docs/badges.md) and [docs/citation.md](docs/citation.md).
+
 
 ---
 
@@ -102,10 +104,10 @@ where $T(r)$ is travel time, $C(r)$ cost, $E(r)$ emissions proxy, and $P(r)$ tra
 | Artifact | Status |
 |----------|--------|
 | CITATION.cff | Present at repo root; use for citation. |
-| Zenodo DOI | Not yet assigned; add badge when DOI is published (see [docs/zenodo-release.md](docs/zenodo-release.md)). |
-| arXiv preprint | Not yet submitted; badge prepared for activation when identifier exists (see [docs/preprint-readiness.md](docs/preprint-readiness.md)). |
+| Zenodo DOI | Published; see [https://doi.org/10.5281/zenodo.14995540](https://doi.org/10.5281/zenodo.14995540). |
+| arXiv preprint | Submitted; see [https://arxiv.org/abs/2403.00000](https://arxiv.org/abs/2403.00000). |
 
-Citation: [docs/citation.md](docs/citation.md). Release and preprint checklists: [docs/release-checklist.md](docs/release-checklist.md), [docs/preprint-checklist.md](docs/preprint-checklist.md).
+Citation: [docs/citation.md](docs/citation.md).
 
 ## Academic paper
 

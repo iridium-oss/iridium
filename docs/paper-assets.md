@@ -15,4 +15,4 @@ When a preprint or paper is prepared, assets (figures, tables, supplementary mat
 
 ## Citation
 
-If the paper is published or assigned an identifier, the repository can reference it (e.g. in README or CITATION.cff) and the arXiv/DOI badge can be activated as described in docs/badges.md and docs/preprint-checklist.md.
+If the paper is published or assigned an identifier, the repository can reference it (e.g. in README or CITATION.cff) and the arXiv/DOI badge can be added to the README.

@@ -12,12 +12,12 @@ IRIDIUM is maintained as an open source project. This document describes how the
 | Mechanism | Purpose |
 |-----------|---------|
 | GitHub releases | Versioned snapshots; trigger Zenodo archival when Zenodo is linked. |
-| Zenodo | Assigns a persistent DOI per release for formal citation. See docs/zenodo-release.md. |
+| Zenodo | Assigns a persistent DOI per release for formal citation. |
 | CITATION.cff | Enables tools and platforms to suggest citation text; used by Zenodo and others. |
 
 ## Versioning
 
-- Version is set in pyproject.toml, CITATION.cff, and .zenodo.json. When cutting a release, update all three and add an entry to CHANGELOG.md.
+- Version is set in pyproject.toml and CITATION.cff. When cutting a release, update both and add an entry to CHANGELOG.md.
 - Semantic versioning (major.minor.patch) is used. Pre-release versions (e.g. 0.2.0-dev) are not assigned a Zenodo DOI unless explicitly released as a release tag.
 
 ## What Is Archived
