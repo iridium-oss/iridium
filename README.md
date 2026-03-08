@@ -16,7 +16,7 @@
 [![Next.js](https://img.shields.io/badge/Next.js-14-000000?style=flat&logo=next.js&logoColor=white)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-18-61DAFB?style=flat&logo=react&logoColor=white)](https://reactjs.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-[![PostGIS](https://img.shields.io/badge/PostGIS-3.4-006400?style=flat&logo=postgis&logoColor=white)](https://postgis.net/)
+[![PostGIS](https://img.shields.io/badge/PostGIS-3.4-336699?style=flat&logo=postgis&logoColor=white)](https://postgis.net/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
 [![Ruff](https://img.shields.io/badge/Ruff-Linter-FCC21B?style=flat&logo=ruff&logoColor=white)](https://github.com/astral-sh/ruff)
