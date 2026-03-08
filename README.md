@@ -5,7 +5,7 @@
 [![Lint](https://img.shields.io/github/actions/workflow/status/iridium-oss/iridium/lint.yml?branch=main&logo=github-actions&logoColor=white&label=Lint)](https://github.com/iridium-oss/iridium/actions/workflows/lint.yml)
 [![Docs](https://img.shields.io/github/actions/workflow/status/iridium-oss/iridium/docs.yml?branch=main&logo=github-actions&logoColor=white&label=Docs)](https://github.com/iridium-oss/iridium/actions/workflows/docs.yml)
 [![codecov](https://codecov.io/gh/iridium-oss/iridium/branch/main/graph/badge.svg?token=IRIDIUM_TOKEN)](https://codecov.io/gh/iridium-oss/iridium)
-[![OpenSSF Best Practices](https://bestpractices.coreinfrastructure.org/projects/9999/badge)](https://bestpractices.coreinfrastructure.org/projects/9999)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/iridium-oss/iridium/badge)](https://securityscorecards.dev/viewer/?uri=github.com/iridium-oss/iridium)
 [![GitHub issues](https://img.shields.io/github/issues/iridium-oss/iridium?logo=github&logoColor=white)](https://github.com/iridium-oss/iridium/issues)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/iridium-oss/iridium?logo=github&logoColor=white)](https://github.com/iridium-oss/iridium/pulls)
 [![DOI](https://img.shields.io/badge/DOI-10.5281/zenodo.18915211-blue.svg?logo=zenodo&logoColor=white)](https://doi.org/10.5281/zenodo.18915211)
