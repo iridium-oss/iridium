@@ -8,8 +8,17 @@
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/iridium-oss/iridium)](https://github.com/iridium-oss/iridium/pulls)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18915211.svg)](https://doi.org/10.5281/zenodo.18915211)
 [![arXiv](https://img.shields.io/badge/arXiv-submit/7340933-B31B1B.svg)](https://arxiv.org/abs/submit/7340933)
-
-
+[![Python](https://img.shields.io/badge/Python-3.12+-3776AB?style=flat&logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.109+-009688?style=flat&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Next.js](https://img.shields.io/badge/Next.js-14-000000?style=flat&logo=next.js&logoColor=white)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-18-61DAFB?style=flat&logo=react&logoColor=white)](https://reactjs.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![PostGIS](https://img.shields.io/badge/PostGIS-3.4-336699?style=flat&logo=postgis&logoColor=white)](https://postgis.net/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
+[![Ruff](https://img.shields.io/badge/Ruff-Linter-FCC21B?style=flat&logo=ruff&logoColor=white)](https://github.com/astral-sh/ruff)
+[![ESLint](https://img.shields.io/badge/ESLint-Checked-4B32C3?style=flat&logo=eslint&logoColor=white)](https://eslint.org/)
+[![Prettier](https://img.shields.io/badge/Prettier-Formatted-F7B93E?style=flat&logo=prettier&logoColor=white)](https://prettier.io/)
 
 ---
 
@@ -111,7 +120,11 @@ Citation: [docs/citation.md](docs/citation.md).
 
 ## Academic paper
 
-A full manuscript package is in [paper/](paper/): **IRIDIUM: A Provenance-Aware Urban Mobility Platform for Digital Twin Assembly, Multimodal Analytics, and Federated Learning in Azerbaijani Cities**. IEEE journal LaTeX (IEEEtran); prepared for arXiv and journal submission. Contents: real-data architecture, digital twin, formalization of routing, forecasting, equity, anomaly, and FedAvg, and baseline evaluation (API semantics, data-status, latency, weather integration). Build and figure instructions: [paper/README.md](paper/README.md). arXiv: run `python paper/scripts/package_arxiv.py` to produce [paper/arxiv/](paper/arxiv/) source zip. No arXiv identifier is claimed until the preprint is submitted.
+A full manuscript package is in [paper/](paper/):
+```
+O. Y. Laitinen Imanov et al. (2026). "IRIDIUM: A Provenance-Aware Urban Mobility Platform for Digital Twin Assembly, Multimodal Analytics, and Federated Learning in Azerbaijani Cities." arXiv:submit/7340933. DOI: 10.5281/zenodo.18915211 (Released March 8, 2026).
+```
+ IEEE journal LaTeX (IEEEtran); prepared for arXiv and journal submission. Contents: real-data architecture, digital twin, formalization of routing, forecasting, equity, anomaly, and FedAvg, and baseline evaluation (API semantics, data-status, latency, weather integration). Build and figure instructions: [paper/README.md](paper/README.md). arXiv: run `python paper/scripts/package_arxiv.py` to produce [paper/arxiv/](paper/arxiv/) source zip. No arXiv identifier is claimed until the preprint is submitted.
 
 ## Repository map
 

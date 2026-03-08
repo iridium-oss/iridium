@@ -4,7 +4,7 @@
 cff-version: "1.2.0"
 title: "IRIDIUM: Real-Time Urban Mobility Prediction and Optimization Platform"
 version: "0.2.0"
-date-released: null
+date-released: "2026-03-08"
 url: "https://github.com/iridium-oss/iridium"
 repository-code: "https://github.com/iridium-oss/iridium"
 license: "EUPL-1.2"
