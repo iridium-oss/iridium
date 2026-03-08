@@ -1,0 +1,31 @@
+% ---------------------------------------------------------------
+%  Notation and Abbreviations  (IEEE IEEEdescription style)
+% ---------------------------------------------------------------
+
+\begin{IEEEdescription}[\IEEEusemathlabelsep\IEEEsetlabelwidth{$\hat{\mathbf{Y}}_{t+1:t+H}$}]
+
+\item[$G=(V,E,W)$] Directed attributed mobility graph.
+\item[$V, E$] Node set (junctions, stops, segments) and edge set.
+\item[$\mathbf{x}_v$] Node feature vector.
+\item[$\mathbf{a}_e$] Edge static attribute vector ($\ell_e$: length, $\tau_e^0$: free-flow time, $c_e$: cost, $\kappa_e$: carbon proxy).
+\item[$\mathbf{d}_e(t)$] Edge dynamic state ($s_e$: speed, $\rho_e$: occupancy, $\iota_e$: incident flag).
+\item[$\tilde{A}_{uv}$] Distance-weighted adjacency entry.
+\item[$\mathbf{X}_t$] Node feature matrix $\in\mathbb{R}^{|V|\times F}$ at time $t$.
+\item[$T,\,H$] Lookback window length; forecast horizon.
+\item[$\hat{\mathbf{Y}}_{t+1:t+H}$] Multi-step forecast output.
+\item[$f_\theta$] Parametric forecasting model (ST-GNN / heuristic).
+\item[$K,\,n_k,\,p_k$] FL client count, local dataset size, aggregation weight.
+\item[$\theta_k^{(r)}$] Client $k$ parameters after local training in round $r$.
+\item[$\varepsilon,\,\delta$] Differential privacy budget parameters.
+\item[$J(r)$] Multi-objective route disutility.
+\item[$\alpha,\beta,\gamma,\delta$] Routing weight coefficients (time, cost, emissions, penalty).
+\item[$\MES_d$] Mobility Equity Score for district $d$.
+\item[$\Delta_{\MES}$] Citywide equity gap.
+\item[$z_t$] Instantaneous anomaly z-score.
+\item[$S_t$] Composite anomaly severity score.
+\item[$\tau_S$] Anomaly detection threshold.
+\item[$\pi_s$] Source provenance record; $\Pi$: snapshot provenance list.
+\item[$\DS$] \texttt{data\_status} field (one of \texttt{live}, \texttt{recorded}, \texttt{config\_required}, \texttt{permission\_required}, \texttt{unavailable}).
+\item[$\overline{\Delta T}$] Mean Baku--Quba temperature differential.
+
+\end{IEEEdescription}

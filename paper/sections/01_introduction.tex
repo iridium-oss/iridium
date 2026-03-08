@@ -1,0 +1,135 @@
+% ---------------------------------------------------------------
+%  Section I -- Introduction
+% ---------------------------------------------------------------
+
+Urban mobility in rapidly expanding metropolitan areas is shaped by three
+interacting structural problems: peak-hour congestion that imposes measurable
+economic and environmental costs~\cite{schrank2019tti}, fragmented data
+held simultaneously by multiple operators and public agencies, and
+regulatory constraints that make centralizing raw personal traces infeasible
+in many jurisdictions.
+Effective real-time prediction and optimization require integrating
+road-network topology, sensor telemetry, transit schedules, atmospheric
+conditions, and large-scale event calendars, yet no single operator
+typically controls all of these inputs.
+
+Baku, the capital of Azerbaijan and the country's largest urban region,
+exemplifies this challenge acutely.
+The city has substantially expanded its road network over the past decade
+and is investing in an extended metro system and bus-rapid-transit corridors,
+yet public, machine-readable GTFS feeds were not available to the authors
+during preparation of the baseline release.
+Planners and travelers simultaneously need short-horizon congestion forecasts
+that can inform signal control and navigation, multimodal journey plans
+accounting for current service disruptions, equity-aware accessibility
+metrics that identify underserved districts, and incident detection that
+distinguishes genuine demand shocks from sensor faults.
+In the absence of open data feeds, any deployed platform must communicate
+its data-source status explicitly rather than silently degrading or
+substituting synthetic data.
+
+\textit{IRIDIUM} is an open-source platform that addresses this operational
+and architectural gap through four pillars.
+
+\noindent\textbf{Dynamic digital twin.}
+A directed attributed mobility graph $G=(V,E,W)$ is assembled at each
+request from all configured real sources.
+Nodes represent junctions, road segments, and transit stops; edges carry
+mode-specific travel time, monetary cost, carbon proxy, and dynamic state
+attributes.
+When a source is absent or unconfigured, the assembler returns an empty but
+validly typed payload together with an explicit status code, never a
+synthetic substitute.
+
+\noindent\textbf{Modular analytics suite.}
+A congestion forecaster targets the multi-step prediction
+$\hat{\mathbf{Y}}_{t+1:t+H} = f_\theta(\mathbf{X}_{t-T+1:t}, G)$
+via a spatio-temporal graph neural network (ST-GNN) extension point with a
+heuristic fallback for the pre-model baseline.
+A constrained shortest-path router minimizes the weighted functional
+$J(r)=\alpha T(r)+\beta C(r)+\gamma E(r)+\delta P(r)$.
+A district-level Mobility Equity Score $\MES_d=\sum_m w_m z_{d,m}$
+supports spatial justice analysis.
+A composite anomaly severity score
+$S_t = \lambda_1|z_t|+\lambda_2 e_t+\lambda_3 w_t$ fuses speed deviations
+with event and weather signals.
+
+\noindent\textbf{Federated learning pathway.}
+Operator nodes train local models on their private datasets and contribute
+parameter updates to a central aggregator following the FedAvg rule
+$\theta^{(r+1)} = \sum_k p_k\theta_k^{(r)}$~\cite{mcmahan2017fedavg}.
+The pathway supports optional $(\varepsilon,\delta)$-differential privacy
+noise calibration to protect against gradient inversion
+attacks~\cite{kairouz2021advances}.
+No federated training experiments are reported in this paper; the FL
+component is fully architected and awaits deployment of local training nodes.
+
+\noindent\textbf{Provenance-and-status protocol.}
+Every API response carries a machine-readable \texttt{data\_status} tag
+and a source provenance list $\Pi = [\pi_{s_1},\ldots,\pi_{s_K}]$
+(Eq.~\ref{eq:provenance}).
+This design ensures that downstream consumers can always determine whether
+a result is grounded in real observations and enables automated data-quality
+monitoring as new sources are activated.
+
+\subsection*{Gap Addressed}
+
+Prior work on urban mobility prediction largely relies on either simulated
+traffic generation or on proprietary datasets that are unavailable to
+independent replication~\cite{pan2019urban,yao2019revisiting,wang2020traffic}.
+Platforms built for cities in North America or Western Europe
+(METR-LA, PeMS, London TfL) benefit from mature open-data
+ecosystems~\cite{li2018dcrnn,wu2019graphwavenet} that do not yet exist
+in the South Caucasus region.
+IRIDIUM establishes a \textit{real-data stack} in which every source is
+documented with acquisition method, license, refresh cadence, and fallback
+behavior, enabling honest evaluation under partial data availability and
+incremental deployment as operator agreements and feed access become
+available.
+
+\subsection*{Contributions}
+
+The primary contributions of this paper are as follows.
+\begin{enumerate}
+  \item A precise, self-consistent mathematical formalization of the
+        mobility graph, the multi-objective routing functional,
+        the ST-GNN forecasting target, the Mobility Equity Score,
+        the composite anomaly severity score, and the FedAvg aggregation
+        step, each consistent with the implemented codebase
+        (Section~\ref{sec:formulation}).
+  \item A layered system architecture specification that makes the
+        provenance-and-status protocol a first-class citizen of
+        every API response, supported by a formal description of the
+        five-layer platform design and the state-assembly algorithm
+        (Tables~\ref{tab:layers}--\ref{tab:pipeline},
+        Section~\ref{sec:formulation}).
+  \item A real-data ingestion stack covering OpenStreetMap/PostGIS,
+        Open-Meteo, and a provider-agnostic traffic and transit
+        abstraction layer with quantified data-access status for all
+        eight registered sources
+        (Section~\ref{sec:data}).
+  \item A baseline evaluation covering API semantic correctness,
+        end-to-end response latency with fitted log-normal parameters,
+        and a real 72-hour weather time-series integration for Baku
+        and Quba, including a quantification of the persistent
+        inter-city temperature differential
+        (Sections~\ref{sec:setup}--\ref{sec:results}).
+  \item A candid, mathematically grounded accounting of all unresolved
+        operator dependencies, data-access gaps, and evaluation
+        limitations (Section~\ref{sec:limitations}).
+\end{enumerate}
+
+The IRIDIUM codebase, configuration files, and dataset documentation
+are publicly available at
+\url{https://github.com/iridium-oss/iridium}.
+
+The remainder of this paper is organized as follows.
+Section~\ref{sec:related} reviews related work.
+Section~\ref{sec:formulation} formalizes the system model.
+Section~\ref{sec:data} describes the data sources.
+Section~\ref{sec:methods} details the implemented pipeline.
+Section~\ref{sec:setup} explains the experimental setup.
+Section~\ref{sec:results} presents results.
+Section~\ref{sec:discussion} discusses implications.
+Section~\ref{sec:limitations} addresses limitations, ethics, and privacy.
+Section~\ref{sec:conclusion} concludes.

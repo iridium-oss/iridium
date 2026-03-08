@@ -1,0 +1,192 @@
+% ---------------------------------------------------------------
+%  Section IV -- Data Sources and Operational Context
+% ---------------------------------------------------------------
+
+Table~\ref{tab:providers} summarizes the complete data-provider inventory.
+Each source is characterized by its access type, refresh cadence, license
+conditions, deployment readiness in the current baseline, and participation
+in the experiments reported here.
+Table~\ref{tab:status} defines the complete vocabulary of admissible
+\texttt{data\_status} values.
+
+\subsection{Network Data}
+
+The road-network topology is obtained from OpenStreetMap via the Geofabrik
+Azerbaijan extract in Protocol Buffer Binary Format (PBF).
+A dedicated fetch script records the source URL, acquisition timestamp, and
+SHA-256 file checksum in a manifest table
+(\texttt{network\_import\_manifest}).
+A separate network-import service reads the PBF file, filters highway types
+(motorway, trunk, primary, secondary, tertiary, residential, service), and
+writes nodes and edges into PostgreSQL~16 with PostGIS~3.4.
+The schema defines \texttt{network\_nodes} (node identifier, WGS-84
+coordinates, type, mode) and \texttt{network\_edges} (source/target node
+identifiers, edge length, free-flow travel time, mode, OSM highway tag).
+The raw PBF file is not committed to the repository; it is re-fetched by the
+provided script to ensure reproducibility under the OpenStreetMap
+Open Database License (ODbL~1.0).
+Geographic scope is all of Azerbaijan; evaluation focuses on Baku
+(40.41\textdegree{}N, 49.87\textdegree{}E).
+
+\subsection{Weather}
+
+Atmospheric data are ingested from the Open-Meteo
+API~\cite{zippenfenig2023openmeteo}, which provides zero-key access for
+standard meteorological variables at hourly resolution.
+The IRIDIUM client requests current conditions and a 72-hour forward
+forecast for both Baku (40.4093\textdegree{}N, 49.8671\textdegree{}E) and
+Quba (41.3617\textdegree{}N, 48.5136\textdegree{}E).
+Variables include 2-m air temperature (°C), hourly precipitation sum
+(mm\,h$^{-1}$), cloud cover (\%), wind speed at 10\,m (m\,s$^{-1}$), and
+relative humidity at 2\,m (\%).
+Responses are normalized into internal \texttt{WeatherSnapshot} objects
+with a region identifier, an acquisition timestamp, and a data-status tag.
+On timeout or HTTP error, the snapshot carries $\DS = \texttt{unavailable}$
+with an empty field set; no synthetic weather values are substituted.
+
+\subsection{Transit}
+
+Transit data follow the General Transit Feed Specification
+(GTFS)~\cite{gtfs_overview} and its real-time extension
+(GTFS-RT)~\cite{gtfs_realtime_overview}.
+The provider registry lists Baku Metro and BakuBus as
+\emph{agreement required}: the authors did not have access to a public,
+machine-readable GTFS feed from either operator during preparation of the
+baseline release.
+Once an operator provides a feed URL and terms-of-service acceptance, the
+pipeline will ingest GTFS static schedules (stops, routes, trips,
+stop\_times) and, where offered, GTFS-RT trip updates and vehicle positions.
+In the current baseline, transit edges are absent from $G$ and all
+transit-dependent analytics report their inherited status accordingly.
+
+\subsection{Traffic}
+
+The traffic provider abstraction supports licensed real-time
+segment-speed feeds following the pattern of commercial flow APIs such as
+TomTom Traffic Flow.
+When an API key is absent or the adapter is unconfigured, the assembler
+receives $\DS = \texttt{config\_required}$ and attaches empty dynamic-state
+vectors to $G$; edge travel times fall back to free-flow estimates via
+Eq.~(\ref{eq:heuristic_forecast}).
+The abstraction interface is provider-agnostic: alternative or open-source
+speed feeds (e.g., HERE, OpenTraffic) can be registered without changing
+downstream analytics.
+
+\subsection{Telemetry}
+
+Consent-based device telemetry (GNSS traces collected via Traccar or an
+equivalent open-source GPS server) is documented in the ingestion pipeline
+for crowd-sourced speed estimation.
+The GNSS ingester validates incoming \texttt{GNSSPoint} records against a
+Pydantic schema (device identifier, POSIX timestamp, WGS-84 latitude and
+longitude, speed in m\,s$^{-1}$, heading in degrees, and horizontal
+accuracy in m) before forwarding to the digital twin assembler.
+Integration is architectural in the current release; no raw personal traces
+are stored in the repository.
+
+\subsection{Events and Energy Context}
+
+Event ingestion from public listings (iTicket, CityLife) and energy-context
+data (SOCAR, national statistics) are documented; adapters are not yet
+implemented.
+Both appear in Table~\ref{tab:providers} as documented but not yet
+implemented components.
+Event proximity $e_t$ in the anomaly severity score
+(Eq.~\ref{eq:anomaly_severity}) will be computed from event start times
+and venue coordinates once feeds are active.
+
+\subsection{Provenance and Data-Status Protocol}
+
+Every external call is wrapped by a \texttt{SourceProvenance} record:
+\begin{equation}
+  \pi_s = \bigl(\text{source\_name},\;\DS_s,\;t_s^{\text{fetch}},\;
+          h_s^{\text{sha256}}\bigr),
+  \label{eq:provenance}
+\end{equation}
+where $h_s^{\text{sha256}}$ is populated for file-based sources and null for
+streaming APIs.
+The assembled twin snapshot exposes a list
+$\Pi = [\pi_{s_1}, \ldots, \pi_{s_K}]$
+that completely characterizes the data lineage of each API response.
+The set of admissible status values and their semantics are defined in
+Table~\ref{tab:status}.
+The response-level status aggregation rule is
+\begin{equation}
+  \DS_{\mathrm{global}} =
+  \operatorname{Agg}\!\bigl(\{\DS_s : s \in \mathcal{S}_{\mathrm{req}}\}\bigr),
+  \label{eq:global_status}
+\end{equation}
+where $\mathcal{S}_{\mathrm{req}}$ denotes the sources required by a
+particular endpoint. The aggregation policy returns \texttt{live} when all
+required sources are live; \texttt{recorded} when the response can be served
+entirely from live or validated recorded inputs and at least one required
+input is recorded; \texttt{config\_required} when a required source lacks
+configuration; \texttt{permission\_required} when a required source is
+blocked by access terms; and \texttt{unavailable} otherwise.
+
+\begin{table}[t]
+\caption{Response \texttt{data\_status} vocabulary: admissible values,
+         semantics, and expected API behavior. No synthetic data are
+         returned under any non-\texttt{live} status.}
+\label{tab:status}
+\centering
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}p{3.4cm}p{4.3cm}@{}}
+\toprule
+\textbf{Status} & \textbf{Semantics and API behavior} \\
+\midrule
+\texttt{live}
+  & Source reachable; fresh data returned. Payload fields populated. \\
+\texttt{recorded}
+  & Data from a validated prior snapshot. Payload populated; timestamp
+    reflects recording time. \\
+{\footnotesize\texttt{config\_required}}
+  & Missing environment variable, credential, or local resource needed to
+    execute the adapter. Payload empty; no synthetic fallback. \\
+{\footnotesize\texttt{permission\_required}}
+  & Data-sharing agreement, license, or operator approval is needed before
+    the adapter may return data. Payload empty; no synthetic fallback. \\
+\texttt{unavailable}
+  & Source configured but temporarily unreachable or invalid at request
+    time. Payload empty; no synthetic fallback. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table*}[t]
+\caption{Data-provider inventory: access type, license, nominal refresh cadence,
+         deployment readiness in the current release, and baseline participation.
+         Runtime \texttt{data\_status} values follow Table~\ref{tab:status};
+         the labels below document the baseline release configuration.}
+\label{tab:providers}
+\centering
+\renewcommand{\arraystretch}{1.20}
+\begin{tabular}{@{}lllllcc@{}}
+\toprule
+\textbf{Source} &
+\textbf{Access type} &
+\textbf{License} &
+\textbf{Refresh} &
+\textbf{Latency} &
+\textbf{Readiness} &
+\textbf{Baseline} \\
+\midrule
+OpenStreetMap (Geofabrik AZ)
+  & Open / public  & ODbL 1.0     & Static PBF (weekly) & N/A (file) & \texttt{live}             & Yes \\
+Open-Meteo (weather)
+  & Open API       & CC BY 4.0    & Hourly forecast     & $<$\SI{500}{ms}   & \texttt{live}             & Yes \\
+TomTom Traffic Flow
+  & Licensed API   & Commercial   & Real-time ($<$60\,s) & $<$\SI{200}{ms} & agreement / config & No  \\
+Baku Metro (GTFS static)
+  & Agreement req. & Bilateral    & Daily schedule      & N/A               & agreement req.    & No  \\
+BakuBus (GTFS static + RT)
+  & Agreement req. & Bilateral    & Static + real-time  & N/A               & agreement req.    & No  \\
+Traccar (GNSS telemetry)
+  & Consent-based  & Proprietary  & Real-time (GPS)     & $<$\SI{100}{ms}   & planned           & No  \\
+iTicket (event calendar)
+  & ToS review     & Proprietary  & Daily               & N/A               & planned           & No  \\
+SOCAR (energy context)
+  & Open / TBD     & Public / TBD & Monthly             & N/A               & planned           & No  \\
+\bottomrule
+\end{tabular}
+\end{table*}

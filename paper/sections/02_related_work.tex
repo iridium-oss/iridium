@@ -1,0 +1,183 @@
+% ---------------------------------------------------------------
+%  Section II -- Related Work
+% ---------------------------------------------------------------
+
+\subsection{Federated Learning and Privacy-Aware Mobility}
+
+Federated learning~\cite{mcmahan2017fedavg} enables model training across
+distributed data holders without transmitting raw records to a central server.
+McMahan et al.\ introduced FedAvg, in which clients execute $\tau$ local
+stochastic gradient descent steps and the server aggregates parameter
+updates weighted by local sample size; this mechanism is the conceptual
+basis for the IRIDIUM FL pathway.
+Li et al.\ \cite{li2020fedprox} showed that heterogeneous client drift can
+be mitigated by adding a proximal regularization term
+$\mu/2\,\norm{\theta - \theta^{(r)}}^2$ to each client's objective.
+Li et al.\ \cite{li2020fedavg_convergence} established convergence bounds
+for FedAvg under non-IID data distributions, which is a practically
+critical condition when mobility data are partitioned by operator or
+district: for non-convex objectives, FedAvg converges at rate
+$\mathcal{O}(1/\sqrt{TK})$ under bounded gradient variance.
+Kairouz et al.\ \cite{kairouz2021advances} provide a comprehensive survey
+covering Byzantine robustness, communication compression, and differential
+privacy, all relevant to a multi-operator Azerbaijani deployment.
+Lim et al.\ \cite{lim2020federated_edge} survey FL in mobile edge networks,
+highlighting that latency constraints and device heterogeneity impose strict
+bounds on communication rounds.
+IRIDIUM positions its FL component as a fully specified architectural
+extension point awaiting local training node deployment.
+
+\subsection{Spatio-Temporal Traffic Forecasting}
+
+Short-horizon traffic forecasting has been substantially advanced by
+graph-structured deep learning.
+Li et al.\ \cite{li2018dcrnn} proposed the diffusion convolutional recurrent
+network (DCRNN), which models traffic as a bidirectional diffusion process
+on the road graph and outperforms recurrent baselines on METR-LA and
+PeMS-BAY by leveraging spatial correlations.
+Yu et al.\ \cite{yu2018stgcn} introduced spatio-temporal graph convolutional
+networks (ST-GCN) using purely convolutional temporal operations for
+faster training.
+Graph WaveNet~\cite{wu2019graphwavenet} extended the framework with
+adaptive, self-learned adjacency matrices that capture non-local dependencies
+absent from static proximity graphs.
+Guo et al.\ \cite{guo2019astgcn} added attention mechanisms over both spatial
+and temporal dimensions, yielding attention-based ST-GCN (ASTGCN) with
+improved interpretability on PEMS datasets.
+Jiang and Luo~\cite{jiang2022gnn_survey} survey graph neural networks for
+traffic forecasting comprehensively.
+The ST-GNN extension point in IRIDIUM follows Eq.~(\ref{eq:forecast})
+and Eq.~(\ref{eq:gcn}); a heuristic baseline is active until a historical
+observation store of sufficient length is assembled.
+
+\subsection{Urban Digital Twins and Transport Platforms}
+
+The concept of a city-scale digital twin is gaining traction in research
+and practice.
+Ferre-Bigorra et al.\ \cite{ferrebigorra2022urban_digital_twins} analyze
+adoption barriers including data governance and interoperability, which
+directly motivate the provenance-and-status design of IRIDIUM.
+Wan et al.\ \cite{wan2024urban_modelling_to_city_digital_twins} trace the
+transition from offline urban modelling to continuously updated digital
+twins with live sensor fusion.
+Weil et al.\ \cite{weil2023urban_digital_twin_challenges} systematically
+review challenges and sustainability requirements.
+Nag et al.\ \cite{nag2025digital_twins_transport_planning} and
+Yan et al.\ \cite{yan2023digital_twin_transport_infra} survey digital
+twin applications in transport planning and infrastructure management.
+A key distinction of IRIDIUM is that the twin is assembled dynamically from
+real configured sources at every request, rather than frozen at a
+batch-update boundary.
+
+\subsection{Multimodal Routing and Accessibility}
+
+Delling et al.\ \cite{delling2015raptor} introduced the RAPTOR algorithm
+for round-based public-transit routing, achieving practical query times
+on city-scale networks through range-based Dijkstra extensions.
+Pfertner et al.\ \cite{pfertner2023multimodal_accessibility} describe an
+open-source methodology for multimodal accessibility analysis using
+OpenTripPlanner and PostGIS.
+Graff et al.\ \cite{graff2024nomad} construct a routable, multi-cost,
+time-dependent network suitable for combined road and transit optimization.
+Gil~\cite{gil2015multimodal_osm_accessibility} builds a multimodal network
+directly from OpenStreetMap for sustainable urban accessibility analysis.
+IRIDIUM generalizes the routing objective to the weighted sum in
+Eq.~(\ref{eq:routing}), covering travel time, monetary cost, carbon
+emissions, and transfer penalties; full OpenTripPlanner integration is
+deferred until GTFS feeds are available.
+
+\subsection{Mobility Equity Measurement}
+
+Karner et al.\ \cite{karner2025transportation_equity} discuss advances and
+methodological pitfalls in measuring transportation equity, noting that
+composite indices must account for indicator selection bias and distributional
+assumptions.
+Guo et al.\ \cite{guo2020transportation_equity_overview} provide a systematic
+overview spanning accessibility, emissions, and safety dimensions.
+Martens et al.\ \cite{martens2019measuring_transport_equity_metrics} and
+Lucas et al.\ \cite{lucas2019measuring_transport_equity_book} define
+key components and metrics for transport equity measurement.
+The IRIDIUM Mobility Equity Score (Eq.~\ref{eq:mes}) is a district-level
+composite of normalized indicators reported as a derived analytic index and
+not as an official government statistic.
+
+\subsection{Anomaly Detection in Transportation}
+
+Pramanik et al.\ \cite{pramanik2022traffic_anomaly_video} employ
+spatio-temporal rough-fuzzy granulation for video-based anomaly detection
+in road surveillance.
+Hassan et al.\ \cite{hassan2019spatiotemporal_anomaly_its} address
+spatio-temporal detection in intelligent transportation systems using
+statistical and machine-learning methods.
+IRIDIUM adopts a rule-based composite severity score
+(Eq.~\ref{eq:anomaly_severity}) that fuses rolling z-scores over speed
+deviations with event-proximity and adverse-weather signals.
+
+\subsection{Comparison with Related Systems}
+
+Table~\ref{tab:related_systems} positions IRIDIUM against representative
+urban mobility and traffic forecasting platforms across six dimensions.
+The key differentiators of IRIDIUM are: (i) the strict no-synthetic-substitution
+policy enforced through a machine-readable status protocol; (ii) the
+FL architectural pathway for multi-operator privacy preservation; and
+(iii) the explicit targeting of a data-scarce, data-governance-constrained
+environment in the South Caucasus.
+
+\begin{table*}[t]
+\caption{Comparison of IRIDIUM with representative urban mobility and traffic
+         forecasting platforms. Checkmarks indicate supported or planned
+         capabilities; dashes indicate that the property is absent or
+         not applicable. \textit{Arch.} denotes an architected capability
+         not yet evaluated experimentally.}
+\label{tab:related_systems}
+\centering
+\renewcommand{\arraystretch}{1.20}
+\begin{tabular}{@{}lcccccccc@{}}
+\toprule
+\textbf{Platform} &
+\textbf{RT} &
+\textbf{FL} &
+\textbf{Prov.} &
+\textbf{OSS} &
+\textbf{Multi.} &
+\textbf{Equity} &
+\textbf{Region} &
+\textbf{Open data} \\
+\midrule
+IRIDIUM (this work)
+  & \checkmark & \checkmark$^*$ & \checkmark & \checkmark
+  & \checkmark & \checkmark & AZ & Yes \\
+DCRNN~\cite{li2018dcrnn}
+  & \checkmark & -- & -- & \checkmark
+  & -- & -- & US & Curated \\
+Graph WaveNet~\cite{wu2019graphwavenet}
+  & \checkmark & -- & -- & \checkmark
+  & -- & -- & US & Curated \\
+ASTGCN~\cite{guo2019astgcn}
+  & \checkmark & -- & -- & \checkmark
+  & -- & -- & US & Curated \\
+Urban DT~\cite{nag2025digital_twins_transport_planning}
+  & Varies & -- & Partial & Varies
+  & Varies & -- & Various & Varies \\
+OTP / Valhalla
+  & Partial & -- & -- & \checkmark
+  & \checkmark & -- & Global & GTFS/OSM \\
+FedMob~\cite{lim2020federated_edge}
+  & \checkmark & \checkmark & -- & --
+  & -- & -- & Various & Private \\
+\bottomrule
+\multicolumn{9}{@{}l@{}}{\footnotesize RT: real-time; FL: federated learning ($^*$arch.); Prov.: provenance; OSS: open-source; Multi.: multimodal; AZ: Azerbaijan.}
+\end{tabular}
+\end{table*}
+
+\subsection{Data Standards and Open Geospatial Infrastructure}
+
+GTFS~\cite{gtfs_overview} and GTFS Realtime~\cite{gtfs_realtime_overview}
+define the transit data standards that IRIDIUM targets for integration.
+OpenStreetMap provides the base road-network topology; Klinkhardt et al.\
+\cite{klinkhardt2023osm_poi_quality} assess OSM point-of-interest quality,
+while Moradi et al.\ \cite{moradi2022osm_road_quality} analyze road-network
+quality indicators relevant to routing accuracy.
+IRIDIUM fetches the Geofabrik Azerbaijan extract, stores the SHA-256 file
+checksum in a manifest table, and records full provenance for
+reproducibility.

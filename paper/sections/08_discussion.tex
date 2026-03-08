@@ -1,0 +1,93 @@
+% ---------------------------------------------------------------
+%  Section VIII -- Discussion
+% ---------------------------------------------------------------
+
+The core finding of this paper is architectural: the IRIDIUM platform
+demonstrates that a real-data urban mobility stack can be constructed
+with explicit, machine-readable provenance and data-status semantics,
+without requiring access to a complete set of operational feeds at the
+time of development or initial deployment.
+Three design decisions are central to this property, and each has
+broader implications for the design of transport data platforms in
+data-scarce environments.
+
+\textbf{Strict no-synthetic-substitution policy.}
+When a source is absent or unreachable, the assembler returns empty
+fields with a specific status code rather than populating the response
+with simulated data.
+This prevents the failure mode in which a system appears to perform well
+during testing because a synthetic fallback is indistinguishable from
+live data.
+It also means that the system is directly usable in production with
+partial data: a planner who queries the API receives an honest representation
+of what is known and what is not, enabling informed interpretation rather
+than silent overconfidence.
+
+\textbf{Composable, machine-readable provenance records.}
+The provenance list $\Pi$ in each API response (Eq.~\ref{eq:provenance})
+is versioned and structured, enabling automatic audit trails and
+incremental data-quality monitoring.
+As new sources are activated under data-sharing agreements, their
+contributions appear in $\Pi$ without requiring changes to the API schema.
+This composability property reduces the cost of incremental platform
+maturation, which is the realistic mode of development for urban data
+platforms in the Global South.
+
+\textbf{Architectural separation of concerns.}
+The analytics layer depends on the twin snapshot interface, not on
+specific data backends.
+Substituting PostgreSQL/PostGIS with an alternative graph store,
+replacing the heuristic forecaster with a trained ST-GNN, or integrating
+OpenTripPlanner for multimodal routing, requires no modifications to
+the routing, equity, or anomaly modules.
+This independence reduces the cost of each individual upgrade and limits
+the blast radius of integration failures.
+
+\textbf{Interpretation of weather results.}
+The persistent Baku--Quba temperature differential of
+$\overline{\Delta T} = 2.50\,\text{\textdegree{}C}$ reflects the expected
+superposition of orographic cooling ($\approx 3.8\,\text{\textdegree{}C}$
+at the standard lapse rate) and Caspian thermal buffering of Baku.
+This validates the multi-city API call structure and confirms that the
+Open-Meteo integration is producing physically coherent output.
+Operationally, it implies that weather-conditioned features and
+adverse-weather thresholds for anomaly severity scoring must be
+city-specific throughout Azerbaijan, not shared across regions with
+differing elevation profiles.
+The precipitation analysis confirms that live weather data can drive
+$w_t$ in Eq.~(\ref{eq:anomaly_severity}) in real-time, providing
+a weather-aware dimension to the anomaly severity score that is absent
+from purely traffic-speed-based detectors.
+
+\textbf{Comparison with related platforms.}
+Table~\ref{tab:related_systems} (Section~\ref{sec:related}) shows that
+existing ST-GNN benchmarks (DCRNN, Graph WaveNet, ASTGCN) operate on
+curated traffic datasets from mature data ecosystems that are not yet
+matched by the baseline Azerbaijani provider configuration described here.
+IRIDIUM provides the architectural scaffold on which analogous evaluations
+can be conducted once operator agreements are in place, without requiring
+a redesign of the analytics layer.
+The provenance protocol and the explicit equity-analysis layer are not
+standard components of the benchmark systems reviewed, while the federated
+learning pathway remains uncommon in urban mobility platform papers.
+
+\textbf{Significance for Azerbaijani cities.}
+At the current development stage, the practical value of IRIDIUM for
+Azerbaijani urban planning lies in three areas.
+First, the documented data stack provides a reference architecture for
+city planners who need to understand exactly which data agreements are
+required and how each feed would be used.
+Second, the OSM/PostGIS pipeline is immediately operational for network
+analysis, accessibility queries, and single-modal routing once credentials
+are obtained.
+Third, the Open-Meteo integration provides a live atmospheric input for
+anomaly severity scoring and route quality degradation warnings without
+any additional operator agreements, which is immediately deployable.
+
+\textbf{Outstanding uncertainties.}
+Forecasting accuracy under Azerbaijani traffic dynamics, routing quality
+under multimodal load, equity score calibration, and anomaly detection
+performance against a labeled incident log remain open.
+These are operational constraints of the current deployment stage,
+not architectural limitations; each has a resolution path detailed in
+Section~\ref{sec:conclusion}.

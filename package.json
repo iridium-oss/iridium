@@ -1,0 +1,22 @@
+{
+  "name": "iridium-monorepo",
+  "private": true,
+  "description": "IRIDIUM urban mobility platform - root workspace",
+  "scripts": {
+    "install:web": "cd apps/web && npm ci",
+    "dev:api": "cd apps/api && python -m uvicorn app.main:app --reload",
+    "dev:web": "cd apps/web && npm run dev",
+    "test": "npm run test:py && npm run test:web",
+    "test:py": "python -m pytest tests/ -v",
+    "test:web": "cd apps/web && npm run test -- --run",
+    "lint": "npm run lint:py && npm run lint:web",
+    "lint:py": "ruff check apps packages services scripts tests",
+    "lint:web": "cd apps/web && npm run lint",
+    "format": "npm run format:py && npm run format:web",
+    "format:py": "black apps packages services scripts tests",
+    "format:web": "cd apps/web && npm run format"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

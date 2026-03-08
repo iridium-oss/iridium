@@ -1,0 +1,5 @@
+[
+  {"segment_id": "e1", "lat": 40.4095, "lon": 49.8675, "timestamp": "2025-03-08T10:05:00Z", "speed_kmh": 27.0, "count": 15},
+  {"segment_id": "e2", "lat": 40.4102, "lon": 49.8682, "timestamp": "2025-03-08T10:05:00Z", "speed_kmh": 21.0, "count": 22},
+  {"lat": 40.4115, "lon": 49.8695, "timestamp": "2025-03-08T10:06:00Z", "speed_kmh": 19.0, "count": 8}
+]

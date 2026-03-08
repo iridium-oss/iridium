@@ -1,0 +1,6 @@
+[
+  {"segment_id": "e1", "timestamp": "2025-03-08T10:00:00Z", "speed_kmh": 28.5, "occupancy_pct": 35, "flow_count": 120, "source_id": "s1"},
+  {"segment_id": "e2", "timestamp": "2025-03-08T10:00:00Z", "speed_kmh": 22.0, "occupancy_pct": 55, "flow_count": 200, "source_id": "s1"},
+  {"segment_id": "e3", "timestamp": "2025-03-08T10:00:00Z", "speed_kmh": 18.0, "occupancy_pct": 72, "flow_count": 180, "source_id": "s2"},
+  {"segment_id": "e4", "timestamp": "2025-03-08T10:00:00Z", "speed_kmh": 32.0, "occupancy_pct": 25, "flow_count": 90, "source_id": "s1"}
+]

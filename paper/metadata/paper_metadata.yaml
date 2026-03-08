@@ -1,0 +1,18 @@
+# IRIDIUM paper metadata (March 2026)
+# Title must match main.tex \title{}
+title: "IRIDIUM: A Provenance-Aware Urban Mobility Platform for Digital Twin Assembly, Multimodal Analytics, and Federated Learning in Azerbaijani Cities"
+short_title: "IRIDIUM"
+version: "1.0"
+date: "2026-03-08"
+paper_type: "system"
+framing: "System paper with provenance-aware platform, digital twin, modular analytics, and federated learning pathway"
+contributions:
+  - "Real-data ingestion and provenance-aware digital twin assembly (OSM, Open-Meteo, provider abstraction)"
+  - "Explicit data-status semantics and no synthetic fallback in main path"
+  - "Formalization of routing, forecasting, equity, anomaly, and FedAvg for urban mobility"
+  - "Implemented baseline evaluation (API latency, data status behavior, weather integration)"
+  - "Honest documentation of limitations and operator dependencies"
+target_venues: "IEEE Transactions on Intelligent Transportation Systems; Transportation Research Part C"
+arxiv_ready: true
+build_entry: "main.tex"
+figure_source: "fig1_latency from measure_api_latency.py; fig2_temperature and fig3_precipitation from Open-Meteo API"

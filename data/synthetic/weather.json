@@ -1,0 +1,4 @@
+[
+  {"timestamp": "2025-03-08T10:00:00Z", "region_id": "baku", "temp_c": 12.5, "precipitation_mm": 0, "visibility_km": 10.0, "condition": "clear"},
+  {"timestamp": "2025-03-08T11:00:00Z", "region_id": "baku", "temp_c": 13.0, "precipitation_mm": 0, "visibility_km": 10.0, "condition": "clear"}
+]

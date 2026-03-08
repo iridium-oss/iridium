@@ -1,0 +1,104 @@
+% ---------------------------------------------------------------
+%  Section VI -- Experimental Setup
+% ---------------------------------------------------------------
+
+\subsection{Hardware and Software Environment}
+
+Experiments were conducted on a development workstation running
+Ubuntu~22.04~LTS with an Intel Core i7-12700 processor
+(8 performance cores at 3.6\,GHz boost, 4 efficiency cores at 2.7\,GHz boost,
+20\,MB L3 cache, \SI{2.1}{GHz} base clock), \SI{32}{GB} DDR5 RAM,
+and no discrete GPU.
+The IRIDIUM REST API was served via uvicorn~0.29 (single Uvicorn worker
+process on a loopback interface).
+The backend database was PostgreSQL~16.2 with PostGIS~3.4 running on the
+same machine.
+The Python runtime was version~3.12.0; the Node.js runtime for auxiliary
+tooling was version~20~LTS.
+No distributed, GPU, or cloud infrastructure was used; all latency
+measurements therefore reflect single-process, loopback-network conditions
+and represent a lower bound on production overhead.
+
+\subsection{Study Region and Coordinates}
+
+The geographic scope is the Republic of Azerbaijan.
+Two cities serve as evaluation targets.
+
+\begin{itemize}
+  \item \textit{Baku}: the capital city, located on the western Caspian Sea
+        coast at 40.41\textdegree{}N, 49.87\textdegree{}E,
+        elevation approximately \SI{28}{m}~a.s.l.
+  \item \textit{Quba}: an inland city in the northern Greater Caucasus
+        foothills at 41.36\textdegree{}N, 48.51\textdegree{}E,
+        elevation approximately \SI{610}{m}~a.s.l.
+\end{itemize}
+
+The elevation difference of $\approx\SI{582}{m}$ and the absence of a
+sea-surface thermal buffer at Quba produce a systematic temperature
+differential quantified in Section~\ref{sec:results}.
+The theoretical orographic lapse for this elevation difference, using the
+international standard atmospheric lapse rate of
+$6.5\,\text{\textdegree{}C\,km}^{-1}$, is approximately
+$0.582 \times 6.5 \approx 3.8\,\text{\textdegree{}C}$;
+the empirically observed differential is smaller due to Caspian Sea
+thermal buffering of Baku's near-surface temperatures.
+
+\subsection{Data Acquisition and Temporal Scope}
+
+Weather data were retrieved from the Open-Meteo API on the evaluation date
+(March~2026) for both cities, returning 72-hour hourly time series with a
+single compound API request.
+No historical traffic or transit dataset was available; both provider
+categories remained in \texttt{permission\_required} or
+\texttt{config\_required} state throughout the evaluation period.
+The OSM network graph was populated by running the Geofabrik fetch script
+and the network-import service on the Azerbaijan PBF extract.
+No synthetic time series, synthetic traffic, or benchmark surrogate data
+were used at any point.
+
+\subsection{Latency Measurement Protocol}
+
+End-to-end HTTP response times were measured by issuing 50 consecutive
+\texttt{GET} requests to each of three endpoints using a Python
+\texttt{requests}-library client on the loopback interface (127.0.0.1).
+Wall-clock time was recorded from the moment the request was dispatched
+to the moment the complete response body was received and decoded.
+Measurements were taken sequentially, one endpoint at a time, to avoid
+confounding due to concurrent resource contention.
+The server process was already warmed up before measurement began; no
+warm-up requests were excluded from the reported statistics.
+Reported statistics are the sample median and the 95th percentile over
+$n = 50$ observations.
+
+Each endpoint's latency distribution is modeled as log-normal with
+parameters estimated by maximum likelihood from the empirical sample:
+\begin{equation}
+  \hat{\mu}_{\ln} = \frac{1}{n}\sum_{i=1}^{n} \ln \ell_i,
+  \quad
+  \hat{\sigma}_{\ln}^2 = \frac{1}{n-1}\sum_{i=1}^{n}
+    (\ln \ell_i - \hat{\mu}_{\ln})^2,
+  \label{eq:lognormal_mle}
+\end{equation}
+where $\ell_i$ is the $i$-th observed latency in milliseconds.
+The log-normal family is a standard model for HTTP response time
+distributions~\cite{latency_lognormal}, as it captures the right-skewed
+tail arising from occasional garbage-collection pauses and TCP buffer
+flushes.
+
+\subsection{Baseline Scope and Metrics}
+
+Because trained predictive models and full network integration are not yet
+deployed, the evaluation is confined to four verifiable claims:
+\begin{enumerate}
+  \item API response correctness and \texttt{data\_status} semantic
+        conformance under both live and unconfigured source conditions.
+  \item End-to-end HTTP response latency under light single-client load.
+  \item Real weather time-series retrieval, multi-city consistency, and
+        quantification of the Baku--Quba temperature differential.
+  \item Graceful degradation: explicit status propagation and empty-but-valid
+        payloads when sources are unconfigured, with no synthetic fallback.
+\end{enumerate}
+Forecasting accuracy metrics (MAE, RMSE, MAPE, sMAPE) and routing quality
+metrics are explicitly deferred until the ST-GNN pipeline and
+OpenTripPlanner/Valhalla integration are operational with real graph tensors
+and a GTFS feed.

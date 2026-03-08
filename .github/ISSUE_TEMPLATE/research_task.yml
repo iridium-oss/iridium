@@ -1,0 +1,49 @@
+name: Research Task
+description: Document a research question, literature review, or methodology task for IRIDIUM
+title: "[Research] "
+labels: ["research"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template for research-oriented work: problem definition, literature, methodology, or evaluation.
+  - type: textarea
+    id: objective
+    attributes:
+      label: Research Objective
+      description: What is the question or goal?
+      placeholder: Clear statement of the research objective
+    validations:
+      required: true
+  - type: dropdown
+    id: type
+    attributes:
+      label: Type
+      options:
+        - Problem statement / definition
+        - Literature review
+        - Methodology design
+        - Evaluation plan or experiment
+        - Risk or limitation analysis
+        - Other
+  - type: textarea
+    id: context
+    attributes:
+      label: Context and Background
+      description: Brief background and why this matters for IRIDIUM
+    validations:
+      required: true
+  - type: textarea
+    id: deliverables
+    attributes:
+      label: Expected Deliverables
+      description: Documents, experiments, or artefacts (e.g. research/problem-statement.md, evaluation metrics)
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: Papers, reports, or links (optional)
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Notes

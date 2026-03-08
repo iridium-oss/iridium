@@ -1,0 +1,52 @@
+# IRIDIUM - Citation File Format
+# https://citation-file-format.github.io/
+
+cff-version: "1.2.0"
+title: "IRIDIUM: Real-Time Urban Mobility Prediction and Optimization Platform"
+version: "0.2.0"
+date-released: null
+url: "https://github.com/iridium-oss/iridium"
+repository-code: "https://github.com/iridium-oss/iridium"
+license: "EUPL-1.2"
+abstract: >
+  IRIDIUM is a real-time urban mobility prediction and optimization platform
+  for Azerbaijani cities, designed around federated learning, a dynamic urban
+  mobility digital twin, multimodal routing, anomaly detection, and equity-aware
+  mobility analytics. The platform uses real data sources when configured
+  (OSM, Open-Meteo, optional traffic and transit) and exposes explicit
+  data status when sources are unavailable.
+authors:
+  - family-names: "Laitinen Imanov"
+    given-names: "Olaf Yunus"
+    affiliation: "IRIDIUM Project"
+  - family-names: "Sadiqzade"
+    given-names: "Amina"
+    affiliation: "IRIDIUM Project"
+  - family-names: "Ismayilova"
+    given-names: "Malahat"
+    affiliation: "IRIDIUM Project"
+  - family-names: "Ibadullayev"
+    given-names: "Aslan"
+    affiliation: "IRIDIUM Project"
+  - family-names: "Bagirova"
+    given-names: "Fidan"
+    affiliation: "IRIDIUM Project"
+keywords:
+  - urban mobility
+  - federated learning
+  - digital twin
+  - multimodal routing
+  - anomaly detection
+  - equity
+  - Azerbaijan
+  - Baku
+  - traffic forecasting
+preferred-citation:
+  type: software
+  title: "IRIDIUM: Real-Time Urban Mobility Prediction and Optimization Platform"
+  authors:
+    - family-names: "Laitinen Imanov"
+      given-names: "Olaf Yunus"
+  url: "https://github.com/iridium-oss/iridium"
+  version: "0.2.0"
+  license: "EUPL-1.2"

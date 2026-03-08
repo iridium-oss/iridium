@@ -1,0 +1,319 @@
+% ---------------------------------------------------------------
+%  Section III -- System Architecture and Problem Formulation
+% ---------------------------------------------------------------
+
+The IRIDIUM platform is organized into five functional layers, each with a
+defined interface boundary and a set of registered data-source adapters.
+Table~\ref{tab:layers} enumerates all layers, their constituent components,
+the technology stack at the time of publication, and their deployment
+readiness.
+Table~\ref{tab:pipeline} describes the state-assembly pipeline that
+implements the merge-only provenance policy.
+These two tables replace a block-diagram representation deliberately: by
+enumerating every component together with its runtime role and readiness
+label, the architecture description becomes auditable and implementation
+proximate, consistent with the provenance-first design philosophy of
+IRIDIUM.
+
+\begin{table*}[t]
+\caption{IRIDIUM five-layer platform architecture. Each component is listed
+         with its technology stack, deployment readiness, and activation
+         state in the current release. ``Arch.'' denotes an architected
+         component not yet operationally deployed.}
+\label{tab:layers}
+\centering
+\renewcommand{\arraystretch}{1.20}
+\begin{tabular}{@{}llllcc@{}}
+\toprule
+\textbf{Layer} &
+\textbf{Component} &
+\textbf{Technology} &
+\textbf{Function} &
+\textbf{Readiness} &
+\textbf{Active} \\
+\midrule
+\multirow{7}{*}{External Sources}
+  & Road network (OSM)          & Geofabrik PBF / HTTP & Topology data       & live              & Yes \\
+  & Weather (Open-Meteo)        & REST / JSON          & Atmospheric data    & live              & Yes \\
+  & Traffic (TomTom Flow)       & Licensed REST        & Speed telemetry     & config.\ req.     & No  \\
+  & Transit (Baku Metro)        & GTFS / Agreement     & Schedule data       & perm.\ req.       & No  \\
+  & Transit (BakuBus)           & GTFS / Agreement     & Schedule data       & perm.\ req.       & No  \\
+  & Telemetry (Traccar)         & Consent-based GPS    & Crowd-sourced speed & not impl.         & No  \\
+  & Events (iTicket)            & ToS review           & Event calendar      & not impl.         & No  \\
+\midrule
+\multirow{2}{*}{Ingestion \& Validation}
+  & Schema validator            & Pydantic v2 / Python & Type-safe parsing   & live              & Yes \\
+  & Provenance recorder         & Custom Python        & Lineage tracking    & live              & Yes \\
+\midrule
+\multirow{2}{*}{Digital Twin Assembler}
+  & Graph builder               & PostgreSQL~16/PostGIS~3.4 & Topology merge & live              & Yes \\
+  & State aggregator            & Python / NetworkX   & Dynamic state merge & live (partial)    & Yes \\
+\midrule
+\multirow{5}{*}{Analytics}
+  & Congestion forecaster       & ST-GNN / heuristic  & Speed prediction    & heuristic only    & Partial \\
+  & Multi-objective router      & Dijkstra / OTP (plan.) & Path optimization & baseline only     & Partial \\
+  & Equity scorer               & NumPy               & $\MES_d$ computation & live             & Yes \\
+  & Anomaly detector            & SciPy / Python      & Severity scoring    & live              & Yes \\
+  & FL aggregator               & Flower (planned)    & FedAvg gradient agg.& arch.\ only       & No  \\
+\midrule
+\multirow{2}{*}{REST API}
+  & API server                  & FastAPI / uvicorn~0.29 & HTTP interface  & live              & Yes \\
+  & Status propagator           & Custom Python       & $\Pi$ attachment    & live              & Yes \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\begin{table*}[t]
+\caption{Digital twin state-assembly pipeline stages. Each stage produces a
+         partial snapshot merged into the global graph $G$.
+         Data-status labels propagate from acquisition through all
+         downstream stages.}
+\label{tab:pipeline}
+\centering
+\renewcommand{\arraystretch}{1.20}
+\begin{tabular}{@{}clll@{}}
+\toprule
+\textbf{Stage} & \textbf{Operation} & \textbf{Input} & \textbf{Output} \\
+\midrule
+1 & Fetch            & Source adapter  & Raw bytes or HTTP response \\
+2 & Validate         & Raw payload     & Typed Pydantic model \\
+3 & Normalize        & Pydantic model  & Internal snapshot object \\
+4 & Attach provenance& Snapshot + meta & $\pi_s$ record \\
+5 & Merge into $G$   & Partial graph   & Updated $G$ (if \texttt{live} or \texttt{recorded}) \\
+6 & Aggregate status & $\{\DS_s\}$     & $\DS_{\mathrm{global}}$ via Eq.~(\ref{eq:global_status}) \\
+7 & Emit snapshot    & $G,\,\Pi$       & JSON API response \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\subsection{Mobility Graph}
+
+Let $G = (V, E, W)$ be a directed, attributed, multi-modal graph.
+The node set
+\begin{equation}
+  V = V_\mathrm{seg} \cup V_\mathrm{jct} \cup V_\mathrm{stop}
+\end{equation}
+partitions into road segments, junctions, and transit stops.
+Each node $v \in V$ carries a feature vector
+\begin{equation}
+  \mathbf{x}_v = [\text{type},\; \text{lat},\; \text{lon},\;
+                  \text{mode}]^\top \in \mathcal{X}_v,
+\end{equation}
+where $\text{mode} \in \{\text{road, bus, metro, walking, cycling}\}$.
+Each directed edge $e = (u,v) \in E$ carries a static attribute vector
+\begin{equation}
+  \mathbf{a}_e = [\ell_e,\; \tau_e^0,\; c_e,\; \kappa_e]^\top,
+\end{equation}
+where $\ell_e$ is edge length (m), $\tau_e^0$ is free-flow travel time (s),
+$c_e$ is a generalized monetary cost (AZN), and $\kappa_e$ is a carbon
+proxy (g CO$_2$-eq).
+The optional dynamic state vector
+\begin{equation}
+  \mathbf{d}_e(t) = [s_e(t),\; \rho_e(t),\; \iota_e(t)]^\top
+\end{equation}
+carries current speed $s_e(t)$ (m\,s$^{-1}$), occupancy $\rho_e(t) \in [0,1]$,
+and incident flag $\iota_e(t) \in \{0,1\}$.
+The graph is assembled exclusively from configured real sources.
+When no network import has been executed, $V = E = \emptyset$ and the
+assembler returns $\DS = \texttt{config\_required}$.
+
+The adjacency matrix $\mathbf{A} \in \{0,1\}^{|V|\times|V|}$ has
+$A_{uv} = 1$ if $(u,v) \in E$.
+A distance-weighted variant
+\begin{equation}
+  \tilde{A}_{uv} = \exp\!\left(-\frac{\ell_{uv}^2}{\sigma_\ell^2}\right)
+  \cdot \mathbf{1}[(u,v)\in E]
+  \label{eq:adj_weighted}
+\end{equation}
+with bandwidth $\sigma_\ell$ is used by the ST-GNN layer to encode
+proximity-based spatial influence.
+
+\subsection{Forecasting Formulation}
+
+Let $\mathbf{X}_t \in \R^{|V| \times F}$ denote the node feature matrix
+at time $t$ over $F$ features (speed, occupancy, weather conditions).
+Given a lookback window of length $T$, the multi-step forecasting target is
+\begin{equation}
+  \hat{\mathbf{Y}}_{t+1:t+H} = f_\theta\!\left(
+    \mathbf{X}_{t-T+1:t},\; G\right),
+  \label{eq:forecast}
+\end{equation}
+where $H$ is the forecast horizon and $f_\theta$ is the parametric model.
+Standard regression metrics for the held-out evaluation are
+\begin{align}
+  \mathrm{MAE}  &= \frac{1}{nH}\sum_{i=1}^{n}\sum_{h=1}^{H}
+                   \left|y_{i,h} - \hat{y}_{i,h}\right|,
+                   \label{eq:mae} \\
+  \mathrm{RMSE} &= \sqrt{\frac{1}{nH}\sum_{i=1}^{n}\sum_{h=1}^{H}
+                   \left(y_{i,h} - \hat{y}_{i,h}\right)^2},
+                   \label{eq:rmse} \\
+  \mathrm{MAPE} &= \frac{100\%}{nH}\sum_{i=1}^{n}\sum_{h=1}^{H}
+                   \left|\frac{y_{i,h} - \hat{y}_{i,h}}{y_{i,h}}\right|.
+                   \label{eq:mape}
+\end{align}
+The graph convolution step in a single ST-GNN layer reads
+\begin{equation}
+  \mathbf{H}^{(\ell+1)} = \sigma\!\left(
+    \tilde{\mathbf{D}}^{-\tfrac{1}{2}}\tilde{\mathbf{A}}
+    \tilde{\mathbf{D}}^{-\tfrac{1}{2}}\,
+    \mathbf{H}^{(\ell)}\,\mathbf{\Theta}^{(\ell)}\right),
+  \label{eq:gcn}
+\end{equation}
+where $\tilde{\mathbf{A}} = \mathbf{A} + \mathbf{I}$,
+$\tilde{\mathbf{D}}$ is its degree matrix,
+$\mathbf{\Theta}^{(\ell)}$ is the trainable weight matrix for layer $\ell$,
+and $\sigma(\cdot)$ is a nonlinear activation (ReLU in the baseline
+configuration).
+The temporal dimension is handled by a gated recurrent unit (GRU) or
+dilated causal convolution applied over the sequence
+$\mathbf{H}^{(\ell)}_{t-T+1:t}$.
+
+\subsection{Federated Aggregation (Architectural)}
+
+Let there be $K$ client nodes, each holding a local dataset $\mathcal{D}_k$
+of size $n_k = |\mathcal{D}_k|$.
+The global FL objective is
+\begin{equation}
+  \min_{\theta}\; \sum_{k=1}^{K} p_k\, \mathcal{L}_k(\theta),
+  \quad p_k = \frac{n_k}{\sum_{j=1}^{K} n_j},
+  \label{eq:fl_obj}
+\end{equation}
+where
+$\mathcal{L}_k(\theta) = \E_{(\mathbf{x},y)\sim\mathcal{D}_k}
+[\ell(f_\theta(\mathbf{x}), y)]$.
+The FedAvg global update after communication round $r$ is
+\begin{equation}
+  \theta^{(r+1)} = \sum_{k=1}^{K} p_k\, \theta_k^{(r)},
+  \label{eq:fedavg}
+\end{equation}
+where $\theta_k^{(r)}$ is the parameter vector of client $k$ after $\tau$
+local gradient steps.
+Under the non-IID convergence result of Li et al.\
+\cite{li2020fedavg_convergence}, the expected gradient norm satisfies
+\begin{equation}
+  \frac{1}{R}\sum_{r=0}^{R-1}
+  \E\!\left[\norm{\nabla \mathcal{L}(\theta^{(r)})}^2\right]
+  \leq
+  \frac{2(\mathcal{L}(\theta^{(0)}) - \mathcal{L}^*)}
+       {\eta\sqrt{RTK}}
+  + \mathcal{O}\!\left(\frac{\eta\Gamma^2}{K}\right),
+  \label{eq:fl_convergence}
+\end{equation}
+where $R$ is the total number of communication rounds, $\eta$ is the
+learning rate, and $\Gamma^2$ quantifies the non-IID degree (gradient
+divergence across clients).
+The communication overhead per round scales as
+$\mathcal{O}(K \cdot |\theta|)$ bits for uncompressed transfers, reducible
+to $\mathcal{O}(K \cdot d \log b)$ for $d$-dimensional quantized updates
+with $b$ bits per coordinate~\cite{kairouz2021advances}.
+
+\subsection{Routing Objective}
+
+A route $r = (e_1, e_2, \ldots, e_L)$ is an ordered sequence of edges
+in $G$.
+The scalar disutility to minimize is
+\begin{equation}
+  J(r) = \alpha\, T(r) + \beta\, C(r) + \gamma\, E(r) + \delta\, P(r),
+  \label{eq:routing}
+\end{equation}
+where:
+$T(r) = \sum_{e \in r} \tau_e(t)$ is realized travel time (s);
+$C(r) = \sum_{e \in r} c_e$ is generalized monetary cost (AZN);
+$E(r) = \sum_{e \in r} \kappa_e \cdot \ell_e$ is the emissions proxy
+(g CO$_2$-eq); $P(r)$ is a mode-transfer or accessibility penalty;
+$\alpha, \beta, \gamma, \delta \geq 0$ are user-configurable weights with
+$\alpha + \beta + \gamma + \delta > 0$.
+The feasibility constraint enforces a maximum journey time $T_{\max}$:
+\begin{equation}
+  \sum_{e \in r} \tau_e(t) \leq T_{\max},
+  \quad r \in \mathcal{R}(o, d),
+  \label{eq:routing_constraint}
+\end{equation}
+where $\mathcal{R}(o,d)$ is the set of all paths from origin $o$ to
+destination $d$ in $G$.
+When dynamic edge state $\mathbf{d}_e(t)$ is available from a configured
+traffic provider, the realized travel time is
+$\tau_e(t) = \ell_e / s_e(t)$; otherwise,
+$\tau_e(t) = \tau_e^0$.
+The computational complexity of Dijkstra's algorithm over $G$ is
+$\mathcal{O}((|V|+|E|)\log|V|)$ with a Fibonacci heap priority queue,
+which is tractable for Baku's road graph ($|V| \approx 10^5$,
+$|E| \approx 2.5 \times 10^5$ from the OSM extract).
+
+\subsection{Mobility Equity Score}
+
+For district $d \in \mathcal{D}$ and accessibility indicator
+$m \in \{1, \ldots, M\}$, let $x_{d,m}$ denote the raw indicator value
+with empirical mean $\mu_m$ and standard deviation $\sigma_m$ over all
+$|\mathcal{D}|$ districts.
+The normalized indicator is
+\begin{equation}
+  z_{d,m} =
+  \begin{cases}
+    (x_{d,m} - \mu_m)\,/\,\sigma_m & \text{if } \sigma_m > 0, \\
+    0 & \text{otherwise,}
+  \end{cases}
+  \label{eq:zscore_district}
+\end{equation}
+and the Mobility Equity Score for district $d$ is
+\begin{equation}
+  \MES_d = \sum_{m=1}^{M} w_m\, z_{d,m},
+  \quad \text{s.t.}\;\sum_{m=1}^{M} w_m = 1,\; w_m \geq 0.
+  \label{eq:mes}
+\end{equation}
+The citywide equity gap is
+\begin{equation}
+  \Delta_{\MES} = \max_{d \in \mathcal{D}} \MES_d
+                - \min_{d \in \mathcal{D}} \MES_d,
+  \label{eq:equity_gap}
+\end{equation}
+a scalar summary of spatial inequality in mobility access.
+The variance of $\MES_d$ across districts,
+\begin{equation}
+  \mathrm{Var}(\MES) = \frac{1}{|\mathcal{D}|}
+    \sum_{d \in \mathcal{D}}\!\left(\MES_d - \overline{\MES}\right)^2,
+  \label{eq:mes_var}
+\end{equation}
+provides a complementary dispersion measure that is less sensitive to
+outlier districts than $\Delta_{\MES}$.
+
+\subsection{Anomaly Detection}
+
+Let $x_t$ be the observed scalar signal (e.g., speed on a road segment)
+at discrete time $t$.
+Over a rolling window of length $w$, compute the rolling mean and standard
+deviation:
+\begin{align}
+  \mu_{t,w}    &= \frac{1}{w}\sum_{i=0}^{w-1} x_{t-i},
+                 \label{eq:roll_mean} \\
+  \sigma_{t,w} &= \sqrt{\frac{1}{w-1}\sum_{i=0}^{w-1}
+                   (x_{t-i}-\mu_{t,w})^2}.
+                 \label{eq:roll_std}
+\end{align}
+The instantaneous z-score is
+\begin{equation}
+  z_t = \frac{x_t - \mu_{t,w}}{\sigma_{t,w} + \epsilon},
+  \label{eq:zscore_anomaly}
+\end{equation}
+where $\epsilon > 0$ prevents division by zero when the signal is constant.
+A composite anomaly severity score that fuses speed deviation, event
+proximity, and adverse weather is
+\begin{equation}
+  S_t = \lambda_1 |z_t| + \lambda_2 e_t + \lambda_3 w_t,
+  \quad \lambda_1 + \lambda_2 + \lambda_3 = 1,
+  \label{eq:anomaly_severity}
+\end{equation}
+where $e_t \in [0,1]$ encodes the temporal proximity to a scheduled large
+event and $w_t \in [0,1]$ encodes adverse weather intensity derived from
+the Open-Meteo precipitation rate.
+An anomaly is declared when $S_t > \tau_S$ for a configurable threshold
+$\tau_S$.
+Under the assumption that $z_t$ is approximately standard normal in the
+absence of anomalies, the false-positive rate at threshold $\tau_S$ is
+\begin{equation}
+  \mathrm{FPR}(\tau_S) = 2\left(1 - \Phi(\tau_S / \lambda_1)\right),
+  \label{eq:fpr}
+\end{equation}
+where $\Phi(\cdot)$ is the standard normal CDF.
+For $\lambda_1 = 1$ (speed-only mode) and $\tau_S = 2.5$,
+$\mathrm{FPR} \approx 1.24\%$ per time step.

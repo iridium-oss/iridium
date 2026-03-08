@@ -1,0 +1,11 @@
+{
+  "paper_version": "1.0",
+  "date": "2026-03-08",
+  "figures": [
+    {"id": "fig1_latency", "file": "figures/fig1_latency.pdf", "source": "measure_api_latency.py (repo script)", "description": "API response latency violin and ECDF"},
+    {"id": "fig2_temperature", "file": "figures/fig2_temperature.pdf", "source": "Open-Meteo API", "description": "72-hour Baku vs Quba temperature"},
+    {"id": "fig3_precipitation", "file": "figures/fig3_precipitation.pdf", "source": "Open-Meteo API", "description": "72-hour Baku precipitation"}
+  ],
+  "tables": ["Response latency (Results)", "Notation summary (Appendix)", "Data source status (Appendix)", "Evaluation metrics (Appendix)"],
+  "results_traceability": "API behavior and data-status from implemented endpoints; weather from Open-Meteo. No fabricated metrics."
+}

@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "iridium-network-import"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = ["iridium-schemas", "psycopg2-binary>=2.9", "pyosmium>=3.6"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+packages = ["network_import"]

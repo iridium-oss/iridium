@@ -1,0 +1,10 @@
+* text=auto eol=lf
+*.{cmd,[cC][mM][dD]} text eol=crlf
+*.{bat,[bB][aA][tT]} text eol=crlf
+*.py text diff=python
+*.md text diff=markdown
+*.yml text
+*.yaml text
+*.json text
+*.sh text
+LICENSE text

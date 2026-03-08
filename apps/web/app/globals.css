@@ -1,0 +1,84 @@
+@import "@fontsource-variable/google-sans";
+
+:root {
+  --font-google-sans: "Google Sans Variable", system-ui, sans-serif;
+  /* Midnight Magic palette */
+  --midnight-black: #02010a;
+  --midnight-prussian: #04052e;
+  --midnight-twilight: #140152;
+  --midnight-navy: #22007c;
+  --midnight-electric: #0d00a4;
+  /* Surfaces (dark default) */
+  --surface-deepest: #02010a;
+  --surface-dark: #04052e;
+  --surface-card: rgba(20, 1, 82, 0.6);
+  --surface-elevated: rgba(34, 0, 124, 0.4);
+  --surface-border: rgba(255, 255, 255, 0.08);
+  /* Accents */
+  --accent-luminous: rgba(138, 100, 255, 0.9);
+  --accent-focus: #0d00a4;
+  --accent-muted: rgba(138, 100, 255, 0.5);
+  --accent-glow: rgba(138, 100, 255, 0.15);
+  /* Text */
+  --text-primary: rgba(255, 255, 255, 0.95);
+  --text-secondary: rgba(255, 255, 255, 0.78);
+  --text-muted: rgba(255, 255, 255, 0.55);
+  /* Radius */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  /* Shadows */
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.25);
+  --shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.35);
+  /* Success, warning, error (palette-calibrated) */
+  --color-success: #4ade80;
+  --color-warning: #fbbf24;
+  --color-error: #f87171;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-google-sans);
+  background: var(--surface-deepest);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Material Symbols - load from Google Fonts */
+.material-symbols-outlined {
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+  user-select: none;
+}
+
+/* Focus ring */
+:focus-visible {
+  outline: 2px solid var(--accent-focus);
+  outline-offset: 2px;
+}
+
+/* Selection */
+::selection {
+  background: var(--midnight-electric);
+  color: white;
+}

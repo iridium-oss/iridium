@@ -1,0 +1,112 @@
+% IRIDIUM: Provenance-Aware Urban Mobility Platform
+% IEEE Transactions on Intelligent Transportation Systems (T-ITS)
+% Build: pdflatex -> bibtex -> pdflatex -> pdflatex
+\documentclass[journal]{IEEEtran}
+
+% ------------------------------------------------------------------
+% Packages
+% ------------------------------------------------------------------
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\graphicspath{{./figures/}}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage{cite}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\hypersetup{hidelinks}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{algorithm}
+\usepackage{siunitx}
+\usepackage{algpseudocode}
+
+% ------------------------------------------------------------------
+% Custom commands
+% ------------------------------------------------------------------
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\MES}{\mathrm{MES}}
+\newcommand{\DS}{\mathtt{status}}
+
+% ------------------------------------------------------------------
+% Suppress spurious small-caps-italic substitution warning for all sizes
+\DeclareFontShape{T1}{ptm}{m}{scit}
+  {<5><6><7><8><9><10><10.95><12><14.4><17.28><20.74><24.88>sub * ptm/m/it}{}
+
+\begin{document}
+
+\title{IRIDIUM: A Provenance-Aware Urban Mobility Platform for
+       Digital Twin Assembly, Multimodal Analytics, and Federated
+       Learning in Azerbaijani Cities}
+
+\input{metadata/authors}
+
+\maketitle
+
+\begin{abstract}
+\input{abstract}
+\end{abstract}
+
+\begin{IEEEkeywords}
+Urban mobility, digital twin, provenance, multimodal routing,
+traffic analytics, anomaly detection, federated learning, OpenStreetMap.
+\end{IEEEkeywords}
+
+\section*{Notation and Abbreviations}
+\input{sections/00_notation}
+
+\section{Introduction}
+\label{sec:intro}
+\input{sections/01_introduction}
+
+\section{Related Work}
+\label{sec:related}
+\input{sections/02_related_work}
+
+\section{System Architecture and Problem Formulation}
+\label{sec:formulation}
+\input{sections/03_system_and_problem_formulation}
+
+\section{Data Sources and Operational Context}
+\label{sec:data}
+\input{sections/04_data_and_operational_context}
+
+\section{Methods}
+\label{sec:methods}
+\input{sections/05_methods}
+
+\section{Experimental Setup}
+\label{sec:setup}
+\input{sections/06_experimental_setup}
+
+\section{Results}
+\label{sec:results}
+\input{sections/07_results}
+
+\section{Discussion}
+\label{sec:discussion}
+\input{sections/08_discussion}
+
+\section{Limitations, Ethics, and Privacy}
+\label{sec:limitations}
+\input{sections/09_limitations_ethics_and_privacy}
+
+\section{Conclusion}
+\label{sec:conclusion}
+\input{sections/10_conclusion}
+
+\appendices
+\section{Evaluation Tables}
+\input{sections/appendix}
+
+\input{metadata/acknowledgements}
+
+\bibliographystyle{IEEEtran}
+\bibliography{refs/references}
+
+\end{document}

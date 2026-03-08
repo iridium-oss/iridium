@@ -1,0 +1,33 @@
+Urban mobility platforms in data-scarce settings must integrate heterogeneous
+real-world feeds while preserving transparent provenance and avoiding
+synthetic fallbacks. This paper presents \textit{IRIDIUM}, a
+provenance-aware urban mobility platform for Azerbaijani cities, with Baku
+as the baseline deployment case. IRIDIUM constructs a request-time digital
+twin of the transport network from configured sources, attaches per-source
+provenance to every response, and exposes a machine-readable
+\texttt{data\_status} field indicating whether returned content is
+\texttt{live}, \texttt{recorded}, \texttt{config\_required},
+\texttt{permission\_required}, or \texttt{unavailable}. On top of this
+twin, the platform defines modular services for congestion forecasting,
+multi-objective routing, district-level mobility equity scoring, anomaly
+detection, and a federated-learning extension path for privacy-preserving
+model training.
+
+The paper formalizes the mobility graph, routing objective,
+spatio-temporal forecasting target, equity score, anomaly severity
+function, and FedAvg aggregation rule. The current implementation
+integrates OpenStreetMap through a PostgreSQL~16/PostGIS~3.4 backend and
+ingests live Open-Meteo observations for Baku and Quba; traffic and transit
+adapters are registered but remain inactive in the baseline configuration.
+Evaluation focuses on three verifiable aspects: API semantics, end-to-end
+response latency, and real weather integration. Across $n=50$ loopback
+requests per endpoint, median latencies were \SI{2}{ms} for
+\texttt{/health}, \SI{45}{ms} for \texttt{/network/graph}, and
+\SI{55}{ms} for \texttt{/forecast/congestion}. The weather pipeline
+captured a mean Baku--Quba temperature differential of
+$\overline{\Delta T} = 2.50 \pm 0.82$\,\textdegree{}C and approximately
+16\,mm cumulative precipitation over 72 hours in Baku. Forecasting
+accuracy and multimodal-routing benchmarks are intentionally deferred until
+traffic histories and transit-feed agreements become available. These
+results position IRIDIUM as a transparent baseline architecture for urban
+mobility analytics under partial data availability.

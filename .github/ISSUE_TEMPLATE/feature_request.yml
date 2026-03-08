@@ -1,0 +1,48 @@
+name: Feature Request
+description: Propose a new feature or enhancement for IRIDIUM
+title: "[Feature] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the feature and how it fits the project. Be specific and avoid vague or marketing language.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: What problem does this feature solve?
+      placeholder: As a ... I need ... so that ...
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed Solution
+      description: Describe the feature and expected behaviour
+      placeholder: Clear description of the proposed change
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Other approaches you have considered (optional)
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Primary area of the codebase this affects
+      options:
+        - Backend / APIs
+        - Frontend
+        - Models / ML
+        - Data contracts / Ingestion
+        - Documentation
+        - DevOps / CI
+        - Other
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Links to docs, related issues, or constraints (e.g. privacy, performance)

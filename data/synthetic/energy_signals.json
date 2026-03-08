@@ -1,0 +1,4 @@
+[
+  {"zone_id": "grid_1", "timestamp": "2025-03-08T10:00:00Z", "price_per_kwh": 0.08, "capacity_fraction": 0.85},
+  {"zone_id": "grid_1", "timestamp": "2025-03-08T11:00:00Z", "price_per_kwh": 0.09, "capacity_fraction": 0.82}
+]

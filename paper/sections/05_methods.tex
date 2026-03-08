@@ -1,0 +1,187 @@
+% ---------------------------------------------------------------
+%  Section V -- Methods
+% ---------------------------------------------------------------
+
+\subsection{Ingestion and Validation}
+
+All external inputs are validated against Pydantic~v2 schemas before
+downstream processing.
+Four schema families are defined and enforced at the ingestion boundary:
+\begin{itemize}
+  \item \textit{SensorEvent}: device identifier, ISO-8601 timestamp,
+        event type enumeration, payload dictionary (typed), and optional
+        WGS-84 coordinates.
+  \item \textit{GNSSPoint}: device identifier, POSIX timestamp, WGS-84
+        latitude and longitude, speed (m\,s$^{-1}$), heading (degrees),
+        and horizontal accuracy (m).
+  \item \textit{WeatherSnapshot}: region identifier, acquisition timestamp,
+        temperature (°C), precipitation (mm\,h$^{-1}$), wind speed
+        (m\,s$^{-1}$), relative humidity (\%), and data status.
+  \item \textit{PublicEvent}: event identifier, venue coordinates,
+        ISO-8601 start and end timestamps, and estimated attendance.
+\end{itemize}
+Validation failures are logged with the offending field, the expected type,
+and the received value; invalid records are discarded without halting the
+pipeline.
+Provenance records $\pi_s$ (Eq.~\ref{eq:provenance}) are attached immediately
+after successful validation and before the merge step.
+File-based ingestion from configured directories supports validated real
+snapshots for reproducible offline evaluation; synthetic directories are
+not used in any application-level code path.
+
+\subsection{Digital Twin State Assembly}
+
+Algorithm~\ref{alg:assembly} formalizes the assembler.
+The assembler follows a merge-only policy: it attempts each configured source
+in priority order and attaches the result (populated payload or empty payload
+with an explicit status tag) to the snapshot provenance list $\Pi$.
+No synthetic data is injected at any step, and no source output is
+silently suppressed.
+
+\begin{algorithm}[t]
+\caption{Digital Twin State Assembly}
+\label{alg:assembly}
+\begin{algorithmic}[1]
+\Require Configured source list $\mathcal{S}$, request timestamp $t$
+\Ensure Snapshot $(G, t, \DS_{\mathrm{global}}, \Pi)$
+
+\State $G \leftarrow (V{=}\emptyset,\; E{=}\emptyset,\; W{=}\emptyset)$;\;
+       $\Pi \leftarrow [\;]$
+\For{each source $s \in \mathcal{S}$ in priority order}
+  \State $(\mathrm{data}_s,\; \DS_s) \leftarrow \textsc{Fetch}(s, t)$
+  \Comment{Returns empty + status on timeout}
+  \If{$\DS_s \in \{\texttt{live},\, \texttt{recorded}\}$}
+    \State $G \leftarrow \textsc{Merge}(G,\; \mathrm{data}_s)$
+    \Comment{Merge graph and dynamic state}
+  \EndIf
+  \State $\Pi \mathrel{+}= (s.\mathrm{name},\;\DS_s,\;t,\;\mathrm{checksum}(s))$
+\EndFor
+\State $\DS_{\mathrm{global}} \leftarrow \textsc{Aggregate}(\{\DS_s : s \in \mathcal{S}\})$
+       \Comment{Rule: Eq.~(\ref{eq:global_status})}
+\State \Return $(G,\; t,\; \DS_{\mathrm{global}},\; \Pi)$
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Forecasting Baseline}
+
+The forecasting module consumes the assembled snapshot $(G, t, \DS, \Pi)$.
+In the heuristic baseline (active in the current release), the predicted
+speed on edge $e$ at look-ahead $h$ time steps is
+\begin{equation}
+  \hat{s}_e(t+h) =
+  \begin{cases}
+    s_e(t) \cdot g(h) & \text{if } \DS_{\mathrm{traffic}} = \texttt{live}, \\
+    s_e^0             & \text{otherwise,}
+  \end{cases}
+  \label{eq:heuristic_forecast}
+\end{equation}
+where $g(h) = e^{-\mu h}$ is an exponential decay towards free-flow speed
+with decay rate $\mu > 0$ and $s_e^0 = \ell_e / \tau_e^0$ is the free-flow
+speed.
+The response inherits $\DS$ from the twin, ensuring that downstream consumers
+can detect degraded input quality at any horizon.
+
+The ST-GNN extension point follows Eqs.~(\ref{eq:forecast})--(\ref{eq:gcn}).
+Training will proceed via mini-batch stochastic gradient descent on
+$\mathcal{L}(\theta) = \mathrm{MAE}(\hat{\mathbf{Y}}, \mathbf{Y})$ with
+the Adam optimizer (learning rate $\eta = 10^{-3}$, weight decay
+$\lambda_w = 10^{-4}$, batch size $B = 64$) once a historical observation
+store of sufficient length is assembled.
+Table~\ref{tab:hyperparams} summarizes the target hyperparameter
+configuration for the ST-GNN training phase.
+
+\begin{table}[t]
+\caption{Target hyperparameter configuration for the ST-GNN training phase.
+         No training results are reported in the current release; these
+         values define the planned experimental protocol.}
+\label{tab:hyperparams}
+\centering
+\renewcommand{\arraystretch}{1.20}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Hyperparameter} & \textbf{Symbol} & \textbf{Value} \\
+\midrule
+Lookback window        & $T$           & 12 steps (1 h at 5-min polling) \\
+Forecast horizon       & $H$           & 12 steps (1 h ahead) \\
+GNN hidden channels    & $d_h$         & 64 \\
+GNN depth              & $L$           & 3 layers \\
+Adjacency bandwidth    & $\sigma_\ell$ & \SI{500}{m} \\
+GRU hidden size        & $d_\mathrm{gru}$ & 64 \\
+Optimizer              & --            & Adam \\
+Learning rate          & $\eta$        & $10^{-3}$ \\
+Weight decay           & $\lambda_w$   & $10^{-4}$ \\
+Batch size             & $B$           & 64 graphs \\
+Maximum epochs         & --            & 100 \\
+Early stopping patience& --            & 10 epochs \\
+Train / val / test split & --          & 70\,/\,10\,/\,20\,\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Routing}
+
+The routing service solves Eq.~(\ref{eq:routing}) subject to
+Eq.~(\ref{eq:routing_constraint}) over the assembled graph $G$.
+When $G$ is empty or incomplete due to unconfigured sources, the service
+returns a minimal response with the inherited data status and an explanatory
+message in the \texttt{message} field.
+The preference vector $[\alpha, \beta, \gamma, \delta]$ is accepted per
+request; the default configuration minimizes travel time only
+($\alpha=1$, $\beta=\gamma=\delta=0$).
+OpenTripPlanner and Valhalla will realize full multi-modal routing once
+GTFS feeds are available; the routing-engine abstraction layer
+ensures that switching backends does not affect the upstream API contract
+or the provenance protocol.
+
+\subsection{Equity Computation}
+
+The equity service reads district-level data from a path configured by
+the environment variable \texttt{EQUITY\_DATA\_PATH}.
+Each record in the \texttt{district\_scores.json} file provides indicator
+values $\{x_{d,m}\}_{d,m}$.
+The service computes $z_{d,m}$ via Eq.~(\ref{eq:zscore_district}),
+the composite $\MES_d$ via Eq.~(\ref{eq:mes}), the equity gap
+$\Delta_{\MES}$ via Eq.~(\ref{eq:equity_gap}), and the equity dispersion
+$\mathrm{Var}(\MES)$ via Eq.~(\ref{eq:mes_var}).
+The API response includes $\MES_d$ for all districts, $\Delta_{\MES}$,
+$\mathrm{Var}(\MES)$, and a ranked list of the five least- and
+most-accessible districts.
+When \texttt{EQUITY\_DATA\_PATH} is not set, the service returns
+$\DS = \texttt{unavailable}$ and empty payload fields.
+
+\subsection{Anomaly Detection}
+
+The anomaly pipeline evaluates Eq.~(\ref{eq:zscore_anomaly}) over edge-speed
+signals using a configurable rolling window ($w = 12$ steps by default,
+corresponding to one hour at five-minute polling intervals).
+Severity is computed via Eq.~(\ref{eq:anomaly_severity}) when event and
+weather signals are available; if not, the severity reduces to
+$S_t = |z_t|$ (i.e., $\lambda_1 = 1$, $\lambda_2 = \lambda_3 = 0$).
+The false-positive rate estimate (Eq.~\ref{eq:fpr}) is included in each
+anomaly response to enable threshold calibration by operators.
+Detected anomalies are labeled with: type (speed deviation, occupancy
+spike, provider alert), severity
+(\texttt{low}\,/\,\texttt{medium}\,/\,\texttt{high}\,/\,\texttt{critical}),
+confidence (derived from Eq.~\ref{eq:fpr} at threshold $\tau_S$),
+affected geography (edge set or bounding box), and source family
+(\texttt{observed}, \texttt{inferred}, \texttt{provider-reported}).
+
+\subsection{Federated Learning Path}
+
+The FL pathway is specified in terms of communication rounds $r=1,\ldots,R$,
+local epoch count $\tau$, and the FedAvg update rule (Eq.~\ref{eq:fedavg}).
+Privacy amplification via local differential privacy is applied by clipping
+client gradients to $\ell_2$ norm $C$ and adding calibrated Gaussian noise
+$\mathcal{N}(\mathbf{0},\; \sigma_{\mathrm{dp}}^2 C^2 \mathbf{I})$
+before aggregation, with the privacy budget characterized by
+$(\varepsilon,\delta)$-DP~\cite{kairouz2021advances}.
+The noise level satisfies
+\begin{equation}
+  \sigma_{\mathrm{dp}} \geq
+  \frac{C\sqrt{2\ln(1.25/\delta)}}{\varepsilon \sqrt{n_k}},
+  \label{eq:dp_noise}
+\end{equation}
+where $n_k$ is the number of local training samples used per round.
+Flower or an equivalent FL orchestration framework is planned for
+deployment; no federated training or aggregation experiments are reported
+in this paper.

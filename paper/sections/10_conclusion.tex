@@ -1,0 +1,67 @@
+% ---------------------------------------------------------------
+%  Section X -- Conclusion
+% ---------------------------------------------------------------
+
+We presented IRIDIUM, a provenance-aware urban mobility platform for
+Azerbaijani cities that unifies a real-data dynamic digital twin
+$G=(V,E,W)$, a modular analytics suite, and a federated learning pathway
+under a strict no-synthetic-substitution policy.
+Every API response carries a machine-readable \texttt{data\_status} field
+and a provenance list $\Pi$ that completely characterizes the data lineage
+of the result.
+The mathematical formulations for multi-objective routing
+(Eq.~\ref{eq:routing}), ST-GNN forecasting
+(Eqs.~\ref{eq:forecast}--\ref{eq:gcn}), Mobility Equity Score
+(Eqs.~\ref{eq:mes}--\ref{eq:mes_var}), anomaly severity
+(Eqs.~\ref{eq:anomaly_severity}--\ref{eq:fpr}),
+FedAvg aggregation (Eq.~\ref{eq:fedavg}), and federated convergence
+(Eq.~\ref{eq:fl_convergence}) are fully specified and consistent with
+the implemented codebase, enabling future work to instantiate each
+component without ambiguity.
+
+Baseline evaluation confirmed API semantic correctness, graceful
+degradation under unconfigured sources, end-to-end latency of
+2--55\,ms (median) under light load, and successful real weather
+integration for Baku and Quba.
+The empirically measured temperature differential of
+$\overline{\Delta T} = 2.50 \pm 0.82\,\text{\textdegree{}C}$ is
+consistent with the expected superposition of orographic lapse
+($\approx 3.8\,\text{\textdegree{}C}$ for the \SI{582}{m} elevation
+difference) and Caspian Sea thermal buffering, confirming that multi-city
+atmospheric data are both retrievable and physically coherent.
+Three precipitation events were identified in the 72-hour Baku series,
+yielding approximately 16\,mm cumulative precipitation and confirming
+the operational readiness of the weather input for anomaly severity scoring.
+
+Realistic next steps, in priority order, are as follows.
+
+\begin{enumerate}
+  \item Validating the OSM network import on the full Azerbaijan PBF
+        extract, verifying routing on representative Baku
+        origin-destination pairs, and benchmarking Dijkstra-based routing
+        latency against production load targets.
+  \item Negotiating GTFS static and GTFS-RT data-sharing agreements with
+        Baku Metro and BakuBus to enable multimodal routing and
+        transit-aware congestion forecasting.
+  \item Integrating a licensed or open traffic-speed feed to activate
+        dynamic edge state $\mathbf{d}_e(t)$ and evaluating the heuristic
+        forecaster and the ST-GNN (Table~\ref{tab:hyperparams}) against
+        held-out observations, reporting MAE, RMSE, MAPE, and sMAPE
+        (Eqs.~\ref{eq:mae}--\ref{eq:mape}).
+  \item Assembling a district-level accessibility indicator dataset for
+        Baku and evaluating $\MES_d$ and $\Delta_{\MES}$ against external
+        benchmarks, with sensitivity analysis over indicator weights $w_m$.
+  \item Deploying the federated learning pathway with local training nodes
+        at partner operator sites and characterizing convergence
+        (Eq.~\ref{eq:fl_convergence}) and the privacy-utility trade-off
+        (Eq.~\ref{eq:dp_noise}) empirically.
+\end{enumerate}
+
+The repository, mathematical specification, provider inventory, and
+data-status protocol presented in this paper constitute a transparent,
+auditable foundation for these extensions, without overclaiming the
+current maturity of the system.
+The platform design is intended to serve both as a practical baseline
+for Azerbaijani mobility deployments and as a reproducible reference
+architecture for urban mobility systems operating in data-scarce,
+governance-constrained environments.

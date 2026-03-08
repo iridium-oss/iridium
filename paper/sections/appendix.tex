@@ -1,0 +1,70 @@
+% ---------------------------------------------------------------
+%  Appendix -- Evaluation Metric Definitions and API Reference
+% ---------------------------------------------------------------
+
+\subsection{Forecasting Evaluation Metric Definitions}
+
+Table~\ref{tab:metrics} provides complete definitions of the forecasting
+evaluation metrics.
+All four metrics will be reported when the ST-GNN component is evaluated
+on held-out observations; none are reported in the current manuscript
+because no trained model has been run against real traffic data.
+
+\begin{table}[t]
+\caption{Forecasting evaluation metric definitions.
+         Multi-horizon variants sum over sample index $i$ and horizon $h$.}
+\label{tab:metrics}
+\centering
+\renewcommand{\arraystretch}{1.30}
+\begin{tabular}{@{}lp{5.5cm}@{}}
+\toprule
+\textbf{Metric} & \textbf{Definition} \\
+\midrule
+MAE
+  & $\displaystyle\frac{1}{nH}\sum_{i=1}^{n}\sum_{h=1}^{H}
+    |y_{i,h}-\hat{y}_{i,h}|$ \\[8pt]
+RMSE
+  & $\displaystyle\sqrt{\frac{1}{nH}\sum_{i=1}^{n}\sum_{h=1}^{H}
+    (y_{i,h}-\hat{y}_{i,h})^2}$ \\[8pt]
+MAPE
+  & $\displaystyle\frac{100\%}{nH}\sum_{i=1}^{n}\sum_{h=1}^{H}
+    \left|\frac{y_{i,h}-\hat{y}_{i,h}}{y_{i,h}}\right|$,\quad
+    $y_{i,h}\neq 0$ \\[8pt]
+sMAPE
+  & $\displaystyle\frac{200\%}{nH}\sum_{i,h}
+    \frac{|y_{i,h}-\hat{y}_{i,h}|}{|y_{i,h}|+|\hat{y}_{i,h}|}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{REST API Endpoint Reference}
+
+Table~\ref{tab:endpoints} lists all REST endpoints implemented in the
+current release, their HTTP methods, primary data-status paths, and
+provenance-list content.
+
+\begin{table}[t]
+\caption{REST API endpoint reference. All endpoints return JSON with a
+         \texttt{data\_status} field and a \texttt{source\_provenance}
+         list following Table~\ref{tab:status}.}
+\label{tab:endpoints}
+\centering
+\renewcommand{\arraystretch}{1.20}
+{\scriptsize
+\begin{tabular}{@{}p{3.5cm}lll@{}}
+\toprule
+\textbf{Endpoint} &
+\textbf{Meth.} &
+\textbf{Status path} &
+\textbf{Provenance} \\
+\midrule
+\texttt{/health}                   & GET & Always ok       & None \\
+\texttt{/api/v1/network/graph}     & GET & live/cfg.\ req. & OSM, wx, traf. \\
+\texttt{/api/v1/forecast/cong.}    & GET & From twin       & All sources \\
+\texttt{/api/v1/route}             & GET & From twin       & All sources \\
+\texttt{/api/v1/equity/scores}     & GET & live/unavail.   & Equity path \\
+\texttt{/api/v1/anomalies}         & GET & live/unavail.   & Traf., wx \\
+\bottomrule
+\end{tabular}
+}
+\end{table}

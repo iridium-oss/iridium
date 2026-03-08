@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "iridium-schemas"
+version = "0.1.0"
+description = "Shared data contracts and Pydantic schemas for IRIDIUM"
+requires-python = ">=3.12"
+dependencies = ["pydantic>=2.5.0"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+packages = ["iridium_schemas"]

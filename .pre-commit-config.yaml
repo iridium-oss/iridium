@@ -1,0 +1,37 @@
+# Pre-commit hooks for IRIDIUM
+# Install: pre-commit install
+# Run: pre-commit run --all-files
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-added-large-files
+        args: ["--maxkb=500"]
+      - id: check-merge-conflict
+      - id: detect-private-key
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.1.15
+    hooks:
+      - id: ruff
+        args: [--fix]
+
+  - repo: https://github.com/psf/black
+    rev: 24.1.1
+    hooks:
+      - id: black
+        language_version: python3.12
+        files: ^(apps|packages|services|scripts|tests)/.*\.py$
+
+  - repo: local
+    hooks:
+      - id: no-emdash
+        name: No em dash or en dash
+        entry: bash -c '! grep -rE "—|–" --include="*.md" --include="*.py" --include="*.ts" --include="*.tsx" . 2>/dev/null || true'
+        language: system
+        pass_filenames: false

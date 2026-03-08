@@ -1,0 +1,14 @@
+# LaTeX build artifacts
+main.aux
+main.bbl
+main.blg
+main.log
+main.out
+main.tex.tmp
+*.synctex.gz
+
+# Output PDF (optional; remove if you want to track main.pdf)
+# main.pdf
+
+# arXiv zip (regenerate with scripts/package_arxiv.py)
+arxiv/*.zip

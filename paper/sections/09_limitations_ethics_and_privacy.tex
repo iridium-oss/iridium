@@ -1,0 +1,107 @@
+% ---------------------------------------------------------------
+%  Section IX -- Limitations, Ethics, and Privacy
+% ---------------------------------------------------------------
+
+\subsection{Data Access and Operator Dependencies}
+
+The most significant practical limitation is the absence of machine-readable
+transit feeds for Baku Metro and BakuBus.
+Both operators would need to provide GTFS static schedules and, ideally,
+GTFS-RT trip updates under a formal data-sharing agreement before IRIDIUM
+can offer production-quality multimodal journey planning.
+Traffic data require a commercial license and an API key; without these,
+dynamic edge state $\mathbf{d}_e(t)$ is absent and routing falls back to
+free-flow estimates via Eq.~(\ref{eq:heuristic_forecast}).
+Event and energy pipelines are documented but lack implemented adapters;
+both appear in Table~\ref{tab:providers} with \texttt{not\_impl.}\ status.
+Consent-based GNSS telemetry depends on Traccar deployment, device enrollment,
+and informed consent from participants.
+As a result, the current evaluation can confirm only OSM network ingestion
+and Open-Meteo weather integration; claims about forecasting accuracy,
+multimodal routing quality, equity scores, and anomaly detection performance
+remain deferred pending resolution of these dependencies.
+
+\subsection{Evaluation Scope and Generalizability}
+
+The absence of trained predictive models means that no comparison against
+published ST-GNN benchmarks (DCRNN, ST-GCN, Graph WaveNet, ASTGCN)
+can be provided at this stage.
+Response-latency measurements (Section~\ref{sec:results}) were obtained
+on a loopback interface under zero concurrent load and represent a lower
+bound on production latency; production deployments will experience
+additional overhead from network round-trips, PostgreSQL replication,
+connection pooling, and concurrent request handling.
+All hyperparameters in Table~\ref{tab:hyperparams} are design targets
+rather than experimentally validated values.
+
+\subsection{Mobility Equity Score: Bias and Scope Limitations}
+
+The $\MES_d$ (Eq.~\ref{eq:mes}) is sensitive to indicator selection,
+district boundary definitions, and spatial data coverage.
+Under-coverage of informal settlements or peripheral areas can bias
+normalized indicators $z_{d,m}$ downward for those districts, artificially
+compressing $\Delta_{\MES}$ and $\mathrm{Var}(\MES)$.
+Within-district inequality is invisible by construction: a high $\MES_d$
+for a district with a spatially concentrated transport hub does not imply
+equitable access for all residents.
+The score is a derived analytic index produced by the platform analytics
+layer; it is not validated against an independent ground truth, and
+policy decisions must account for these limitations and seek external
+verification~\cite{karner2025transportation_equity}.
+
+\subsection{Privacy, Consent, and Telemetry}
+
+Consent-based GNSS telemetry involves personal location data subject to
+national data protection legislation in Azerbaijan and principles aligned
+with the General Data Protection Regulation (GDPR) for any processing
+involving EU-resident individuals.
+The IRIDIUM design keeps raw traces out of the central server through
+short-lived in-memory processing and federated model training; no personal
+GNSS traces are persisted in the central repository.
+Operators deploying the telemetry layer must conduct a data-protection
+impact assessment (DPIA), define retention limits consistent with the
+principle of data minimization, implement a consent withdrawal mechanism,
+and provide a documented right-to-erasure procedure.
+
+\subsection{Differential Privacy in Federated Learning}
+
+The FL pathway uses FedAvg aggregation (Eq.~\ref{eq:fedavg}).
+Without differential privacy, gradient inversion attacks could potentially
+reconstruct training samples from aggregated parameter
+updates~\cite{kairouz2021advances}.
+The planned noise calibration via Eq.~(\ref{eq:dp_noise}) requires
+specifying the privacy budget $(\varepsilon,\delta)$ before deployment.
+The privacy-utility trade-off (i.e., the degradation in forecasting
+accuracy $\Delta\mathrm{MAE}$ as a function of $\varepsilon$) has not yet
+been characterized, and must be evaluated empirically for the Azerbaijani
+traffic data distribution.
+Deployers must conduct this analysis and assess the required privacy budget
+before enabling FL in production.
+
+\subsection{Model Generalization and Transferability}
+
+All design choices, default hyperparameters, and provider configurations
+are calibrated for Azerbaijani cities and the data sources described in
+Section~\ref{sec:data}.
+Applying the platform to other countries requires re-running the OSM
+import, registering locally relevant GTFS and traffic providers, and
+potentially retraining the ST-GNN on city-specific historical data.
+No formal transferability study comparing forecast accuracy across
+multiple cities or road-network topologies has been conducted.
+
+\subsection{Deployment Risks and Operational Safety}
+
+Anomaly detection based on z-score thresholds will produce false positives
+under heavy distributional shift (e.g., a public holiday reducing baseline
+traffic) and false negatives when incidents develop gradually below the
+threshold $\tau_S$.
+The false-positive rate estimate from Eq.~(\ref{eq:fpr}) assumes approximate
+normality of the rolling speed distribution and independence across time
+steps; neither assumption holds perfectly under real traffic dynamics.
+Real-time routing decisions may briefly direct users toward congested
+segments if an incident is detected with a lag of up to $w$ time steps
+(default: 12 steps, equivalent to one hour at five-minute polling).
+The system is best-effort and must not serve as the sole basis for
+safety-critical operational decisions.
+Incident escalation procedures and operator fallback protocols are
+documented in the operational guide accompanying the repository.
