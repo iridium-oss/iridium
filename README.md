@@ -8,9 +8,9 @@
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/iridium-oss/iridium?logo=github&logoColor=white)](https://github.com/iridium-oss/iridium/pulls)
 [![DOI](https://img.shields.io/badge/DOI-10.5281/zenodo.18915211-blue.svg?logo=zenodo&logoColor=white)](https://doi.org/10.5281/zenodo.18915211)
 [![arXiv](https://img.shields.io/badge/arXiv-submit/7340933-B31B1B.svg?logo=arxiv&logoColor=white)](https://arxiv.org/abs/submit/7340933)
-[![GitHub stars](https://img.shields.io/github/stars/iridium-oss/iridium?style=flat&logo=github&color=white)](https://github.com/iridium-oss/iridium/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/iridium-oss/iridium?style=flat&logo=github&color=white)](https://github.com/iridium-oss/iridium/network/members)
-[![GitHub watchers](https://img.shields.io/github/watchers/iridium-oss/iridium?style=flat&logo=github&color=white)](https://github.com/iridium-oss/iridium/watchers)
+[![GitHub stars](https://img.shields.io/github/stars/iridium-oss/iridium?style=social)](https://github.com/iridium-oss/iridium/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/iridium-oss/iridium?style=social)](https://github.com/iridium-oss/iridium/network/members)
+[![GitHub watchers](https://img.shields.io/github/watchers/iridium-oss/iridium?style=social)](https://github.com/iridium-oss/iridium/watchers)
 [![Python](https://img.shields.io/badge/Python-3.12+-3776AB?style=flat&logo=python&logoColor=white)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.109+-009688?style=flat&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![Next.js](https://img.shields.io/badge/Next.js-14-000000?style=flat&logo=next.js&logoColor=white)](https://nextjs.org/)
@@ -116,15 +116,15 @@ where $T(r)$ is travel time, $C(r)$ cost, $E(r)$ emissions proxy, and $P(r)$ tra
 | Artifact | Status |
 |----------|--------|
 | CITATION.cff | Present at repo root; use for citation. |
-| Zenodo DOI | Published; see [https://doi.org/10.5281/zenodo.18915211](https://doi.org/10.5281/zenodo.18915211). |
-| arXiv preprint | Under submission; see [submit/7340933](https://arxiv.org/abs/submit/7340933). |
+| Zenodo DOI | Published; see [DOI: 10.5281/zenodo.18915211](https://doi.org/10.5281/zenodo.18915211). |
+| arXiv preprint | Under submission; see [arXiv: submit/7340933](https://arxiv.org/abs/submit/7340933). |
 
 Citation: [docs/citation.md](docs/citation.md).
 
 ## Academic paper
 
 A full manuscript package is in [paper/](paper/):
-```
+```text
 O. Y. Laitinen Imanov et al. (2026). "IRIDIUM: A Provenance-Aware Urban Mobility Platform for Digital Twin Assembly, Multimodal Analytics, and Federated Learning in Azerbaijani Cities." arXiv:submit/7340933. DOI: 10.5281/zenodo.18915211 (Released March 8, 2026).
 ```
  IEEE journal LaTeX (IEEEtran); prepared for arXiv and journal submission. Contents: real-data architecture, digital twin, formalization of routing, forecasting, equity, anomaly, and FedAvg, and baseline evaluation (API semantics, data-status, latency, weather integration). Build and figure instructions: [paper/README.md](paper/README.md). arXiv: run `python paper/scripts/package_arxiv.py` to produce [paper/arxiv/](paper/arxiv/) source zip. No arXiv identifier is claimed until the preprint is submitted.
