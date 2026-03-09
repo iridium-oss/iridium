@@ -35,7 +35,7 @@ The baseline test suite uses synthetic fixtures, but the platform is designed to
    ```
    First run: `npm ci` or `npm install` installs dependencies (once). Then `npm run dev` starts the dev server with Turbopack at http://localhost:3000 (fast startup). The app proxies `/api`, `/health`, and `/version` to the API. Scripts use `npx next` so the dev server runs correctly on Windows even when `node_modules/.bin` is not on PATH.
 
-   **Windows:** If `npm install` fails with EPERM or ENOTEMPTY, close all terminals and IDEs using the repo, then remove `apps/web/node_modules` and `apps/web/.next` and run `npm install` again from `apps/web`.
+   **Windows:** If `npm install` fails with EPERM or ENOTEMPTY, close all terminals and IDEs using the repo, then remove `apps/web/node_modules` and `apps/web/.next` and run `npm install` again from `apps/web`. Always run `npm run dev` from `apps/web` so the project uses the local Next.js (package.json version); do not use `npx next` so the correct version is used and internal module errors are avoided.
 
 ## Running the API
 
