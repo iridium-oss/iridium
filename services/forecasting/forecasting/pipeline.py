@@ -68,6 +68,6 @@ def get_congestion_forecast(
         source_coverage=source_coverage,
         confidence_note="Baseline heuristic; no calibrated uncertainty. Use for operational awareness only.",
         fallback_used=False,
-        note="Heuristic from twin state. Real-data training and ST-GNN planned.",
+        note="Deterministic baseline from twin state. Learned model (Graph WaveNet) available when artifact and history are provided.",
         data_status=data_status,
     )
