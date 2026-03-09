@@ -1,4 +1,10 @@
-# LaTeX build artifacts
+# =============================================================================
+# IRIDIUM paper/ LaTeX and academic .gitignore (strict). No build artifacts.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# LaTeX build artifacts (primary)
+# -----------------------------------------------------------------------------
 main.aux
 main.bbl
 main.blg
@@ -6,9 +12,519 @@ main.log
 main.out
 main.tex.tmp
 *.synctex.gz
+main.fdb_latexmk
+main.fls
+main.synctex.gz
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.synctex(busy)
+*.nav
+*.snm
+*.vrb
+*.run.xml
+*.bcf
+*-blx.bib
+*.idx
+*.ilg
+*.ind
+*.glg
+*.glo
+*.gls
+*.acn
+*.acr
+*.alg
+*.loa
+*.lol
+*.thm
+*.sty.bak
+*.dtx.bak
 
-# Output PDF (optional; remove if you want to track main.pdf)
+# Output PDF (optional: uncomment to ignore)
 # main.pdf
+# *.pdf
 
 # arXiv zip (regenerate with scripts/package_arxiv.py)
 arxiv/*.zip
+arxiv/*.tar.gz
+*.zip
+!arxiv/README.md
+
+# -----------------------------------------------------------------------------
+# Python (if scripts in paper/)
+# -----------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.Python
+*.pyc
+*.pyz
+*.pyw
+*.pyi
+*.so
+build/
+dist/
+*.egg-info/
+*.egg
+.installed.cfg
+.venv/
+venv/
+env/
+ENV/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+
+# -----------------------------------------------------------------------------
+# Virtual environments
+# -----------------------------------------------------------------------------
+.env
+.venv
+venv/
+env/
+ENV/
+.env.bak
+.env.*.local
+.env.local
+
+# -----------------------------------------------------------------------------
+# IDE and editors
+# -----------------------------------------------------------------------------
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+*.sublime-workspace
+*.sublime-project
+.project
+.classpath
+.settings/
+*.code-workspace
+*.iml
+*.ipr
+*.iws
+
+# -----------------------------------------------------------------------------
+# OS generated
+# -----------------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# -----------------------------------------------------------------------------
+# Logs and temp
+# -----------------------------------------------------------------------------
+*.log
+logs/
+log/
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+*.orig
+*~
+
+# -----------------------------------------------------------------------------
+# Node (if any tooling)
+# -----------------------------------------------------------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.yarn-integrity
+.next/
+.nuxt/
+.cache/
+dist/
+build/
+*.tsbuildinfo
+
+# -----------------------------------------------------------------------------
+# Build outputs (generic)
+# -----------------------------------------------------------------------------
+out/
+build/
+target/
+bin/
+obj/
+*.exe
+*.dll
+*.o
+*.obj
+
+# -----------------------------------------------------------------------------
+# Data and figures (generated or large)
+# -----------------------------------------------------------------------------
+data/raw/
+data/processed/
+*.pth
+*.pt
+*.onnx
+*.h5
+*.pkl
+*.joblib
+*.csv
+!figures/*.png
+!figures/*.pdf
+!figures/*.jpg
+!figures/*.jpeg
+!metadata/
+!refs/
+!sections/
+!scripts/
+
+# -----------------------------------------------------------------------------
+# Secrets
+# -----------------------------------------------------------------------------
+*.pem
+*.key
+*.crt
+secrets/
+.secrets
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# -----------------------------------------------------------------------------
+# Jupyter (if notebooks in paper/)
+# -----------------------------------------------------------------------------
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+profile_default/
+
+# -----------------------------------------------------------------------------
+# Archives (generated)
+# -----------------------------------------------------------------------------
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+!arxiv/README.md
+
+# -----------------------------------------------------------------------------
+# Strict: recursive patterns
+# -----------------------------------------------------------------------------
+**/__pycache__/
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+**/.coverage
+**/htmlcov/
+**/node_modules/
+**/.venv/
+**/venv/
+**/*.egg-info/
+**/dist/
+**/build/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+**/.DS_Store
+**/Thumbs.db
+**/*.log
+**/secrets/
+**/.secrets
+**/*.pem
+**/*.key
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.sample
+
+# -----------------------------------------------------------------------------
+# LaTeX auxiliary (extended)
+# -----------------------------------------------------------------------------
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.synctex(busy)
+*.nav
+*.snm
+*.vrb
+*.run.xml
+*.bcf
+*-blx.bib
+*.idx
+*.ilg
+*.ind
+*.glg
+*.glo
+*.gls
+*.acn
+*.acr
+*.alg
+*.loa
+*.lol
+*.thm
+*.sty.bak
+*.dtx.bak
+*.ins.bak
+*.bib.bak
+
+# -----------------------------------------------------------------------------
+# Windows
+# -----------------------------------------------------------------------------
+[Tt]humbs.db
+Desktop.ini
+*.lnk
+*.stackdump
+
+# -----------------------------------------------------------------------------
+# Linux
+# -----------------------------------------------------------------------------
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# -----------------------------------------------------------------------------
+# macOS
+# -----------------------------------------------------------------------------
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# -----------------------------------------------------------------------------
+# Backup and swap
+# -----------------------------------------------------------------------------
+*~
+*.swp
+*.swo
+*.swn
+*.bak
+*.backup
+
+# -----------------------------------------------------------------------------
+# Generated lists and reports
+# -----------------------------------------------------------------------------
+*.report
+*.summary
+proje_*.txt
+PROJE_*.md
+*.list
+
+# -----------------------------------------------------------------------------
+# Database
+# -----------------------------------------------------------------------------
+*.db
+*.sqlite
+*.sqlite3
+
+# -----------------------------------------------------------------------------
+# Docker
+# -----------------------------------------------------------------------------
+.docker/
+*.tar
+*.tar.gz
+
+# -----------------------------------------------------------------------------
+# Profiling
+# -----------------------------------------------------------------------------
+*.prof
+*.lprof
+*.gcda
+*.gcno
+*.gcov
+perf.data
+
+# -----------------------------------------------------------------------------
+# Additional Python
+# -----------------------------------------------------------------------------
+.python-version
+pip-log.txt
+pip-delete-this-directory.txt
+.eggs/
+*.manifest
+*.spec
+.dmypy.json
+dmypy.json
+nosetests.xml
+junit.xml
+test-results/
+*.py.bak
+
+# -----------------------------------------------------------------------------
+# Additional IDE
+# -----------------------------------------------------------------------------
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.rsuser
+
+# -----------------------------------------------------------------------------
+# Additional build
+# -----------------------------------------------------------------------------
+*.a
+*.lib
+*.so
+*.dylib
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+replay_pid*
+.gradle/
+
+# -----------------------------------------------------------------------------
+# Terraform (if any)
+# -----------------------------------------------------------------------------
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+*.tfplan
+*.tfvars
+!*.tfvars.example
+
+# -----------------------------------------------------------------------------
+# Go (if any)
+# -----------------------------------------------------------------------------
+*.test
+*.out
+go.work
+vendor/
+
+# -----------------------------------------------------------------------------
+# Rust (if any)
+# -----------------------------------------------------------------------------
+/target/
+Cargo.lock
+
+# -----------------------------------------------------------------------------
+# Paper-specific: do not commit generated PDFs or zips (optional)
+# -----------------------------------------------------------------------------
+# main.pdf
+# *.pdf
+# arxiv/*.zip
+# arxiv/*.tar.gz
+
+# -----------------------------------------------------------------------------
+# Strict: no commit of LaTeX build tree
+# -----------------------------------------------------------------------------
+**/*.aux
+**/*.bbl
+**/*.blg
+**/*.log
+**/*.out
+**/*.toc
+**/*.lof
+**/*.lot
+**/*.fls
+**/*.fdb_latexmk
+**/*.synctex.gz
+**/*.nav
+**/*.snm
+**/*.vrb
+**/*.run.xml
+**/*.bcf
+**/*-blx.bib
+**/__pycache__/
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+**/.coverage
+**/htmlcov/
+**/node_modules/
+**/.venv/
+**/venv/
+**/*.egg-info/
+**/dist/
+**/build/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+**/.DS_Store
+**/Thumbs.db
+**/*.log
+**/secrets/
+**/.secrets
+**/*.pem
+**/*.key
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.sample
+
+# -----------------------------------------------------------------------------
+# arXiv and submission (regenerate; do not track generated zips)
+# -----------------------------------------------------------------------------
+arxiv/*.zip
+arxiv/*.tar.gz
+arxiv/*.tgz
+submission/
+revision/
+reviews/
+*.zip
+*.tar.gz
+!arxiv/README.md
+
+# -----------------------------------------------------------------------------
+# Citation and reference managers (generated)
+# -----------------------------------------------------------------------------
+*.enw
+*.ris
+*.bib.bak
+*.bib.sav
+
+# -----------------------------------------------------------------------------
+# Image and media (generated or large)
+# -----------------------------------------------------------------------------
+*.psd
+*.ai
+*.eps.bak
+*.fig.bak
+generated_figures/
+temp_figures/
+cache/
+
+# -----------------------------------------------------------------------------
+# Optional: uncomment to ignore main PDF
+# -----------------------------------------------------------------------------
+# main.pdf
+# paper.pdf
+# manuscript.pdf
+# draft.pdf

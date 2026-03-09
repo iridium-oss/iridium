@@ -354,3 +354,201 @@ uploads/
 # uv.lock
 # poetry.lock
 # Pipfile.lock
+
+# -----------------------------------------------------------------------------
+# Additional Python tooling
+# -----------------------------------------------------------------------------
+.python-version
+.python-venv
+pip-log.txt
+pip-delete-this-directory.txt
+.eggs/
+*.egg-info/
+*.egg
+.installed.cfg
+*.manifest
+*.spec
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.ruff_cache/
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
+nosetests.xml
+junit.xml
+test-results/
+*.py.bak
+*.pyc
+*.pyo
+*.pyd
+*.pyz
+*.pyw
+*.pyi
+
+# -----------------------------------------------------------------------------
+# Additional IDE
+# -----------------------------------------------------------------------------
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.rsuser
+*.code-workspace
+
+# -----------------------------------------------------------------------------
+# Additional OS
+# -----------------------------------------------------------------------------
+.Spotlight-V100
+.Trashes
+.AppleDouble
+.LSOverride
+.DocumentRevisions-V100
+.fseventsd
+.TemporaryItems
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# -----------------------------------------------------------------------------
+# Additional build and compile
+# -----------------------------------------------------------------------------
+*.exe
+*.dll
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dylib
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+replay_pid*
+.gradle/
+target/
+bin/
+obj/
+
+# -----------------------------------------------------------------------------
+# Additional data and serialization
+# -----------------------------------------------------------------------------
+*.msgpack
+*.msgpack.gz
+*.json.gz
+*.jsonl
+*.jsonl.gz
+*.csv.gz
+*.tsv
+*.tsv.gz
+*.xlsx
+*.xls
+*.ods
+
+# -----------------------------------------------------------------------------
+# Additional secrets and config
+# -----------------------------------------------------------------------------
+config.local.*
+*.gpg
+*.asc
+*.p12
+*.pfx
+*.jks
+*.keystore
+
+# -----------------------------------------------------------------------------
+# Terraform and IaC (if used in service)
+# -----------------------------------------------------------------------------
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+*.tfplan
+*.tfvars
+!*.tfvars.example
+
+# -----------------------------------------------------------------------------
+# Go (if any)
+# -----------------------------------------------------------------------------
+*.test
+*.out
+go.work
+vendor/
+
+# -----------------------------------------------------------------------------
+# Rust (if any)
+# -----------------------------------------------------------------------------
+/target/
+Cargo.lock
+
+# -----------------------------------------------------------------------------
+# Profiling and tracing (extended)
+# -----------------------------------------------------------------------------
+*.prof
+*.lprof
+perf.data
+perf.data.old
+*.trace
+*.trace.gz
+traces/
+profiling/
+*.dump
+*.heap
+*.core
+
+# -----------------------------------------------------------------------------
+# Generated and report files (extended)
+# -----------------------------------------------------------------------------
+*.report
+*.summary
+*.export
+*.backup
+*.snapshot
+proje_*.txt
+PROJE_*.md
+*.list
+*.manifest
+*.index
+
+# -----------------------------------------------------------------------------
+# Strict: no commit of runtime or generated state
+# -----------------------------------------------------------------------------
+**/artifacts/
+**/checkpoints/
+**/runs/
+**/outputs/
+**/results/
+**/wandb/
+**/mlruns/
+**/.neptune/
+**/client_weights/
+**/server_checkpoints/
+**/aggregated/
+**/round_*/
+**/fitness_*.json
+**/history_*.json
+**/*.npz
+**/*.npy
+**/*.pt
+**/*.pth
+**/*.ckpt
+**/*.onnx
+**/*.safetensors
+**/*.bin
+**/*.weights
+**/*.model
+**/datasets/
+**/raw_data/
+**/processed_data/
+**/exports/
+**/uploads/
+**/flower_logs/
+**/federated_runs/
