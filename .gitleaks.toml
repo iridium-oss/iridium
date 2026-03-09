@@ -1,0 +1,25 @@
+# Allowlist for gitleaks: example env, docs, and test fixtures
+title = "iridium-gitleaks"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Allow example env, lockfiles, and docs"
+paths = [
+  '''\.env\.example$''',
+  '''\.env\.sample$''',
+  '''package-lock\.json$''',
+  '''.*\.lock$''',
+  '''docs/''',
+  '''\.md$''',
+  '''CHANGELOG\.md$''',
+  '''node_modules/''',
+  '''\.next/''',
+]
+regexes = [
+  '''iridium''',
+  '''example\.com''',
+  '''your-api-key''',
+  '''your_password''',
+]
