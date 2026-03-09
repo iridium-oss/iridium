@@ -55,3 +55,19 @@ class RouteResponse(BaseModel):
     alternatives: list[RouteAlternative] = Field(default_factory=list)
     requested_at: datetime = Field(default_factory=datetime.utcnow)
     note: Optional[str] = Field(None, description="e.g. baseline optimizer")
+    model_type: Optional[str] = Field(
+        None,
+        description="deterministic_baseline | rule_baseline",
+    )
+    model_maturity: Optional[str] = Field(
+        None,
+        description="production_baseline | experimental | inactive",
+    )
+    data_status: Optional[str] = Field(
+        None,
+        description="live | unavailable | configuration_required when network not loaded.",
+    )
+    fallback_used: bool = Field(
+        False,
+        description="True if no path found and placeholder or fallback route was returned.",
+    )

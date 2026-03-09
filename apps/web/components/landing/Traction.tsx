@@ -32,7 +32,7 @@ export function Traction() {
             Traction and proof points
           </h2>
           <p className="mt-4 text-text-secondary">
-            Only real proof points. No users, revenue, installs, contracts, pilot customers, or waitlists invented. Technical, product, research, and execution traction.
+            Only real proof points. No users, revenue, installs, contracts, pilot customers, or waitlists invented. Technical, product, research, and execution traction. Commercial and deployment model are described in the Business model, Deployment model, and Go-to-market sections.
           </p>
         </motion.div>
         <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

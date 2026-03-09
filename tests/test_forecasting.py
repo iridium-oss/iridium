@@ -48,3 +48,13 @@ def test_congestion_forecast_with_twin_edges():
         result = get_congestion_forecast(horizon_minutes=30, segment_ids=["e1"])
     assert len(result.segments) >= 1
     assert any(s.segment_id == "e1" for s in result.segments)
+
+
+def test_congestion_forecast_metadata():
+    """Production baseline must expose model_type, model_maturity, confidence_note, no fallback."""
+    result = get_congestion_forecast(horizon_minutes=60)
+    assert result.model_type == "deterministic_baseline"
+    assert result.model_maturity == "production_baseline"
+    assert result.fallback_used is False
+    assert result.confidence_note is not None
+    assert "baseline" in (result.confidence_note or "").lower()

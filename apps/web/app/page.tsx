@@ -20,8 +20,13 @@ import { KeyModules } from "@/components/landing/KeyModules";
 import { UserValueProposition } from "@/components/landing/UserValueProposition";
 import { InstitutionalValueProposition } from "@/components/landing/InstitutionalValueProposition";
 import { BusinessModel } from "@/components/landing/BusinessModel";
+import { CommercialMatrix } from "@/components/landing/CommercialMatrix";
+import { CommercialPolicy } from "@/components/landing/CommercialPolicy";
+import { DeploymentModel } from "@/components/landing/DeploymentModel";
 import { GoToMarket } from "@/components/landing/GoToMarket";
+import { ServicesLayer } from "@/components/landing/ServicesLayer";
 import { Traction } from "@/components/landing/Traction";
+import { WhyCredible } from "@/components/landing/WhyCredible";
 import { Wuf13RelevanceMatrix } from "@/components/landing/Wuf13RelevanceMatrix";
 import { CompetitiveLandscape } from "@/components/landing/CompetitiveLandscape";
 import { WhyIridiumWins } from "@/components/landing/WhyIridiumWins";
@@ -58,7 +63,12 @@ export default function HomePage() {
         <UserValueProposition />
         <InstitutionalValueProposition />
         <BusinessModel />
+        <CommercialMatrix />
+        <DeploymentModel />
+        <ServicesLayer />
         <GoToMarket />
+        <WhyCredible />
+        <CommercialPolicy />
         <Traction />
         <Wuf13RelevanceMatrix />
         <CompetitiveLandscape />

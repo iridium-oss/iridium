@@ -48,18 +48,26 @@ def get_congestion_forecast(
     """Return congestion forecast. Data status from twin; heuristic when no real model."""
     snapshot = get_assembled_snapshot()
     data_status = snapshot.data_status or DATA_STATUS_CONFIGURATION_REQUIRED
+    edges = snapshot.edges or []
     if segment_ids:
         all_segments = []
         for seg_id in segment_ids[:10]:
-            all_segments.extend(_baseline_congestion(seg_id, horizon_minutes, snapshot.edges))
+            all_segments.extend(_baseline_congestion(seg_id, horizon_minutes, edges))
         segments = sorted(all_segments, key=lambda s: (s.segment_id, s.timestamp))
     else:
-        segments = _baseline_congestion("", horizon_minutes, snapshot.edges)
+        segments = _baseline_congestion("", horizon_minutes, edges)
+    edge_count = len(edges)
+    source_coverage = f"twin_edges={edge_count}" if edge_count else "no_edges"
     return CongestionForecastResponse(
         segments=segments,
         horizon_minutes=horizon_minutes,
         generated_at=datetime.now(timezone.utc),
         model_version="baseline-heuristic",
+        model_type="deterministic_baseline",
+        model_maturity="production_baseline",
+        source_coverage=source_coverage,
+        confidence_note="Baseline heuristic; no calibrated uncertainty. Use for operational awareness only.",
+        fallback_used=False,
         note="Heuristic from twin state. Real-data training and ST-GNN planned.",
         data_status=data_status,
     )

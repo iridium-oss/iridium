@@ -10,7 +10,7 @@ This document describes real-time anomaly detection and dynamic rerouting in IRI
 
 **Event surges**: Large public events that cause demand spikes or changed patterns. Inferred from event calendars combined with unusual flow or delay patterns.
 
-Detection may be rule-based (e.g. threshold on speed drop), model-based (e.g. deviation from forecast), or hybrid. The exact methods will be documented with the implementation.
+**Current implementation**: Production uses **rule-based detection only**. No learned model and no z-score or statistical deviation in the runtime path. Types emitted: incident (from edge incident flag), demand_surge (occupancy above 85%). Each anomaly can include source_type (observed_disruption | inferred_statistical) and evidence_summary. API response includes model_type rule_baseline and model_maturity production_baseline. Z-score and hybrid methods are documented below as future work.
 
 ## Deviation and Severity
 

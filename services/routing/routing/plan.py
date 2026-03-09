@@ -1,6 +1,7 @@
 """
 Multimodal route planning baseline. Weighted shortest path with time/cost/carbon.
-Uses digital twin graph; origin/destination snapped to nearest nodes for demo.
+Uses digital twin graph; origin/destination snapped to nearest nodes.
+Objective: minimize weighted sum of time, cost, and carbon; weights depend on optimize mode.
 """
 
 from datetime import datetime, timezone
@@ -11,7 +12,7 @@ from iridium_schemas.routing import (
     RouteAlternative,
     RouteSegment,
 )
-from digital_twin.service import get_snapshot
+from digital_twin.state_assembler import get_assembled_snapshot
 
 
 def _weight(optimize: str, duration_min: float, cost: float, carbon_kg: float) -> float:
@@ -24,22 +25,31 @@ def _weight(optimize: str, duration_min: float, cost: float, carbon_kg: float) -
 
 def plan_routes(req: RouteRequest) -> RouteResponse:
     """Compute route alternatives. Baseline: use twin graph and weighted path."""
-    snapshot = get_snapshot()
-    if not snapshot.nodes or not snapshot.edges:
-        return RouteResponse(alternatives=[], note="No network loaded.")
+    snapshot = get_assembled_snapshot()
+    nodes = snapshot.nodes or []
+    edges = snapshot.edges or []
+    data_status = snapshot.data_status if snapshot.data_status else ("live" if (nodes and edges) else "unavailable")
+    if not nodes or not edges:
+        return RouteResponse(
+            alternatives=[],
+            note="No network loaded. Run network-import to load graph.",
+            model_type="deterministic_baseline",
+            model_maturity="production_baseline",
+            data_status=data_status,
+            fallback_used=False,
+        )
     # Snap origin/dest to nearest nodes (by lat/lon distance)
     def dist(n: object, lat: float, lon: float) -> float:
         if not hasattr(n, "lat") or n.lat is None or n.lon is None:
             return 1e9
         return (n.lat - lat) ** 2 + (n.lon - lon) ** 2
-    nodes = snapshot.nodes
     by_dist_orig = sorted(nodes, key=lambda n: dist(n, req.origin_lat, req.origin_lon))
     by_dist_dest = sorted(nodes, key=lambda n: dist(n, req.destination_lat, req.destination_lon))
     start_id = by_dist_orig[0].node_id if by_dist_orig else "n1"
     end_id = by_dist_dest[0].node_id if by_dist_dest else "n5"
-    # Build simple path: filter edges by allowed modes, then BFS/dijkstra placeholder
+    # Build simple path: filter edges by allowed modes, then path search
     allowed = set(req.modes) if req.modes else {"walking", "bus", "metro", "minibus", "cycling", "road"}
-    edges = [e for e in snapshot.edges if e.mode in allowed]
+    edges = [e for e in edges if e.mode in allowed]
     # Shortest path by travel_time_min (simplified: first path found)
     from collections import defaultdict
     adj: dict[str, list[tuple[str, float, float, float, str]]] = defaultdict(list)
@@ -68,7 +78,7 @@ def plan_routes(req: RouteRequest) -> RouteResponse:
             visited.discard(to_node)
     dfs(start_id, [], {start_id})
     if not best_path:
-        # Fallback: single walking segment as placeholder
+        # No path found: return explicit fallback with metadata so client knows it is degraded
         total_d = 15.0
         total_c = 0.0
         total_carb = 0.0
@@ -78,10 +88,12 @@ def plan_routes(req: RouteRequest) -> RouteResponse:
                 duration_min=total_d,
                 cost=total_c,
                 carbon_kg=total_carb,
-                description="Baseline placeholder route",
+                description="No path found; fallback estimate only. Load network for real routing.",
             )
         ]
+        fallback_used = True
     else:
+        fallback_used = False
         segs = [
             RouteSegment(
                 mode=mode,
@@ -108,5 +120,9 @@ def plan_routes(req: RouteRequest) -> RouteResponse:
     return RouteResponse(
         alternatives=[alt],
         requested_at=datetime.now(timezone.utc),
-        note="Baseline optimizer; full journey planner planned.",
+        note="Baseline optimizer; full journey planner planned." if not fallback_used else "No path in graph; fallback estimate returned.",
+        model_type="deterministic_baseline",
+        model_maturity="production_baseline",
+        data_status=data_status,
+        fallback_used=fallback_used,
     )

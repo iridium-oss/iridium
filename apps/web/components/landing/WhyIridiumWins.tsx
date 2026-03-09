@@ -28,7 +28,7 @@ export function WhyIridiumWins() {
             Why IRIDIUM wins
           </h2>
           <p className="mt-4 text-text-secondary">
-            The why we win slide: explicit source truthfulness, no synthetic substitution, modular architecture, and public-sector suitability.
+            The why we win slide: explicit source truthfulness, no synthetic substitution, modular architecture, and public-sector suitability. These differentiators underpin a credible commercial model for municipalities and operators (see Business model and Go-to-market).
           </p>
         </motion.div>
         <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">

@@ -42,7 +42,7 @@ def test_anomaly_incident_and_occupancy_branches():
         NetworkEdge(edge_id="e2", from_node="n2", to_node="n3", mode="road", occupancy_pct=90.0),
     ]
     snap = DigitalTwinSnapshot(nodes=[], edges=edges)
-    with patch("anomaly_detection.detector.get_snapshot", return_value=snap):
+    with patch("anomaly_detection.detector.get_assembled_snapshot", return_value=snap):
         result = get_anomalies()
     assert len(result) >= 1
     types = {a.type for a in result}
@@ -56,6 +56,6 @@ def test_anomaly_segment_ids_filter():
         NetworkEdge(edge_id="e2", from_node="n2", to_node="n3", mode="road"),
     ]
     snap = DigitalTwinSnapshot(nodes=[], edges=edges)
-    with patch("anomaly_detection.detector.get_snapshot", return_value=snap):
+    with patch("anomaly_detection.detector.get_assembled_snapshot", return_value=snap):
         result = get_anomalies(segment_ids=["e1"])
     assert all(a.segment_ids == ["e1"] for a in result)

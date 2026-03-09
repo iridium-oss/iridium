@@ -29,3 +29,19 @@ class MobilityEquityScore(BaseModel):
     generated_at: datetime = Field(default_factory=datetime.utcnow)
     note: Optional[str] = Field(None, description="Assumptions and limitations")
     data_status: Optional[str] = Field(None, description="live, recorded_real_snapshot, unavailable, configuration_required")
+    model_type: Optional[str] = Field(
+        None,
+        description="deterministic_baseline | rule_baseline",
+    )
+    model_maturity: Optional[str] = Field(
+        None,
+        description="production_baseline | experimental | inactive",
+    )
+    source_coverage: Optional[str] = Field(
+        None,
+        description="Summary of input coverage (e.g. district count, data source).",
+    )
+    confidence_note: Optional[str] = Field(
+        None,
+        description="When data is incomplete, confidence is reduced; see note.",
+    )

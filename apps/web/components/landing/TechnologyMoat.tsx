@@ -27,7 +27,7 @@ export function TechnologyMoat() {
             Technology moat
           </h2>
           <p className="mt-4 text-text-secondary">
-            Real technical advantage and implementation depth. We do not overclaim defensibility; we phrase it as what is built and documented.
+            Real technical advantage and implementation depth. This foundation supports platform subscriptions, API and analytics modules, and multiple deployment options (see Business model and Deployment model). We do not overclaim defensibility; we phrase it as what is built and documented.
           </p>
         </motion.div>
         <ul className="mt-10 space-y-4">

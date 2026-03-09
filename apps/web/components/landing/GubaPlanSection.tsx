@@ -43,7 +43,7 @@ export function GubaPlanSection() {
               Open Guba city plan (PDF)
             </a>
             <p className="mt-3 text-xs text-text-muted">
-              Source: <a href="https://arxkom.gov.az" target="_blank" rel="noopener noreferrer" className="text-accent-muted hover:text-accent-luminous">State Committee on Urban Planning and Architecture (Arxkom)</a> — <a href={GUBA_PLAN_PDF} target="_blank" rel="noopener noreferrer" className="text-accent-muted hover:text-accent-luminous">Quba şəhərinin baş planı</a>
+              Source: <a href="https://arxkom.gov.az" target="_blank" rel="noopener noreferrer" className="text-accent-muted hover:text-accent-luminous">State Committee on Urban Planning and Architecture (Arxkom)</a>. <a href={GUBA_PLAN_PDF} target="_blank" rel="noopener noreferrer" className="text-accent-muted hover:text-accent-luminous">Quba şəhərinin baş planı</a>
             </p>
           </div>
         </motion.div>

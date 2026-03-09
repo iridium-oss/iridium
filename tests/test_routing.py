@@ -30,7 +30,7 @@ def _make_snapshot_with_path():
 def test_plan_routes_with_network_finds_path():
     """Cover routing plan main path when snapshot has nodes and edges."""
     snap = _make_snapshot_with_path()
-    with patch("routing.plan.get_snapshot", return_value=snap):
+    with patch("routing.plan.get_assembled_snapshot", return_value=snap):
         req = RouteRequest(origin_lat=40.409, origin_lon=49.867, destination_lat=40.413, destination_lon=49.871)
         res = plan_routes(req)
     assert len(res.alternatives) == 1
@@ -41,7 +41,7 @@ def test_plan_routes_with_network_finds_path():
 def test_plan_routes_optimize_cost():
     """Cover _weight cost branch."""
     snap = _make_snapshot_with_path()
-    with patch("routing.plan.get_snapshot", return_value=snap):
+    with patch("routing.plan.get_assembled_snapshot", return_value=snap):
         req = RouteRequest(origin_lat=40.409, origin_lon=49.867, destination_lat=40.413, destination_lon=49.871, optimize="cost")
         res = plan_routes(req)
     assert len(res.alternatives) == 1
@@ -50,7 +50,7 @@ def test_plan_routes_optimize_cost():
 def test_plan_routes_optimize_carbon():
     """Cover _weight carbon branch."""
     snap = _make_snapshot_with_path()
-    with patch("routing.plan.get_snapshot", return_value=snap):
+    with patch("routing.plan.get_assembled_snapshot", return_value=snap):
         req = RouteRequest(origin_lat=40.409, origin_lon=49.867, destination_lat=40.413, destination_lon=49.871, optimize="carbon")
         res = plan_routes(req)
     assert len(res.alternatives) == 1
@@ -64,7 +64,7 @@ def test_plan_routes_node_without_lat_lon():
     ]
     edges = [NetworkEdge(edge_id="e1", from_node="n1", to_node="n2", mode="walking", travel_time_min=10.0, cost=0.0, carbon_kg=0.0)]
     snap = DigitalTwinSnapshot(nodes=nodes, edges=edges)
-    with patch("routing.plan.get_snapshot", return_value=snap):
+    with patch("routing.plan.get_assembled_snapshot", return_value=snap):
         req = RouteRequest(origin_lat=40.409, origin_lon=49.867, destination_lat=40.413, destination_lon=49.871)
         res = plan_routes(req)
     assert len(res.alternatives) == 1
@@ -83,7 +83,7 @@ def test_plan_routes_visited_skip_branch():
         NetworkEdge(edge_id="e3", from_node="n2", to_node="n1", mode="walking", travel_time_min=5.0, cost=0.0, carbon_kg=0.0),
     ]
     snap = DigitalTwinSnapshot(nodes=nodes, edges=edges)
-    with patch("routing.plan.get_snapshot", return_value=snap):
+    with patch("routing.plan.get_assembled_snapshot", return_value=snap):
         req = RouteRequest(origin_lat=40.409, origin_lon=49.867, destination_lat=40.413, destination_lon=49.871)
         res = plan_routes(req)
     assert len(res.alternatives) == 1
@@ -99,12 +99,13 @@ def test_plan_routes_no_path_fallback():
     ]
     edges = [NetworkEdge(edge_id="e1", from_node="n1", to_node="n3", mode="walking", travel_time_min=5.0, cost=0.0, carbon_kg=0.0)]
     snap = DigitalTwinSnapshot(nodes=nodes, edges=edges)
-    with patch("routing.plan.get_snapshot", return_value=snap):
+    with patch("routing.plan.get_assembled_snapshot", return_value=snap):
         req = RouteRequest(origin_lat=40.409, origin_lon=49.867, destination_lat=40.413, destination_lon=49.871)
         res = plan_routes(req)
     assert len(res.alternatives) == 1
     assert res.alternatives[0].segments[0].mode == "walking"
-    assert res.alternatives[0].segments[0].description == "Baseline placeholder route"
+    assert "fallback" in (res.alternatives[0].segments[0].description or "")
+    assert res.fallback_used is True
 
 
 def test_plan_routes_returns_response():
@@ -130,3 +131,16 @@ def test_plan_routes_alternative_has_segments():
     alt = res.alternatives[0]
     assert alt.total_duration_min >= 0
     assert alt.segments is not None
+
+
+def test_plan_routes_response_metadata():
+    """Response must include model_type, model_maturity, fallback_used, data_status."""
+    snap = _make_snapshot_with_path()
+    with patch("routing.plan.get_assembled_snapshot", return_value=snap):
+        res = plan_routes(
+            RouteRequest(origin_lat=40.409, origin_lon=49.867, destination_lat=40.413, destination_lon=49.871)
+        )
+    assert res.model_type == "deterministic_baseline"
+    assert res.model_maturity == "production_baseline"
+    assert res.fallback_used is False
+    assert res.data_status is not None

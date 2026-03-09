@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "iridium-federated"
+version = "0.1.0"
+description = "Federated learning subsystem for IRIDIUM forecasting and mobility intelligence"
+requires-python = ">=3.12"
+dependencies = [
+    "flwr[simulation]>=1.20.0",
+    "numpy>=1.26.0",
+    "pydantic>=2.5.0",
+    "pydantic-settings>=2.1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+]
+secagg = [
+    "flwr-datasets>=0.0.1",
+]
+dp = []
+
+[tool.setuptools.packages.find]
+where = ["."]
+packages = ["federated"]
+
+[tool.flwr.app.components]
+serverapp = "federated.server_app:app"
+clientapp = "federated.client_app:app"
+
+[tool.flwr.app.config]
+num_rounds = 3
+min_available_clients = 2
+local_epochs = 1
+batch_size = 32
+learning_rate = 0.01

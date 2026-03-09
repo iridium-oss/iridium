@@ -1,0 +1,8 @@
+artifacts/
+*.npz
+__pycache__/
+.eggs/
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/

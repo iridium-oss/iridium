@@ -26,7 +26,7 @@ export function DataMoat() {
             Data moat
           </h2>
           <p className="mt-4 text-text-secondary">
-            Distinct from technology moat. We do not overclaim. No fantasy about proprietary data unless it truly exists. Strategic section on unification and provenance, not fake claims.
+            Distinct from technology moat. Unification and provenance support analytics modules, API access, and data services as credible revenue surfaces (see Business model). We do not overclaim. No fantasy about proprietary data unless it truly exists.
           </p>
         </motion.div>
         <ul className="mt-10 space-y-4">

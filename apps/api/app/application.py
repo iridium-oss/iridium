@@ -24,6 +24,7 @@ from app.api import (
     weather,
     digital_twin,
     alerts,
+    federated,
 )
 from app.schemas import ErrorDetail, ErrorResponse
 from app.observability.logging import configure_logging
@@ -120,4 +121,5 @@ def create_app() -> FastAPI:
     app.include_router(anomalies.router, prefix="/api/v1", tags=["anomalies"])
     app.include_router(ingestion.router, prefix="/api/v1", tags=["ingestion"])
     app.include_router(transit.router, prefix="/api/v1", tags=["transit"])
+    app.include_router(federated.router, prefix="/api/v1", tags=["federated"])
     return app

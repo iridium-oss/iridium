@@ -33,6 +33,10 @@ def get_equity_scores(
             generated_at=datetime.now(timezone.utc),
             note="No equity data configured. Set EQUITY_DATA_PATH to a path containing district_scores.json (real or recorded). See docs/fairness.md.",
             data_status="unavailable",
+            model_type="deterministic_baseline",
+            model_maturity="production_baseline",
+            source_coverage="no_data",
+            confidence_note="No input data; scores unavailable.",
         )
     districts_out: list[DistrictScore] = []
     for r in rows:
@@ -58,4 +62,8 @@ def get_equity_scores(
         generated_at=datetime.now(timezone.utc),
         note="Derived analytic index; not an official government measurement. See docs/fairness.md.",
         data_status="live",
+        model_type="deterministic_baseline",
+        model_maturity="production_baseline",
+        source_coverage=f"districts={len(districts_out)}",
+        confidence_note="Composite from file-based proxies; interpret with caution when coverage is partial.",
     )

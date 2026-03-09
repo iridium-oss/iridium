@@ -26,7 +26,7 @@ export function InstitutionalValueProposition() {
             Institutional value proposition
           </h2>
           <p className="mt-4 text-text-secondary">
-            For public institutions and operator stakeholders: operational visibility, planning support, source transparency, and trust under partial data availability. Useful for city and public-transport stakeholders operating in the context of WUF13 themes (safe and resilient cities). Aligned with safe and resilient city objectives; relevant to housing, access, and service reliability discussions and to public-sector digital coordination. We do not imply official institutional procurement or deployment unless proven.
+            For public institutions and operator stakeholders: operational visibility, planning support, source transparency, and trust under partial data availability. Useful for city and public-transport stakeholders operating in the context of WUF13 themes (safe and resilient cities). Aligned with safe and resilient city objectives; relevant to housing, access, and service reliability discussions and to public-sector digital coordination. The commercial architecture (platform subscriptions, deployment options, services) is set out in the Business model and Deployment model sections. We do not imply official institutional procurement or deployment unless proven.
           </p>
         </motion.div>
         <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

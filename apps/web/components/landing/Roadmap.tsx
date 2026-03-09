@@ -26,7 +26,7 @@ export function Roadmap() {
             Roadmap
           </h2>
           <p className="mt-4 text-text-secondary">
-            Realistic phases. Honest and visually clear. No invented timelines or deliverables.
+            Realistic phases aligned with proposed commercial modules (routing, analytics, equity, federated learning readiness). Honest and visually clear. No invented timelines or deliverables.
           </p>
         </motion.div>
         <div className="mt-14 space-y-4">
