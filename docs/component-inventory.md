@@ -10,7 +10,6 @@ This document is an orientation map for the monorepo. It consolidates older top-
 ### Shared packages
 
 - `packages/schemas`: Shared Pydantic models used across apps and services. This is the single source of truth for data contracts used in code.
-- `packages/config`: Shared configuration helpers (when applicable). Keep cross-cutting utilities here, not app-specific wiring.
 
 ### Domain services
 
