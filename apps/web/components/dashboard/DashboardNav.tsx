@@ -30,8 +30,8 @@ export function DashboardNav() {
             href={href}
             className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
               active
-                ? "bg-surface-elevated text-text-primary"
-                : "text-text-secondary hover:bg-surface-card hover:text-text-primary"
+                ? "border-l-2 border-indigo-600 bg-indigo-50 text-indigo-700"
+                : "text-slate-600 hover:bg-indigo-50/50 hover:text-slate-900"
             }`}
           >
             <Icon name={icon} size={20} />

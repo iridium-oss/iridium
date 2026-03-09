@@ -37,7 +37,7 @@ export function DemoModeModal({ onClose }: Props) {
           initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.96 }}
-          className="w-full max-w-lg rounded-2xl border border-surface-border bg-midnight-prussian p-6 shadow-elevated"
+          className="w-full max-w-lg rounded-2xl border border-surface-border bg-white p-6 shadow-elevated"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex items-start justify-between gap-4">
@@ -68,7 +68,7 @@ export function DemoModeModal({ onClose }: Props) {
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg bg-midnight-electric px-4 py-2.5 text-sm font-medium text-white hover:opacity-90"
+              className="rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-indigo-700"
             >
               Close
             </button>

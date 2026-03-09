@@ -13,11 +13,11 @@ export default {
       },
       colors: {
         midnight: {
-          black: "#02010a",
-          prussian: "#04052e",
-          twilight: "#140152",
-          navy: "#22007c",
-          electric: "#0d00a4",
+          black: "var(--midnight-black)",
+          prussian: "var(--midnight-prussian)",
+          twilight: "var(--midnight-twilight)",
+          navy: "var(--midnight-navy)",
+          electric: "var(--midnight-electric)",
         },
         surface: {
           deepest: "var(--surface-deepest)",
@@ -53,6 +53,9 @@ export default {
         4.5: "1.125rem",
         18: "4.5rem",
         22: "5.5rem",
+      },
+      maxWidth: {
+        wide: "100rem", /* 1600px - geniş rejim */
       },
       animation: {
         "fade-in": "fadeIn 0.3s ease-out",

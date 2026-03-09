@@ -86,10 +86,10 @@ export default function TransitPage() {
             Data type: official, public-web observed, licensed partner, or unavailable. No fake vehicle positions or ETAs.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
-            {sourceStatus.providers.map((s) => (
+            {(sourceStatus.providers ?? []).map((s) => (
               <div key={s.provider_id} className="flex items-center gap-2 rounded-lg border border-surface-border bg-surface-card/80 px-3 py-2">
                 <span className="text-sm font-medium text-text-primary">{s.provider_id}</span>
-                <SourceBadge sourceStatus={s.source_status} sourceFamily={s.source_family} />
+                <SourceBadge sourceStatus={s.source_status ?? "unavailable"} sourceFamily={s.source_family} />
                 {s.configured !== undefined && <span className="text-xs text-text-muted">({s.configured ? "configured" : "not configured"})</span>}
               </div>
             ))}
@@ -105,7 +105,7 @@ export default function TransitPage() {
             BakuBus and Baku Metro as separate but unified providers. Status badges show live, static, or permission-required.
           </p>
           <div className="mt-4 space-y-3">
-            {providers.providers.map((p) => (
+            {(providers.providers ?? []).map((p) => (
               <div
                 key={p.provider_id}
                 className="flex flex-wrap items-center gap-3 rounded-xl border border-surface-border bg-surface-card/80 p-4"
@@ -131,7 +131,7 @@ export default function TransitPage() {
             {(alerts.alerts || []).slice(0, 15).map((a) => (
               <li key={a.alert_id} className="flex flex-wrap items-center gap-2 rounded-lg border border-surface-border bg-surface-card/80 px-4 py-3">
                 <span className="font-medium text-text-primary">{a.title ?? "Alert"}</span>
-                <SourceBadge sourceStatus={a.source_status} sourceFamily={a.source_family} />
+                <SourceBadge sourceStatus={a.source_status ?? "unavailable"} sourceFamily={a.source_family} />
                 {a.source_url && (
                   <a href={a.source_url} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-400 hover:underline">
                     Source

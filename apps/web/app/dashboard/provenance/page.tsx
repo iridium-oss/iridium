@@ -59,7 +59,7 @@ export default function ProvenancePage() {
             >
               <div className="flex flex-wrap items-center gap-2">
                 <span className="font-medium text-text-primary">{p.source_name}</span>
-                <StatusChip status={p.status} />
+                {p.status != null && <StatusChip status={p.status} />}
               </div>
               {p.fetched_at && (
                 <p className="mt-2 text-sm text-text-muted">Fetched: {new Date(p.fetched_at).toISOString()}</p>

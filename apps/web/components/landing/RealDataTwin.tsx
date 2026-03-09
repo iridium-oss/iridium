@@ -6,7 +6,7 @@ import { Icon } from "@/components/ui/Icon";
 export function RealDataTwin() {
   return (
     <section className="border-t border-surface-border py-20 sm:py-28" id="real-data">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-wide px-4 sm:px-6 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
           <motion.div
             initial={{ opacity: 0, x: -12 }}
@@ -26,7 +26,7 @@ export function RealDataTwin() {
               </li>
               <li className="flex items-start gap-2">
                 <Icon name="check_circle" size={20} className="shrink-0 text-accent-luminous" />
-                <span>Open-Meteo weather integration for Baku and Quba</span>
+                <span>Open-Meteo weather integration for Baku and Guba</span>
               </li>
               <li className="flex items-start gap-2">
                 <Icon name="check_circle" size={20} className="shrink-0 text-accent-luminous" />

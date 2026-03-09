@@ -4,8 +4,8 @@ import { motion } from "framer-motion";
 
 export function EquityAnalytics() {
   return (
-    <section className="border-t border-surface-border bg-midnight-prussian/50 py-20 sm:py-28" id="equity">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section className="border-t border-surface-border bg-white py-20 sm:py-28" id="equity">
+      <div className="mx-auto max-w-wide px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}

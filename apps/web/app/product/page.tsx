@@ -5,10 +5,10 @@ import { Icon } from "@/components/ui/Icon";
 
 export default function ProductPage() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white pt-14">
       <Navbar />
-      <main className="pt-24 pb-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <main id="main-content" className="pb-20" tabIndex={-1}>
+        <div className="mx-auto max-w-wide px-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-medium tracking-tight text-text-primary sm:text-4xl">
             Product overview
           </h1>
@@ -27,7 +27,7 @@ export default function ProductPage() {
               <Link
                 key={href}
                 href={href}
-                className="block rounded-xl border border-surface-border bg-surface-card/80 p-6 transition-colors hover:bg-surface-elevated"
+                className="block rounded-xl border border-surface-border bg-white p-6 transition-colors hover:border-indigo-200"
               >
                 <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-midnight-electric/20 text-accent-luminous">
                   <Icon name={icon} size={24} />
@@ -38,7 +38,7 @@ export default function ProductPage() {
             ))}
           </div>
           <div className="mt-12">
-            <Link href="/demo" className="inline-flex items-center gap-2 rounded-lg bg-midnight-electric px-5 py-2.5 text-sm font-medium text-white hover:opacity-90">
+            <Link href="/demo" className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-indigo-700">
               Try IRIDIUM
               <Icon name="arrow_forward" size={20} />
             </Link>

@@ -5,7 +5,7 @@
 export function DisclaimerBanner() {
   return (
     <div
-      className="mt-16 border-b border-amber-500/30 bg-amber-500/10 px-4 py-2.5 text-center text-sm text-amber-200"
+      className="mt-14 border-b border-amber-200 bg-white px-4 py-2.5 text-center text-sm text-amber-800"
       role="status"
     >
       Data shown is from real or recorded sources when configured. Each panel shows data status and provenance. Unconfigured sources are marked as unavailable or configuration required.

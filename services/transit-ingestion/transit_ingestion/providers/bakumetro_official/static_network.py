@@ -60,11 +60,11 @@ INTERCHANGE_PAIRS = [
     ("Azadlıq prospekti", "Azadlıq prospekti"),
 ]
 
-# Line metadata from official pages (length, station count).
+# Line metadata from official pages (length, station count). March 2026 baseline: see docs/baku-transit-statistics-baseline.md.
 LINE_META = {
-    "red": {"long_name": "Red line", "length_km": 15.0, "station_count": 13},
-    "green": {"long_name": "Green line", "length_km": 12.0, "station_count": 8},
-    "purple": {"long_name": "Purple line", "length_km": 6.0, "station_count": 3},
+    "red": {"long_name": "Red line", "length_km": 20.1, "station_count": 13},
+    "green": {"long_name": "Green line", "length_km": 14.5, "station_count": 10},
+    "purple": {"long_name": "Purple line", "length_km": 6.01, "station_count": 4},
 }
 
 
@@ -173,14 +173,14 @@ def get_metro_service_window(fetched_at: Optional[datetime] = None) -> TransitSe
 
 
 def get_metro_fare_policy(fetched_at: Optional[datetime] = None) -> TransitFarePolicy:
-    """One-fare info from official site."""
+    """Single fare from Baku Metro official fare page. March 2026 baseline: 0.60 AZN."""
     t = fetched_at or _ts()
     return TransitFarePolicy(
         fare_id="bakumetro_single",
         agency_id="baku_metro",
-        price=None,
+        price=0.60,
         currency="AZN",
-        description="Single fare; see official site for current tariff.",
+        description="Single fare. Source: Baku Metro official fare page. See docs/baku-transit-statistics-baseline.md.",
         source_provider=PROVIDER_ID,
         source_family=SOURCE_FAMILY,
         source_status=SOURCE_STATUS,

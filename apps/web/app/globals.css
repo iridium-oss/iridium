@@ -2,40 +2,40 @@
 
 :root {
   --font-google-sans: "Google Sans Variable", system-ui, sans-serif;
-  /* Midnight Magic palette */
-  --midnight-black: #02010a;
-  --midnight-prussian: #04052e;
-  --midnight-twilight: #140152;
-  --midnight-navy: #22007c;
-  --midnight-electric: #0d00a4;
-  /* Surfaces (dark default) */
-  --surface-deepest: #02010a;
-  --surface-dark: #04052e;
-  --surface-card: rgba(20, 1, 82, 0.6);
-  --surface-elevated: rgba(34, 0, 124, 0.4);
-  --surface-border: rgba(255, 255, 255, 0.08);
+  /* Light theme – tam beyaz, boz yok */
+  --midnight-black: #ffffff;
+  --midnight-prussian: #ffffff;
+  --midnight-twilight: #ffffff;
+  --midnight-navy: #ffffff;
+  --midnight-electric: #6366f1;
+  /* Surfaces – beyaz */
+  --surface-deepest: #ffffff;
+  --surface-dark: #ffffff;
+  --surface-card: #ffffff;
+  --surface-elevated: #ffffff;
+  --surface-border: rgba(0, 0, 0, 0.1);
   /* Accents */
-  --accent-luminous: rgba(138, 100, 255, 0.9);
-  --accent-focus: #0d00a4;
-  --accent-muted: rgba(138, 100, 255, 0.5);
-  --accent-glow: rgba(138, 100, 255, 0.15);
+  --accent-luminous: #4f46e5;
+  --accent-focus: #4338ca;
+  --accent-muted: #6366f1;
+  --accent-glow: rgba(99, 102, 241, 0.25);
   /* Text */
-  --text-primary: rgba(255, 255, 255, 0.95);
-  --text-secondary: rgba(255, 255, 255, 0.78);
-  --text-muted: rgba(255, 255, 255, 0.55);
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
   /* Radius */
   --radius-xs: 4px;
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-xl: 24px;
-  /* Shadows */
-  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.25);
-  --shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.35);
-  /* Success, warning, error (palette-calibrated) */
-  --color-success: #4ade80;
-  --color-warning: #fbbf24;
-  --color-error: #f87171;
+  /* Shadows – açık tema için hafif derinlik */
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 12px rgba(0, 0, 0, 0.04);
+  --shadow-elevated: 0 4px 6px rgba(0, 0, 0, 0.05), 0 10px 24px rgba(0, 0, 0, 0.06);
+  /* Success, warning, error */
+  --color-success: #16a34a;
+  --color-warning: #ca8a04;
+  --color-error: #dc2626;
 }
 
 @tailwind base;
@@ -79,6 +79,21 @@ body {
 
 /* Selection */
 ::selection {
-  background: var(--midnight-electric);
+  background: var(--accent-muted);
   color: white;
+}
+
+/* Print: hide nav, footer, disclaimer */
+@media print {
+  header,
+  footer,
+  [role="status"] {
+    display: none !important;
+  }
+  body {
+    padding-top: 0;
+  }
+  main {
+    padding-top: 0 !important;
+  }
 }

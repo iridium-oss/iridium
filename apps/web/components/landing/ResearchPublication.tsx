@@ -6,7 +6,7 @@ import { Icon } from "@/components/ui/Icon";
 export function ResearchPublication() {
   return (
     <section className="border-t border-surface-border py-20 sm:py-28" id="research">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-wide px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}

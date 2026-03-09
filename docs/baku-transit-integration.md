@@ -2,6 +2,8 @@
 
 This document describes how BakuBus and Baku Metro are integrated into the IRIDIUM transit layer using only real, publicly accessible or officially published information. No GTFS feeds, stop coordinates, or timetables are invented.
 
+For **March 2026 statistics baseline** (fares, network figures, ridership, source links), see [baku-transit-statistics-baseline.md](baku-transit-statistics-baseline.md).
+
 ## Overview
 
 - **BakuBus**: Integrated via the public AYNA map API. Route list from `getBusList`; route details (stops, geometry, fare, duration) from `getBusById`. Treated as source_family=public_api, source_status=public_undocumented.

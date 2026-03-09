@@ -4,10 +4,10 @@ import { Icon } from "@/components/ui/Icon";
 
 export default function ArchitecturePage() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white pt-14">
       <Navbar />
-      <main className="pt-24 pb-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <main id="main-content" className="pb-20" tabIndex={-1}>
+        <div className="mx-auto max-w-wide px-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-medium tracking-tight text-text-primary sm:text-4xl">
             Architecture and methodology
           </h1>
@@ -22,7 +22,7 @@ export default function ArchitecturePage() {
               </h2>
               <ul className="mt-4 list-inside list-disc space-y-2 text-text-secondary">
                 <li>Network ingestion (OSM PBF, PostGIS, manifest with provenance)</li>
-                <li>Weather ingestion (Open-Meteo; Baku, Quba)</li>
+                <li>Weather ingestion (Open-Meteo; Baku, Guba)</li>
                 <li>Traffic and transit provider abstraction (configuration or permission required when not set)</li>
                 <li>Digital twin state assembler (merges real sources only; no synthetic graph)</li>
                 <li>Forecasting, routing, equity, anomaly modules consuming the twin</li>

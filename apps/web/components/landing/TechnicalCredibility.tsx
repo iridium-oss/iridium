@@ -6,13 +6,13 @@ import { Icon } from "@/components/ui/Icon";
 const ITEMS = [
   { icon: "code" as const, title: "Formalized formulation", text: "Mobility graph, routing objective, forecasting target, equity composite, anomaly score consistent with the codebase." },
   { icon: "verified" as const, title: "Reproducible", text: "Open source (EUPL-1.2). Code version, environment variables, and data sources documented." },
-  { icon: "science" as const, title: "Baseline evaluation", text: "API semantics, response latency, source-status composition, real weather integration for Baku and Quba." },
+  { icon: "science" as const, title: "Baseline evaluation", text: "API semantics, response latency, source-status composition, real weather integration for Baku and Guba." },
 ];
 
 export function TechnicalCredibility() {
   return (
-    <section className="border-t border-surface-border bg-midnight-prussian/50 py-20 sm:py-28" id="credibility">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section className="border-t border-surface-border bg-white py-20 sm:py-28" id="credibility">
+      <div className="mx-auto max-w-wide px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}

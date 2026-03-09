@@ -6,6 +6,12 @@ const nextConfig = {
   reactStrictMode: true,
   output: 'standalone',
   typescript: { ignoreBuildErrors: false },
+  images: {
+    remotePatterns: [
+      { protocol: 'https', hostname: 'upload.wikimedia.org', pathname: '/wikipedia/commons/**' },
+      { protocol: 'https', hostname: 'commons.wikimedia.org', pathname: '/wiki/Special:Redirect/**' },
+    ],
+  },
   webpack: (config) => {
     config.resolve.alias['@'] = path.resolve(__dirname);
     return config;

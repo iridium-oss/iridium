@@ -58,7 +58,7 @@ export function DemoOnboardingModal({ onClose }: Props) {
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg bg-midnight-electric px-4 py-2.5 text-sm font-medium text-white hover:opacity-90"
+              className="rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-indigo-700"
             >
               Get started
             </button>

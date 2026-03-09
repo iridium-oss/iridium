@@ -6,7 +6,7 @@ import { Icon } from "@/components/ui/Icon";
 export function MultimodalRouting() {
   return (
     <section className="border-t border-surface-border py-20 sm:py-28" id="routing">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-wide px-4 sm:px-6 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
           <motion.div
             initial={{ opacity: 0, x: -12 }}

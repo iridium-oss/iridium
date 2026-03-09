@@ -6,8 +6,8 @@ import { Icon } from "@/components/ui/Icon";
 
 export function LiveDemoCta() {
   return (
-    <section className="border-t border-surface-border bg-midnight-electric/20 py-20 sm:py-28" id="demo">
-      <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+    <section className="border-t border-surface-border bg-white py-20 sm:py-28" id="demo">
+      <div className="mx-auto max-w-wide px-4 text-center sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -21,7 +21,7 @@ export function LiveDemoCta() {
           </p>
           <Link
             href="/demo"
-            className="mt-10 inline-flex items-center gap-2 rounded-lg bg-midnight-electric px-8 py-4 text-base font-medium text-white shadow-glow transition-opacity hover:opacity-90"
+            className="mt-10 inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-8 py-4 text-base font-medium text-white shadow-sm transition-colors hover:bg-indigo-700"
           >
             Launch demo
             <Icon name="play_arrow" size={24} />

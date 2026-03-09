@@ -124,13 +124,13 @@ export default function RoutingPage() {
           <h2 className="font-medium text-text-primary">Result</h2>
           {result.note && <p className="mt-2 text-sm text-text-secondary">{result.note}</p>}
           <div className="mt-4 space-y-4">
-            {result.alternatives.map((alt, i) => (
-              <div key={i} className="rounded-lg border border-surface-border bg-midnight-prussian/50 p-4">
+            {(result.alternatives ?? []).map((alt, i) => (
+              <div key={i} className="rounded-lg border border-surface-border bg-white p-4">
                 <p className="font-medium text-text-primary">
-                  Alternative {i + 1}: {alt.total_duration_min.toFixed(1)} min. Cost: {alt.total_cost ?? 0}. Carbon: {alt.total_carbon_kg ?? 0} kg.
+                  Alternative {i + 1}: {alt.total_duration_min != null ? alt.total_duration_min.toFixed(1) : "—"} min. Cost: {alt.total_cost ?? 0}. Carbon: {alt.total_carbon_kg ?? 0} kg.
                 </p>
                 <p className="mt-2 text-sm text-text-secondary">
-                  Segments: {alt.segments.map((s) => `${s.mode} ${s.duration_min} min`).join(", ")}.
+                  Segments: {(alt.segments ?? []).map((s) => `${s.mode ?? ""} ${s.duration_min ?? ""} min`).join(", ")}.
                 </p>
               </div>
             ))}
