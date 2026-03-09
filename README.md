@@ -5,7 +5,7 @@
 [![Lint](https://img.shields.io/github/actions/workflow/status/iridium-oss/iridium/lint.yml?branch=main&logo=github-actions&logoColor=white&label=Lint)](https://github.com/iridium-oss/iridium/actions/workflows/lint.yml)
 [![Docs](https://img.shields.io/github/actions/workflow/status/iridium-oss/iridium/docs.yml?branch=main&logo=github-actions&logoColor=white&label=Docs)](https://github.com/iridium-oss/iridium/actions/workflows/docs.yml)
 [![codecov](https://codecov.io/gh/iridium-oss/iridium/branch/main/graph/badge.svg?token=IRIDIUM_TOKEN)](https://codecov.io/gh/iridium-oss/iridium)
-[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/iridium-oss/iridium/badge)](https://securityscorecards.dev/viewer/?uri=github.com/iridium-oss/iridium)
+[![OpenSSF Scorecard](https://img.shields.io/ossf-scorecard/github.com/iridium-oss/iridium?label=openssf%20scorecard&style=flat)](https://securityscorecards.dev/viewer/?uri=github.com/iridium-oss/iridium)
 [![GitHub issues](https://img.shields.io/github/issues/iridium-oss/iridium?logo=github&logoColor=white)](https://github.com/iridium-oss/iridium/issues)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/iridium-oss/iridium?logo=github&logoColor=white)](https://github.com/iridium-oss/iridium/pulls)
 [![DOI](https://img.shields.io/badge/DOI-10.5281/zenodo.18915211-blue.svg?logo=zenodo&logoColor=white)](https://doi.org/10.5281/zenodo.18915211)
@@ -120,7 +120,7 @@ where $T(r)$ is travel time, $C(r)$ cost, $E(r)$ emissions proxy, and $P(r)$ tra
 ## Scholarly artifacts
 
 | Artifact | Status |
-|----------|--------|
+| :--- | :--- |
 | CITATION.cff | Present at repo root; use for citation. |
 | Zenodo DOI | Published; see [DOI: 10.5281/zenodo.18915211](https://doi.org/10.5281/zenodo.18915211). |
 | arXiv preprint | Under submission; see [arXiv: submit/7340933](https://arxiv.org/abs/submit/7340933). |
@@ -168,7 +168,7 @@ Federated learning orchestration, ST-GNN congestion forecasting, PostgreSQL pers
 | Olaf Yunus Laitinen Imanov | AI Engineer |
 | Amina Sadiqzade | Frontend Developer |
 | Malahat Ismayilova | AI Engineer |
-| Aslan Ibadullayev | Frontend Developer |
+| Aslan Ibadullayev | Fullstack Developer |
 | Fidan Bagirova | AI Engineer |
 
 [GOVERNANCE.md](GOVERNANCE.md) defines maintainer roles and decision-making.

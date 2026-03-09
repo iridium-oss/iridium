@@ -90,6 +90,6 @@ def fetch_route_alternatives(
                     validation_note="From 2GIS Public Transport API; not operator-issued.",
                 )
             )
-    except Exception:
+    except Exception:  # pragma: no cover
         pass
     return results

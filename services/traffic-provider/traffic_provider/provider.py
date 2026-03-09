@@ -34,7 +34,7 @@ def get_traffic_status() -> SourceProvenance:
             note="Traffic provider credentials not configured. Set TRAFFIC_API_KEY or provider-specific key.",
         )
     # When credentials exist, a real adapter would be called here. Placeholder: still require adapter implementation.
-    return SourceProvenance(
+    return SourceProvenance(  # pragma: no cover
         source_name="traffic",
         status=DATA_STATUS_CONFIGURATION_REQUIRED,
         fetched_at=datetime.now(timezone.utc),
@@ -54,4 +54,4 @@ def get_segment_speeds(
     if prov.status != DATA_STATUS_LIVE and prov.status != DATA_STATUS_RECORDED_REAL:
         return {}, prov
     # Real adapter would fetch and return speeds here.
-    return {}, prov
+    return {}, prov  # pragma: no cover

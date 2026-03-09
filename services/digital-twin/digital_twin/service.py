@@ -4,7 +4,7 @@ Primary API path should use get_assembled_snapshot (state_assembler) for real-da
 This module retains get_graph/update_state/get_snapshot for legacy or test use only when explicitly enabled.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 from iridium_schemas.network import (
@@ -48,7 +48,7 @@ def update_state(
     if incident_edges:
         for e in _edges:
             e.incident = e.edge_id in incident_edges
-    _snapshot_at = datetime.utcnow()
+    _snapshot_at = datetime.now(timezone.utc)
 
 
 def get_snapshot() -> DigitalTwinSnapshot:
@@ -60,6 +60,6 @@ def get_snapshot() -> DigitalTwinSnapshot:
     return DigitalTwinSnapshot(
         nodes=nodes,
         edges=edges,
-        snapshot_at=_snapshot_at or datetime.utcnow(),
+        snapshot_at=_snapshot_at or datetime.now(timezone.utc),
         version=_version,
     )

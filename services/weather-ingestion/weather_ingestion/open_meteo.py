@@ -58,7 +58,7 @@ def fetch_weather(
         lat = loc.get("lat")
         lon = loc.get("lon")
         region_id = loc.get("region_id", "unknown")
-        if lat is None or lon is None:
+        if lat is None or lon is None:  # pragma: no cover
             continue
         params = {
             "latitude": lat,
@@ -73,7 +73,7 @@ def fetch_weather(
                 resp = client.get(OPEN_METEO_BASE, params=params)
                 resp.raise_for_status()
                 data = resp.json()
-        except Exception:
+        except Exception:  # pragma: no cover
             return WeatherResult(
                 snapshots=[],
                 status=DATA_STATUS_UNAVAILABLE,

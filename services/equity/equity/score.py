@@ -4,7 +4,7 @@ Real or recorded data only; no synthetic defaults in main path.
 When no data path is configured, returns empty districts with data_status unavailable.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
@@ -30,7 +30,7 @@ def get_equity_scores(
     if not rows:
         return MobilityEquityScore(
             districts=[],
-            generated_at=datetime.utcnow(),
+            generated_at=datetime.now(timezone.utc),
             note="No equity data configured. Set EQUITY_DATA_PATH to a path containing district_scores.json (real or recorded). See docs/fairness.md.",
             data_status="unavailable",
         )
@@ -55,7 +55,7 @@ def get_equity_scores(
         )
     return MobilityEquityScore(
         districts=districts_out,
-        generated_at=datetime.utcnow(),
+        generated_at=datetime.now(timezone.utc),
         note="Derived analytic index; not an official government measurement. See docs/fairness.md.",
         data_status="live",
     )

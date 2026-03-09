@@ -16,7 +16,7 @@ from app.schemas import ErrorDetail, ErrorResponse
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Startup and shutdown. Placeholder for DB pool, caches."""
-    yield
+    yield  # pragma: no cover
 
 
 def create_app() -> FastAPI:

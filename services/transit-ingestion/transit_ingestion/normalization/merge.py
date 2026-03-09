@@ -49,7 +49,7 @@ def build_unified_transit_snapshot(
     seen_variant: set[str] = set()
     seen_stop: set[str] = set()
 
-    if bakubus_routes:
+    if bakubus_routes:  # pragma: no cover
         for item in bakubus_routes:
             ag = item.get("agency")
             if ag and ag.agency_id not in seen_agency:

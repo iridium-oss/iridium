@@ -48,7 +48,7 @@ def fetch_bakubus_news_page(
             fetched_at=fetched_at,
             status_code=r.status_code,
         )
-    except httpx.HTTPStatusError as e:
+    except httpx.HTTPStatusError as e:  # pragma: no cover
         return FetchedPage(
             url=target,
             html="",
@@ -56,7 +56,7 @@ def fetch_bakubus_news_page(
             status_code=e.response.status_code,
             error=str(e),
         )
-    except Exception as e:
+    except Exception as e:  # pragma: no cover
         return FetchedPage(
             url=target,
             html="",

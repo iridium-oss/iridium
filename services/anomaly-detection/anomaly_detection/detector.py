@@ -3,7 +3,7 @@ Rule-based anomaly detector. Detects congestion spikes, closure flags, demand su
 Future: hybrid statistical or ML-based detection.
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 from iridium_schemas.anomaly import AnomalyEvent
@@ -16,7 +16,7 @@ def get_anomalies(
 ) -> list[AnomalyEvent]:
     """Return active anomalies. Baseline: rule-based on twin state (incident flags, high occupancy)."""
     snapshot = get_snapshot()
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     since = since or (now - timedelta(hours=24))
     out: list[AnomalyEvent] = []
     for e in snapshot.edges:

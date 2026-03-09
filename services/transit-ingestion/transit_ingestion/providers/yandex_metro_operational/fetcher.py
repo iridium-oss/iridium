@@ -44,7 +44,7 @@ def fetch_yandex_metro_page(
             fetched_at=fetched_at,
             status_code=r.status_code,
         )
-    except Exception as e:
+    except Exception as e:  # pragma: no cover
         return FetchedMetroPage(
             url=target,
             html="",

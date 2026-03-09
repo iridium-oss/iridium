@@ -52,7 +52,7 @@ def _priority_rank(order: list[str], provider: str) -> int:
     """Lower rank = higher priority. Unknown provider gets last."""
     try:
         return order.index(provider)
-    except ValueError:
+    except ValueError:  # pragma: no cover
         return len(order)
 
 

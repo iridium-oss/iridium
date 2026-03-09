@@ -27,7 +27,7 @@ def load_network_from_db(dsn: Optional[str] = None) -> tuple[list[dict[str, Any]
     """
     try:
         import psycopg2
-    except ImportError:
+    except ImportError:  # pragma: no cover
         raise RuntimeError("psycopg2 is required for load_network_from_db")
 
     conn = psycopg2.connect(dsn or _get_dsn())

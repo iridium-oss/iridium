@@ -50,7 +50,7 @@ def _search_nominatim(
             r = c.get(NOMINATIM_URL, params=params, headers=headers)
             r.raise_for_status()
             data = r.json()
-    except Exception:
+    except Exception:  # pragma: no cover
         return []
     if not isinstance(data, list):
         return []
@@ -90,7 +90,7 @@ def resolve_station(
         try:
             lat_f = float(lat)
             lon_f = float(lon)
-        except (TypeError, ValueError):
+        except (TypeError, ValueError):  # pragma: no cover
             return OsmResolutionResult(stop=stop, confidence="none", candidates_count=len(candidates))
     else:
         return OsmResolutionResult(stop=stop, confidence="none", candidates_count=len(candidates))

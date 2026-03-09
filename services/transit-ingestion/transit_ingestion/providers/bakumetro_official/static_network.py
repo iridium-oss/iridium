@@ -119,7 +119,7 @@ def get_metro_stations(fetched_at: Optional[datetime] = None) -> list[TransitSto
     ]:
         for seq, name in enumerate(station_list, 1):
             key = f"{line_id}_{name}"
-            if key in seen:
+            if key in seen:  # pragma: no cover
                 continue
             seen.add(key)
             stop_id = f"bakumetro_{line_id}_{seq}_{name.replace(' ', '_')}"

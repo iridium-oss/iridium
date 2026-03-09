@@ -11,8 +11,15 @@ for p in ("services/digital-twin", "services/forecasting", "services/routing", "
         sys.path.insert(0, str(path))
 sys.path.insert(0, str(root / "apps" / "api"))
 
+from datetime import datetime
+from unittest.mock import patch
+import pytest
 from fastapi.testclient import TestClient
+from fastapi import HTTPException
+
 from app.main import app
+from app.api.ingestion import post_ingestion_events
+from iridium_schemas.events import IngestionEventBatch, SensorEvent
 
 client = TestClient(app)
 
@@ -86,3 +93,23 @@ def test_ingestion_events_validate():
     assert r.status_code == 200
     data = r.json()
     assert data.get("accepted") == 0
+
+
+def test_ingestion_events_validation_error():
+    """Cover ingestion 400 path: batch that passes Pydantic but fails validate_batch."""
+    bad = IngestionEventBatch.model_construct(
+        sensor_events=[SensorEvent.model_construct(segment_id="e1", timestamp=datetime.now(), speed_kmh=300)]
+    )
+    with pytest.raises(HTTPException) as exc_info:
+        post_ingestion_events(bad)
+    assert exc_info.value.status_code == 400
+    assert "validation_errors" in exc_info.value.detail
+
+
+def test_value_error_handler():
+    # Trigger ValueError from inside /version by making get_settings (used there) raise.
+    with patch("app.api.version.get_settings") as mock_settings:
+        mock_settings.side_effect = ValueError("Test Error")
+        r = client.get("/version")
+        assert r.status_code == 400
+        assert r.json()["error"]["code"] == "invalid_value"

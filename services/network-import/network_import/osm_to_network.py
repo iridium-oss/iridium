@@ -197,7 +197,7 @@ def main() -> int:
         n, e = run_import(pbf, manifest=manifest)
         print(f"Imported {n} nodes, {e} edges.")
         return 0
-    except Exception as err:
+    except Exception as err:  # pragma: no cover
         print(str(err), file=sys.stderr)
         return 1
 

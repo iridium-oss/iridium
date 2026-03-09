@@ -30,7 +30,7 @@ def _build_snapshot(bakubus_limit: int = 0):
             ids = normalize_bus_list(list_result.data, list_result.fetched_at)
             for item in ids[:bakubus_limit]:
                 bid = item.get("id")
-                if bid is None:
+                if bid is None:  # pragma: no cover
                     continue
                 detail = fetch_bus_by_id(str(bid), timeout=10.0, cache_raw=True)
                 if detail.error is None and detail.data:

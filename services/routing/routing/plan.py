@@ -3,7 +3,7 @@ Multimodal route planning baseline. Weighted shortest path with time/cost/carbon
 Uses digital twin graph; origin/destination snapped to nearest nodes for demo.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 from iridium_schemas.routing import (
     RouteRequest,
@@ -107,6 +107,6 @@ def plan_routes(req: RouteRequest) -> RouteResponse:
     )
     return RouteResponse(
         alternatives=[alt],
-        requested_at=datetime.utcnow(),
+        requested_at=datetime.now(timezone.utc),
         note="Baseline optimizer; full journey planner planned.",
     )

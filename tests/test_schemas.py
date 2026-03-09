@@ -19,14 +19,14 @@ from iridium_schemas.anomaly import AnomalyEvent
 
 
 def test_sensor_event_valid():
-    e = SensorEvent(segment_id="e1", timestamp=datetime.utcnow(), speed_kmh=30.0)
+    e = SensorEvent(segment_id="e1", timestamp=datetime.now(timezone.utc), speed_kmh=30.0)
     assert e.segment_id == "e1"
     assert e.speed_kmh == 30.0
 
 
 def test_sensor_event_invalid_speed():
     with pytest.raises(ValidationError):
-        SensorEvent(segment_id="e1", timestamp=datetime.utcnow(), speed_kmh=300)
+        SensorEvent(segment_id="e1", timestamp=datetime.now(timezone.utc), speed_kmh=300)
 
 
 def test_ingestion_batch_empty():
@@ -46,7 +46,7 @@ def test_route_request_invalid_lat():
 
 
 def test_forecast_segment():
-    s = ForecastSegment(segment_id="e1", timestamp=datetime.utcnow(), congestion_score=0.5)
+    s = ForecastSegment(segment_id="e1", timestamp=datetime.now(timezone.utc), congestion_score=0.5)
     assert s.congestion_score == 0.5
 
 
@@ -56,5 +56,5 @@ def test_district_score():
 
 
 def test_anomaly_event():
-    a = AnomalyEvent(anomaly_id="a1", type="incident", severity="high", detected_at=datetime.utcnow())
+    a = AnomalyEvent(anomaly_id="a1", type="incident", severity="high", detected_at=datetime.now(timezone.utc))
     assert a.type == "incident"

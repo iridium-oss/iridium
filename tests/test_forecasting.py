@@ -3,6 +3,7 @@
 import sys
 from pathlib import Path
 from datetime import datetime
+from unittest.mock import MagicMock, patch
 
 root = Path(__file__).resolve().parents[1]
 for p in ("packages/schemas", "services/digital-twin", "services/forecasting"):
@@ -10,6 +11,7 @@ for p in ("packages/schemas", "services/digital-twin", "services/forecasting"):
     if path.exists() and str(path) not in sys.path:
         sys.path.insert(0, str(path))
 
+from iridium_schemas.network import NetworkEdge
 from forecasting.pipeline import get_congestion_forecast
 
 
@@ -31,3 +33,18 @@ def test_forecast_segment_fields():
     s = result.segments[0]
     assert s.timestamp is not None
     assert s.congestion_score is None or 0 <= s.congestion_score <= 1
+
+
+def test_congestion_forecast_with_twin_edges():
+    """Cover _baseline_congestion loop when snapshot has edges with edge_id, speed_kmh, occupancy_pct."""
+    edges = [
+        NetworkEdge(edge_id="e1", from_node="n1", to_node="n2", mode="road", speed_kmh=25.0, occupancy_pct=30.0),
+        NetworkEdge(edge_id="e2", from_node="n2", to_node="n3", mode="road"),
+    ]
+    snap = MagicMock()
+    snap.edges = edges
+    snap.data_status = "live"
+    with patch("forecasting.pipeline.get_assembled_snapshot", return_value=snap):
+        result = get_congestion_forecast(horizon_minutes=30, segment_ids=["e1"])
+    assert len(result.segments) >= 1
+    assert any(s.segment_id == "e1" for s in result.segments)

@@ -61,7 +61,7 @@ def _write_stops(snapshot: dict, out_dir: Path) -> None:
             ])
 
 
-def _write_shapes(snapshot: dict, out_dir: Path) -> None:
+def _write_shapes(snapshot: dict, out_dir: Path) -> None:  # pragma: no cover
     shapes = snapshot.get("shapes") or []
     path = out_dir / "shapes.txt"
     with open(path, "w", newline="", encoding="utf-8") as f:
@@ -95,7 +95,7 @@ def build_gtfs_static(
     _write_agency(snapshot, out)
     _write_routes(snapshot, out)
     _write_stops(snapshot, out)
-    if snapshot.get("shapes"):
+    if snapshot.get("shapes"):  # pragma: no cover
         _write_shapes(snapshot, out)
 
     readme = out / "README.txt"

@@ -22,6 +22,17 @@ def test_equity_scores_default():
         assert len(result.districts) >= 1
 
 
+def test_equity_scores_data_dir_no_file():
+    """Cover _load_district_baselines when district_scores.json does not exist (return [])."""
+    data_dir = root / "data"
+    if not data_dir.exists():
+        return
+    result = get_equity_scores(data_dir=data_dir)
+    assert result.districts is not None
+    assert result.data_status == "unavailable"
+    assert len(result.districts) == 0
+
+
 def test_equity_scores_filter_districts():
     data_dir = root / "data" / "synthetic"
     result = get_equity_scores(district_ids=["d1", "d2"], data_dir=data_dir if data_dir.exists() else None)

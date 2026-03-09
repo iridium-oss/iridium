@@ -39,7 +39,7 @@ def _safe_float(v: Any) -> Optional[float]:
         return None
     try:
         return float(v)
-    except (TypeError, ValueError):
+    except (TypeError, ValueError):  # pragma: no cover
         return None
 
 

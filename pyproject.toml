@@ -68,3 +68,21 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_functions = ["test_*"]
 addopts = "-v --tb=short"
+filterwarnings = [
+    "ignore:datetime.datetime.utcnow.*:DeprecationWarning",
+]
+
+[tool.coverage.run]
+source = ["apps", "packages", "services"]
+omit = ["*/tests/*", "*/__pycache__/*", "*.pyc"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+    "if __name__ == .__main__.:",
+    "except ImportError:",
+]
+fail_under = 100

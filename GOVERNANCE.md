@@ -12,10 +12,10 @@ The following individuals are founding maintainers of the IRIDIUM repository. Th
 - Malahat Ismayilova
 - Fidan Bagirova
 
-**Frontend**
+**Fullstack & Frontend**
 
-- Amina Sadiqzade
-- Aslan Ibadullayev
+- Amina Sadiqzade (Frontend)
+- Aslan Ibadullayev (Fullstack)
 
 Maintainers are expected to act in the best interest of the project, follow the Code of Conduct, and uphold the contribution and security policies. New maintainers may be added by consensus of existing maintainers, with criteria and process documented in this file or in a separate document as the project grows.
 

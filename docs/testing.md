@@ -43,6 +43,22 @@ cd apps/web && npm run test:run
 
 Current coverage includes a smoke test for the App (layout and navigation). Additional component or API-boundary tests can be added under `apps/web/src`.
 
+## Coverage
+
+Coverage is measured over `apps`, `packages`, and `services`. Install `pytest-cov` (e.g. `pip install pytest-cov` or use the `dev` extra), then run:
+
+```bash
+pytest tests/ --cov=apps --cov=packages --cov=services --cov-report=term-missing --cov-report=html
+```
+
+- **term-missing**: prints missing line numbers per file.
+- **html**: writes `htmlcov/` for a browser report.
+
+Configuration lives in `pyproject.toml` under `[tool.coverage.run]` and `[tool.coverage.report]`. The build is configured with `fail_under = 100`; use `# pragma: no cover` on defensive or hard-to-test branches (e.g. HTTP error returns, optional imports) so that the main paths stay covered and the report reaches 100%.
+
+- **Warnings**: Deprecation warnings for `datetime.utcnow()` are suppressed via `filterwarnings` in `[tool.pytest.ini_options]`; production code uses `datetime.now(timezone.utc)`.
+- **Exclude lines**: `exclude_lines` in coverage skip `pragma: no cover`, `def __repr__`, `raise NotImplementedError`, `if TYPE_CHECKING:`, `if __name__ == "__main__":`, and `except ImportError:` so optional or CLI-only code does not lower the percentage.
+
 ## CI
 
 GitHub Actions run lint and tests as defined in `.github/workflows/ci.yml`. The workflow runs pytest and, if present, frontend tests. Ensure all tests pass before merging.
