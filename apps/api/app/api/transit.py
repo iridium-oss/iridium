@@ -281,10 +281,70 @@ def get_realtime_observations():
     metro_page = fetch_yandex_metro_page(timeout=8.0)
     notices, constraints = normalize_yandex_metro_operational(metro_page)
     return {
-        "stop_statuses": [{"stop_id": s.stop_id, "status": s.status, "source_provider": s.source_provider} for s in statuses],
-        "route_observations": [{"route_id": o.route_id, "operating": o.operating, "source_provider": o.source_provider} for o in route_obs],
-        "metro_notices": [{"notice_id": n.notice_id, "notice_type": n.notice_type, "source_provider": n.source_provider} for n in notices],
-        "metro_constraints": [{"constraint_id": c.constraint_id, "source_provider": c.source_provider} for c in constraints],
+        "stop_statuses": [
+            {
+                "stop_id": s.stop_id,
+                "route_id": s.route_id,
+                "status": s.status,
+                "observed_at": s.observed_at.isoformat() if s.observed_at else None,
+                "source_provider": s.source_provider,
+                "source_family": s.source_family,
+                "source_status": s.source_status,
+                "source_url": s.source_url,
+                "confidence": s.confidence,
+                "validation_note": s.validation_note,
+            }
+            for s in statuses
+        ],
+        "route_observations": [
+            {
+                "route_id": o.route_id,
+                "operating": o.operating,
+                "observed_at": o.observed_at.isoformat() if o.observed_at else None,
+                "source_provider": o.source_provider,
+                "source_family": o.source_family,
+                "source_status": o.source_status,
+                "source_url": o.source_url,
+                "confidence": o.confidence,
+                "validation_note": o.validation_note,
+            }
+            for o in route_obs
+        ],
+        "metro_notices": [
+            {
+                "notice_id": n.notice_id,
+                "station_id": n.station_id,
+                "notice_type": n.notice_type,
+                "description": n.description,
+                "effective_start": n.effective_start.isoformat() if n.effective_start else None,
+                "effective_end": n.effective_end.isoformat() if n.effective_end else None,
+                "observed_at": n.observed_at.isoformat() if n.observed_at else None,
+                "source_provider": n.source_provider,
+                "source_family": n.source_family,
+                "source_status": n.source_status,
+                "source_url": n.source_url,
+                "confidence": n.confidence,
+                "validation_note": n.validation_note,
+            }
+            for n in notices
+        ],
+        "metro_constraints": [
+            {
+                "constraint_id": c.constraint_id,
+                "from_station_id": c.from_station_id,
+                "to_station_id": c.to_station_id,
+                "constraint_type": c.constraint_type,
+                "route_time_impact_seconds": c.route_time_impact_seconds,
+                "observed_at": c.observed_at.isoformat() if c.observed_at else None,
+                "source_provider": c.source_provider,
+                "source_family": c.source_family,
+                "source_status": c.source_status,
+                "source_url": c.source_url,
+                "confidence": c.confidence,
+                "validation_note": c.validation_note,
+            }
+            for c in constraints
+        ],
         "source_note": "Public web observed; not official operator GTFS Realtime.",
     }
 

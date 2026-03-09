@@ -15,7 +15,7 @@ This roadmap outlines phased development from repository foundation to pilot eva
 ## Phase 1: System Design and Data Contracts
 
 - Finalize high-level architecture and document in `docs/`.
-- Define and version data contracts for ingestion, digital twin, and APIs in `data-contracts/`.
+- Define and version shared data contracts for ingestion, digital twin, and APIs in `packages/schemas`.
 - Specify schemas for core entities: road segments, sensors, trips (anonymized/aggregated), events, routing requests/responses.
 - Align with privacy and federated learning constraints (no raw personal data in central schemas).
 - Document API surface and error handling in `docs/api-spec.md`.

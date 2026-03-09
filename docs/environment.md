@@ -2,10 +2,43 @@
 
 Environment variables are grouped by subsystem. Copy `.env.example` to `.env` and set values as needed. Do not commit `.env`.
 
+## Canonical names
+
+Preferred variables use the `IRIDIUM_` prefix with nested keys:
+
+- `IRIDIUM_CORE__...`
+- `IRIDIUM_DB__...`
+- `IRIDIUM_CACHE__...`
+- `IRIDIUM_PROVIDERS__...`
+
+Legacy variables (for example `API_PORT`) remain supported for compatibility, but should be considered deprecated for new development.
+
 ## Environment variable matrix
 
 | Variable | Purpose | Required | Default | Sensitivity |
 |----------|---------|----------|---------|-------------|
+| IRIDIUM_CORE__ENVIRONMENT | Environment name | No | development | No |
+| IRIDIUM_CORE__APP_NAME | Service identifier | No | iridium-api | No |
+| IRIDIUM_CORE__APP_VERSION | Service version | No | 0.2.0-dev | No |
+| IRIDIUM_CORE__API_HOST | Bind host for API server | No | 0.0.0.0 | No |
+| IRIDIUM_CORE__API_PORT | API server port | No | 8000 | No |
+| IRIDIUM_CORE__API_BASE_URL | Public base URL for API | No | http://localhost:8000 | No |
+| IRIDIUM_CORE__CORS_ORIGINS | Allowed CORS origins (comma-separated) | No | http://localhost:3000,... | No |
+| IRIDIUM_CORE__CORS_ALLOW_CREDENTIALS | Allow credentials in CORS | No | false | No |
+| IRIDIUM_CORE__CORS_ALLOW_METHODS | Allowed CORS methods (comma-separated) | No | GET,POST,OPTIONS | No |
+| IRIDIUM_CORE__CORS_ALLOW_HEADERS | Allowed CORS headers (comma-separated) | No | Authorization,Content-Type,X-Request-ID | No |
+| IRIDIUM_CORE__LOG_LEVEL | Logging level | No | INFO | No |
+| IRIDIUM_CORE__MAX_REQUEST_BODY_BYTES | Max request body size (Content-Length enforced) | No | 1048576 | No |
+| IRIDIUM_CORE__HSTS_ENABLED | Enable Strict-Transport-Security header | No | false | No |
+| IRIDIUM_CORE__HSTS_MAX_AGE_SECONDS | HSTS max-age seconds | No | 31536000 | No |
+| IRIDIUM_DB__ENABLED | Enable database integration | No | false | No |
+| IRIDIUM_DB__DSN | SQLAlchemy DSN for PostgreSQL | When DB enabled | (empty) | Yes |
+| IRIDIUM_CACHE__ENABLED | Enable Redis caching | No | false | No |
+| IRIDIUM_CACHE__REDIS_URL | Redis connection URL | When cache enabled | (empty) | No |
+| IRIDIUM_PROVIDERS__OPEN_METEO_ENABLED | Enable Open-Meteo | No | true | No |
+| IRIDIUM_PROVIDERS__YANDEX_OBSERVED_ENABLED | Enable web observed sources | No | true | No |
+| IRIDIUM_PROVIDERS__TWOGIS_ENABLED | Enable 2GIS integration | No | false | No |
+| IRIDIUM_PROVIDERS__MOOVIT_ENABLED | Enable Moovit integration | No | false | No |
 | API_HOST | Bind host for API server | No | 0.0.0.0 | No |
 | API_PORT | API server port | No | 8000 | No |
 | API_BASE_URL | Public base URL for API | No | http://localhost:8000 | No |
@@ -26,7 +59,7 @@ Environment variables are grouped by subsystem. Copy `.env.example` to `.env` an
 | TRACCAR_PASSWORD | Traccar password | No | (empty) | Yes |
 | DATA_SAMPLES_DIR | Path to sample data directory | No | data/samples | No |
 | EQUITY_DATA_PATH | Path to directory containing district_scores.json | No | (empty) | No |
-| OSM_DATA_DIR | Path to OSM raw sources (PBF, manifest) | No | infrastructure/raw-sources/osm | No |
+| OSM_DATA_DIR | Path to OSM raw sources (PBF, manifest) | No | data/manifests/osm | No |
 | OTP_GRAPH_DIR | OpenTripPlanner graph directory | For OTP routing | (empty) | No |
 | OTP_PORT | OpenTripPlanner service port | No | 8080 | No |
 | VALHALLA_URL | Valhalla service URL | For Valhalla routing | (empty) | No |

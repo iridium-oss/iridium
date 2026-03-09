@@ -6,45 +6,49 @@ on:
   pull_request:
     branches: [main, develop]
 
+permissions:
+  contents: read
+
 jobs:
   backend:
     name: Backend tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55
         with:
           python-version: "3.12"
 
       - name: Cache pip
-        uses: actions/cache@v4
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('pyproject.toml', 'packages/schemas/pyproject.toml', 'apps/api/pyproject.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
+          restore-keys: ${{ runner.os }}-pip-
 
       - name: Install backend
         run: |
           python -m pip install --upgrade pip
           pip install -e ./packages/schemas
-          pip install pytest pytest-asyncio pytest-cov httpx
-          pip install -e ./apps/api 2>/dev/null || pip install fastapi uvicorn pydantic pydantic-settings
-        continue-on-error: false
+          pip install -e .
+          pip install -e ./apps/api
+          pip install pytest pytest-asyncio pytest-cov
 
       - name: Run Python tests
-        run: python -m pytest tests/ -v --cov=./ --cov-report=xml --cov-report=term
-        continue-on-error: true
+        run: python -m pytest tests/ -v --tb=short --cov=apps --cov=packages --cov=services --cov-report=xml --cov-report=term
+        env:
+          IRIDIUM_CORE__ENVIRONMENT: ci
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@968872560f81e7bdde9272853e65f2507c0eca7c
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage.xml
           flags: backend
           fail_ci_if_error: false
+        continue-on-error: true
 
       - name: Repository structure
         run: |
@@ -56,24 +60,26 @@ jobs:
     name: Frontend tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871
 
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@0a44ba7841725637a19e28fa30b79a866c81b0a6
         with:
           node-version: "20"
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
 
       - name: Install and test web
         run: |
           cd apps/web
-          npm install
-          npm run test -- --coverage 2>/dev/null || echo "Frontend tests skipped"
-        continue-on-error: true
+          npm ci
+          npm run test:run
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@968872560f81e7bdde9272853e65f2507c0eca7c
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: apps/web/coverage
           flags: frontend
           fail_ci_if_error: false
+        continue-on-error: true

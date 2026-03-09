@@ -19,12 +19,12 @@ IRIDIUM can be run in several operational modes depending on available data sour
 | run-public-data | Same as core; use with public-only env (no traffic/transit keys). |
 | run-live-data | Docker with profiles for live integrations, or local with .env set for traffic/transit. |
 | run-demo | Stack suitable for demo (docker compose up or run-api + run-web). |
-| run-observability | Docker with with_observability profile (Prometheus). |
+| run-observability | Docker with with-observability profile (Prometheus). |
 | stop-stack | docker compose down. |
 | reset-local | docker compose down -v; clears Postgres data. Use with care. |
 
 - **Local**: `make run-api`, `make run-web`. Uses .env; data status is explicit when sources are missing. Best for active development.
-- **Docker**: Use compose profiles (see docs/docker-profiles.md). `docker compose up -d` runs core (api, web, postgres, redis). `make run-public-only-stack` for core; `make run-live-stack` for profiles that include live integrations when configured.
+- **Docker**: Use compose profiles (see docs/docker-profiles.md). `docker compose --profile core up -d` runs core (api, web, postgres, redis).
 
 ## Failure behaviour
 

@@ -4,7 +4,7 @@ import sys
 import json
 import tempfile
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
 
 root = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(root / "packages" / "schemas"))

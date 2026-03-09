@@ -2,6 +2,8 @@
 
 IRIDIUM integrates multiple heterogeneous data streams. This document describes the intended sources, their purpose, expected schema direction, quality concerns, and privacy considerations. Schemas are authoritative when defined in `data-contracts/`; this doc provides context.
 
+Note: code-level shared contracts live under `packages/schemas` in this repository. This document describes intended semantics, not an alternative schema source.
+
 ## IoT Road Sensors
 
 **Purpose**: Real-time traffic state (speed, occupancy, flow) on road segments. Primary input for the digital twin and congestion forecasting.

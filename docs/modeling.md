@@ -21,7 +21,7 @@ Specific architectures will be documented in the codebase and in research docs a
 - **Holidays and events**: Binary or categorical indicators from the event calendar.
 - **Weather**: Precipitation, temperature, etc., where available.
 
-Feature pipelines must be reproducible and versioned; schemas live in `data-contracts/` where they affect APIs or storage.
+Feature pipelines must be reproducible and versioned; shared schemas live in `packages/schemas` where they affect APIs or storage.
 
 ## Spatio-Temporal Formulation
 

@@ -1,0 +1,196 @@
+name: Security
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  workflow-lint:
+    name: Workflow security and syntax (actionlint)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871
+      - name: Run actionlint
+        uses: rhysd/actionlint@03d0035246f3e81f36aed592ffb4bebf33a03106
+
+  secret-scan:
+    name: Secret scanning (gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871
+        with:
+          fetch-depth: 0
+      - name: Run gitleaks
+        uses: gitleaks/gitleaks-action@44c470ffc35caa8b1eb3e8012ca53c2f9bea4eb5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  python-vuln:
+    name: Python dependency vulnerabilities (pip-audit)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871
+      - uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55
+        with:
+          python-version: "3.12"
+      - name: Install project (for audit)
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ./packages/schemas
+          pip install -e .
+          pip install -e ./apps/api
+          pip install pip-audit
+      - name: pip-audit (SARIF)
+        run: |
+          pip-audit -f sarif -o pip-audit.sarif || true
+      - name: Upload SARIF (pip-audit)
+        uses: github/codeql-action/upload-sarif@9887d98ae49f1f598651b556d8c8f02f3ea065cb
+        with:
+          sarif_file: pip-audit.sarif
+      - name: pip-audit (enforce)
+        run: |
+          pip-audit
+
+  python-sast:
+    name: Python SAST (bandit)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871
+      - uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55
+        with:
+          python-version: "3.12"
+      - name: Install bandit
+        run: |
+          python -m pip install --upgrade pip
+          pip install bandit
+      - name: Bandit scan (SARIF)
+        run: |
+          bandit -r apps services packages -f sarif -o bandit.sarif || true
+      - name: Upload SARIF (bandit)
+        uses: github/codeql-action/upload-sarif@9887d98ae49f1f598651b556d8c8f02f3ea065cb
+        with:
+          sarif_file: bandit.sarif
+      - name: Bandit scan (enforce)
+        run: |
+          bandit -r apps services packages -ll
+
+  js-vuln:
+    name: Node dependency vulnerabilities (npm audit)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871
+      - uses: actions/setup-node@0a44ba7841725637a19e28fa30b79a866c81b0a6
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install dependencies
+        run: |
+          cd apps/web
+          npm ci
+      - name: npm audit (high and critical)
+        run: |
+          cd apps/web
+          npm audit --audit-level=high
+
+  container-and-iac:
+    name: Container and IaC security (trivy)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871
+      - name: Trivy config scan (SARIF)
+        uses: aquasecurity/trivy-action@915b19bbe73b92a6cf82a1bc12b087c9a19a5fe2
+        with:
+          scan-type: config
+          scan-ref: .
+          format: sarif
+          output: trivy-config.sarif
+          severity: HIGH,CRITICAL
+          exit-code: "1"
+      - name: Upload SARIF (trivy config)
+        uses: github/codeql-action/upload-sarif@9887d98ae49f1f598651b556d8c8f02f3ea065cb
+        with:
+          sarif_file: trivy-config.sarif
+
+  container-image-scan:
+    name: Container image vulnerabilities (trivy)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2
+      - name: Build API image (local)
+        uses: docker/build-push-action@471d1dc4e07e5cdedd4c2171150001c434f0b7a4
+        with:
+          context: .
+          file: infrastructure/docker/Dockerfile.api
+          load: true
+          tags: iridium-api:ci
+      - name: Build web image (local)
+        uses: docker/build-push-action@471d1dc4e07e5cdedd4c2171150001c434f0b7a4
+        with:
+          context: .
+          file: infrastructure/docker/Dockerfile.web
+          load: true
+          tags: iridium-web:ci
+      - name: Trivy image scan (API)
+        uses: aquasecurity/trivy-action@915b19bbe73b92a6cf82a1bc12b087c9a19a5fe2
+        with:
+          image-ref: iridium-api:ci
+          format: sarif
+          output: trivy-api-image.sarif
+          severity: HIGH,CRITICAL
+          exit-code: "1"
+      - name: Upload SARIF (trivy API image)
+        uses: github/codeql-action/upload-sarif@9887d98ae49f1f598651b556d8c8f02f3ea065cb
+        with:
+          sarif_file: trivy-api-image.sarif
+      - name: Trivy image scan (web)
+        uses: aquasecurity/trivy-action@915b19bbe73b92a6cf82a1bc12b087c9a19a5fe2
+        with:
+          image-ref: iridium-web:ci
+          format: sarif
+          output: trivy-web-image.sarif
+          severity: HIGH,CRITICAL
+          exit-code: "1"
+      - name: Upload SARIF (trivy web image)
+        uses: github/codeql-action/upload-sarif@9887d98ae49f1f598651b556d8c8f02f3ea065cb
+        with:
+          sarif_file: trivy-web-image.sarif
+
+  sbom:
+    name: SBOM (Syft)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871
+      - name: Generate SBOM (CycloneDX JSON)
+        uses: anchore/sbom-action@d94f46e13c6c62f59525ac9a1e147a99dc0b9bf5
+        with:
+          format: cyclonedx-json
+          output-file: iridium.sbom.cdx.json
+      - name: Upload SBOM artifact
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
+        with:
+          name: sbom-cyclonedx
+          path: iridium.sbom.cdx.json

@@ -5,7 +5,7 @@ This document describes the baseline deployment options and a placeholder for fu
 ## Implemented Options
 
 - **Local development**: Run the API (uvicorn) and frontend (Vite dev server) from the repo; see [local-development.md](local-development.md). No database required for the baseline; the digital twin is in-memory.
-- **Docker Compose**: `docker compose up -d` runs API, web (nginx serving Vite build), PostgreSQL, and Redis. The API container uses in-memory state; the database is initialised from `infrastructure/db/schema.sql` for future use. Web container proxies `/api`, `/health`, and `/version` to the API service.
+- **Docker Compose**: `docker compose --profile core up -d` runs API, web (nginx serving Vite build), PostgreSQL, and Redis. The API container can run without persistence for the baseline; the database is initialised from `infrastructure/db/schema.sql` and migrations for future use. Web container proxies `/api`, `/health`, and `/version` to the API service.
 
 ## Target Environments
 
@@ -32,7 +32,7 @@ This document describes the baseline deployment options and a placeholder for fu
 ## Configuration
 
 - Environment-specific config (per env) for feature flags, endpoints, and limits.
-- Schema and contract versions aligned across components; see `data-contracts/`.
+- Schema and contract versions aligned across components; see `packages/schemas`.
 
 ## Future Additions
 

@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-Security updates are provided for the current major version and the immediately preceding major version, when applicable. Pre-1.0 releases are supported on a best-effort basis. Supported versions will be clearly stated in the release notes and on the repository release page.
+Security fixes are handled on a best-effort basis. Pre-1.0 releases may change rapidly, and security patches are typically applied to the default branch first. When releases exist, security relevant fixes should be reflected in release notes.
 
 ## Reporting a Vulnerability
 
@@ -22,11 +22,10 @@ We will acknowledge receipt, work with you to understand and validate the issue,
 
 In scope for security reporting:
 
-- Authentication, authorization, or session handling flaws.
+- Authentication, authorization, or session handling flaws (when present).
 - Injection, deserialization, or other code execution vulnerabilities.
 - Exposure of sensitive data (credentials, personal data, or internal configuration) through the application or its dependencies.
-- Issues in the federated learning or aggregation pipeline that could allow recovery of private data or model inversion.
-- Weaknesses in cryptographic usage or key management in the codebase.
+- Weaknesses in cryptographic usage or key management in the codebase (when present).
 
 Out of scope:
 
@@ -36,7 +35,7 @@ Out of scope:
 
 ## Privacy-Sensitive Data
 
-IRIDIUM is designed to process mobility-related data. Raw personal data is intended to remain on local nodes; only encrypted or otherwise privacy-preserving updates are shared in the federated setting. The public repository contains only synthetic data; no real mobility or user data is stored or processed in the baseline. Despite this design:
+IRIDIUM is a mobility platform and deployments may process sensitive telemetry depending on enabled integrations (for example consent based device traces, partner feeds, operator feeds). This repository should not contain raw personal data or committed secrets. Despite that:
 
 - Deployers are responsible for their own data handling and compliance with applicable law.
 - Security discussions and patches must avoid exposing sensitive operational details (e.g. real deployment topology, real credentials, or real user data). When sharing proof-of-concept or logs, redact or anonymize appropriately.

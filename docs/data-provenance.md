@@ -21,7 +21,7 @@ Each connector documents:
 
 ## Source-Specific Manifests
 
-- **OSM (Geofabrik)**: See infrastructure/raw-sources/osm/README and docs/source-licensing.md. Acquisition: scripts/fetch_osm_azerbaijan.py; then services/network-import loads PBF into PostgreSQL (network_nodes, network_edges). Manifest in raw-sources/osm/manifest.json; network_import_manifest table stores import provenance. Refresh: manual or scheduled. No personal data. Raw PBF not in git. To run: make fetch-real-data, then pip install -e ./services/network-import and apply infrastructure/db/schema.sql, then make ingest-real-data.
+- **OSM (Geofabrik)**: See data/manifests/osm/README.md and docs/source-licensing.md. Acquisition: scripts/fetch_osm_azerbaijan.py; then services/network-import loads PBF into PostgreSQL (network_nodes, network_edges). Manifest in data/manifests/osm/manifest.json; network_import_manifest table stores import provenance. Refresh: manual or scheduled. No personal data. Raw PBF not in git. To run: make fetch-real-data, then pip install -e ./services/network-import and apply infrastructure/db/schema.sql, then make ingest-real-data.
 - **Transit (GTFS)**: See services/transit-ingestion and docs/operator-integration-requirements.md. Baku Metro and BakuBus: permission_required until operator provides feed. No fabricated GTFS.
 - **Weather (Open-Meteo)**: See services/weather-ingestion and docs/weather-integration.md. Public API. No personal data. Caching allowed per API terms.
 - **Traffic**: See services/traffic-provider. Licensed provider (e.g. TomTom) requires credentials. When absent: configuration_required; no synthetic traffic.

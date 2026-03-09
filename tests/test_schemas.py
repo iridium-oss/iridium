@@ -1,7 +1,7 @@
 """Schema validation tests."""
 
 import pytest
-from datetime import datetime
+from datetime import datetime, timezone
 from pydantic import ValidationError
 
 import sys

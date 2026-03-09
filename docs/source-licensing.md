@@ -6,7 +6,7 @@ This document summarises licensing and terms for external data sources used or p
 
 - **Data**: OpenStreetMap contributors. License: ODbL (Open Database License). You must attribute and share-alike.
 - **Geofabrik extracts**: Pre-built country/region extracts. Same ODbL. Terms: https://www.geofabrik.de/data/shapefiles.html and OSM legal.
-- **Use in IRIDIUM**: Base road network, administrative boundaries, transport stops, cycling and pedestrian infrastructure. Processed network stored in PostgreSQL/PostGIS. Raw PBF files are not committed to the repository; fetch via script and store in infrastructure/raw-sources/osm or a gitignored cache.
+- **Use in IRIDIUM**: Base road network, administrative boundaries, transport stops, cycling and pedestrian infrastructure. Processed network stored in PostgreSQL/PostGIS. Raw PBF files are not committed to the repository; fetch via script and store in data/manifests/osm or a gitignored cache.
 - **Attribution**: Required in UI and documentation when displaying OSM-derived maps or data.
 
 ## Transit (GTFS)

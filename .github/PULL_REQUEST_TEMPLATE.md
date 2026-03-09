@@ -23,8 +23,9 @@ Why is this change needed? Link to related issues if applicable.
 
 ## Privacy and Security Considerations
 
-- Does this change touch personal data, credentials, or the federated/aggregation pipeline?
+- Does this change touch personal data, credentials, telemetry, or licensed partner sources?
 - Any new dependencies or permissions that affect security?
+- Any new external provider integration or new outbound network calls?
 
 ## Checklist
 
@@ -33,3 +34,4 @@ Why is this change needed? Link to related issues if applicable.
 - [ ] Comments and docs use formal, professional language; no emojis; no em dash or en dash.
 - [ ] Documentation updated where behaviour or APIs change.
 - [ ] No sensitive data or credentials in commits or description.
+- [ ] Provider integrations: timeouts, retries, and input validation are in place; raw payloads are not returned to clients.

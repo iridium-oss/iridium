@@ -31,6 +31,13 @@ def test_health():
     assert data.get("status") == "ok"
 
 
+def test_ready():
+    r = client.get("/ready")
+    assert r.status_code == 200
+    data = r.json()
+    assert data.get("status") == "ready"
+
+
 def test_version():
     r = client.get("/version")
     assert r.status_code == 200

@@ -7,6 +7,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
+from iridium_schemas.source_status import DataStatus, ConfidenceLevel
 
 # Allowed values for data status in responses and UI
 DATA_STATUS_LIVE = "live"
@@ -35,6 +36,18 @@ class SourceProvenance(BaseModel):
     provider: Optional[str] = None
     confidence: Optional[str] = None  # e.g. high, medium, low
     note: Optional[str] = None  # e.g. "Credentials missing", "Operator feed not yet provided"
+
+    def to_canonical_status(self) -> DataStatus:
+        try:
+            return DataStatus(self.status)
+        except Exception:
+            return DataStatus.unavailable
+
+    def to_confidence(self) -> ConfidenceLevel:
+        try:
+            return ConfidenceLevel(self.confidence or "unknown")
+        except Exception:
+            return ConfidenceLevel.unknown
 
 
 class ProviderRegistryEntry(BaseModel):

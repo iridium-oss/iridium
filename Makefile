@@ -10,6 +10,8 @@ DOCKER_COMPOSE := docker compose
 .PHONY: install install-py install-js dev test lint format typecheck run-api run-web seed-data clean help
 .PHONY: fetch-real-data ingest-real-data build-otp run-live-stack run-public-only-stack refresh-snapshots validate-provenance verify-badges
 .PHONY: run-core run-public-data run-live-data run-demo run-observability stop-stack reset-local
+.PHONY: docker-up docker-down logs
+.PHONY: db-up db-migrate db-revision db-reset
 
 help:
 	@echo "IRIDIUM targets:"
@@ -103,12 +105,27 @@ run-demo:
 	$(DOCKER_COMPOSE) up -d
 
 run-observability:
-	$(DOCKER_COMPOSE) --profile with_observability up -d
+	$(DOCKER_COMPOSE) --profile with-observability up -d
 
 stop-stack:
 	$(DOCKER_COMPOSE) down
 
 reset-local:
+	$(DOCKER_COMPOSE) down -v
+
+logs:
+	$(DOCKER_COMPOSE) logs -f --tail=200
+
+db-up:
+	$(DOCKER_COMPOSE) --profile core up -d postgres
+
+db-migrate:
+	alembic upgrade head
+
+db-revision:
+	@echo "Create a new migration: alembic revision -m \"message\""
+
+db-reset:
 	$(DOCKER_COMPOSE) down -v
 
 run-live-stack:
@@ -121,7 +138,7 @@ refresh-snapshots:
 	@echo "Recorded snapshot refresh: run ingestion for configured snapshot paths (see docs/data-provenance.md)"
 
 validate-provenance:
-	@test -f infrastructure/raw-sources/osm/manifest.json && echo "OSM manifest present" || echo "OSM manifest missing; run make fetch-real-data"
+	@test -f data/manifests/osm/manifest.json && echo "OSM manifest present" || echo "OSM manifest missing; run make fetch-real-data"
 
 verify-badges:
 	$(PYTHON) scripts/verify_badges.py

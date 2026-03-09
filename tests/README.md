@@ -6,7 +6,7 @@ This directory contains the test suite for IRIDIUM: unit tests, integration test
 
 - **Unit tests**: Test individual functions, classes, or modules in isolation. Mock external dependencies (APIs, databases) where appropriate.
 - **Integration tests**: Test interaction between components (e.g. ingestion to twin, API to routing). May use in-memory or test databases and synthetic data.
-- **Contract tests**: Validate that request and response payloads conform to the schemas in `data-contracts/`. Ensure backward compatibility when contracts change.
+- **Contract tests**: Validate that request and response payloads conform to the shared schemas in `packages/schemas`. Ensure backward compatibility when schemas change.
 - **CI**: The test suite is run in CI (`.github/workflows/ci.yml`). All tests must pass before merge unless explicitly excluded with justification.
 
 ## Structure

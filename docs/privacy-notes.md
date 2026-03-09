@@ -1,3 +1,37 @@
+## Privacy notes and sensitive data awareness
+
+IRIDIUM can integrate mobility related data sources. Depending on configuration, deployments may handle data that is sensitive. This repository baseline avoids committing raw sensitive data and provides guidance for safer handling.
+
+### What is sensitive
+
+Treat the following as sensitive by default:
+
+- **Device level telemetry**: GNSS traces, device identifiers, per trip traces, and any raw logs that can be linked to an individual.
+- **Credential material**: API keys, passwords, tokens, session cookies, and connection strings containing secrets.
+- **Partner feeds**: Licensed or permission required datasets where terms restrict redistribution or caching.
+
+### Repository rules
+
+- Do not commit `.env` files or secret material.
+- Do not commit raw telemetry or raw provider payload captures.
+- Prefer aggregated or anonymised derived datasets for tests and demos.
+
+### Retention and caching guidance
+
+- Default to short retention for cached external payloads unless terms permit longer storage.
+- Avoid caching payloads that include identifiers or fine grained traces.
+- When recorded snapshots are used for demos, store only the minimum necessary fields and include provenance and redaction status metadata.
+
+### Provenance without unsafe exposure
+
+Provenance should describe the source and capture time without embedding raw upstream payloads:
+
+- provider id and source family
+- source status and access type
+- observed at or fetched at timestamps
+- license or terms reference
+- validation notes and confidence signals where applicable
+
 # Privacy Notes
 
 IRIDIUM is designed to support privacy-preserving deployment. This document states design choices and operational notes. It does not constitute legal advice. Deployers are responsible for compliance with applicable law.

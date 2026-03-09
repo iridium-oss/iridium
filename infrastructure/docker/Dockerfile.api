@@ -1,23 +1,22 @@
-# IRIDIUM API - production-style Dockerfile
-FROM python:3.12-slim
+# IRIDIUM API - production-minded Dockerfile
+FROM python:3.12-slim AS base
 
 WORKDIR /app
 
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 
-COPY pyproject.toml .
-COPY packages/schemas packages/schemas
-COPY services/digital-twin services/digital-twin
-COPY services/forecasting services/forecasting
-COPY services/routing services/routing
-COPY services/equity services/equity
-COPY services/anomaly-detection services/anomaly-detection
-COPY services/ingestion services/ingestion
-COPY apps/api apps/api
+RUN python -m pip install --no-cache-dir --disable-pip-version-check --upgrade pip
 
-RUN pip install --no-cache-dir -e ./packages/schemas \
-    && pip install --no-cache-dir fastapi uvicorn pydantic pydantic-settings python-dotenv structlog \
+COPY pyproject.toml ./
+COPY packages/schemas ./packages/schemas
+COPY services ./services
+COPY apps/api ./apps/api
+
+# Install monorepo runtime dependencies from root pyproject.toml.
+# Editable installs are used to keep imports consistent with the monorepo layout.
+RUN pip install --no-cache-dir -e . \
+    && pip install --no-cache-dir -e ./packages/schemas \
     && pip install --no-cache-dir -e ./apps/api
 
 # Non-root user
@@ -26,5 +25,7 @@ USER iridium
 
 WORKDIR /app/apps/api
 EXPOSE 8000
+
+HEALTHCHECK --interval=10s --timeout=5s --retries=3 CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3).read(); print('ok')"
 
 CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

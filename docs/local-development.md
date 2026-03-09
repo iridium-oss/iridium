@@ -1,6 +1,7 @@
 # Local Development
 
-This document describes how to run IRIDIUM locally for development and demos. All data used is synthetic; no real city or user data is required.
+This document describes how to run IRIDIUM locally for development and demos.
+The baseline test suite uses synthetic fixtures, but the platform is designed to operate on real or recorded data when configured.
 
 ## Prerequisites
 
@@ -27,11 +28,14 @@ This document describes how to run IRIDIUM locally for development and demos. Al
    ```
    This uses `data/synthetic` and optionally runs the ingestion pipeline. No persistence is required for the baseline.
 
-4. Frontend (separate terminal):
+4. Frontend (one-time install, then dev):
    ```bash
-   cd apps/web && npm ci && npm run dev
+   cd apps/web && npm ci
+   npm run dev
    ```
-   The Vite dev server runs at http://localhost:3000 and proxies `/api`, `/health`, and `/version` to the API.
+   First run: `npm ci` or `npm install` installs dependencies (once). Then `npm run dev` starts the dev server with Turbopack at http://localhost:3000 (fast startup). The app proxies `/api`, `/health`, and `/version` to the API. Scripts use `npx next` so the dev server runs correctly on Windows even when `node_modules/.bin` is not on PATH.
+
+   **Windows:** If `npm install` fails with EPERM or ENOTEMPTY, close all terminals and IDEs using the repo, then remove `apps/web/node_modules` and `apps/web/.next` and run `npm install` again from `apps/web`.
 
 ## Running the API
 
@@ -72,7 +76,7 @@ Ensure the API is running so that dashboard views can load data.
 
 - Frontend:
   ```bash
-  cd apps/web && npm run test:run
+  cd apps/web && npm run test
   ```
 
 - Lint and format:
@@ -87,11 +91,11 @@ Ensure the API is running so that dashboard views can load data.
 To run the full stack (API, web, PostgreSQL, Redis) in containers:
 
 ```bash
-docker compose up -d
+docker compose --profile core up -d
 ```
 
 - API: http://localhost:8000
-- Web: http://localhost:3000 (nginx serves the built app and proxies API requests to the api service)
+- Web: http://localhost:3000 (Next.js; API proxied to the api service)
 - PostgreSQL: localhost:5432 (user iridium, password iridium, db iridium)
 - Redis: localhost:6379
 
@@ -107,5 +111,5 @@ Copy `.env.example` to `.env` and adjust if needed. Key variables:
 
 ## What is implemented vs planned
 
-- **Implemented**: API with health, version, network graph, forecast, routing, equity, anomalies, ingestion (validate-only); in-memory digital twin; baseline forecasting and routing; synthetic data and seed script; frontend dashboard; Docker and Compose; pytest and Vitest tests.
+- **Implemented**: API with health, version, network graph, forecast, routing, equity, anomalies, ingestion (validate-only); in-memory digital twin; baseline forecasting and routing; synthetic data and seed script; frontend dashboard; Docker and Compose; pytest and frontend tests.
 - **Planned**: Persistence (PostgreSQL), streaming ingestion, ST-GNN forecasting, federated learning, full schedule-based routing, PostGIS. See ROADMAP.md.
