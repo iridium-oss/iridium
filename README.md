@@ -167,7 +167,7 @@ Federated learning orchestration, ST-GNN congestion forecasting, PostgreSQL pers
 |------|------|
 | Olaf Yunus Laitinen Imanov | AI Engineer |
 | Amina Sadiqzade | Frontend Developer |
-| Malahat Ismayilova | AI Engineer |
+| Malahat Ismayilova | AI Product Owner |
 | Aslan Ibadullayev | Fullstack Developer |
 | Fidan Bagirova | AI Engineer |
 

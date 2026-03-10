@@ -6,10 +6,10 @@ This document describes the governance model for the IRIDIUM project. The model 
 
 The following individuals are founding maintainers of the IRIDIUM repository. They are responsible for day-to-day stewardship, code and documentation review, and release decisions within the scope of this document.
 
-**AI Engineering**
+**AI Engineering & Product**
 
 - Olaf Yunus Laitinen Imanov
-- Malahat Ismayilova
+- Malahat Ismayilova (AI Product Owner)
 - Fidan Bagirova
 
 **Fullstack & Frontend**
@@ -18,6 +18,18 @@ The following individuals are founding maintainers of the IRIDIUM repository. Th
 - Aslan Ibadullayev (Fullstack)
 
 Maintainers are expected to act in the best interest of the project, follow the Code of Conduct, and uphold the contribution and security policies. New maintainers may be added by consensus of existing maintainers, with criteria and process documented in this file or in a separate document as the project grows.
+
+## AI Product Owner (AI PO)
+
+The AI Product Owner is responsible for the strategic direction, feature prioritization, and stakeholder alignment for the AI and machine learning components of the IRIDIUM platform.
+
+**Responsibilities**
+
+- **Vision and Strategy**: Defining the long-term roadmap for AI modules (ST-GNN forecasting, federated learning, anomaly detection).
+- **Backlog Management**: Prioritizing AI-related features and research tasks based on project goals and user needs.
+- **Stakeholder Alignment**: Acting as a bridge between technical AI engineering, frontend development, and external project stakeholders.
+- **Requirement Definition**: Translating high-level objectives into actionable technical requirements for the AI engineering team.
+- **Quality Assurance**: Ensuring that AI models and features meet the platform's standards for accuracy, performance, and ethical deployment.
 
 ## Decision Making
 
