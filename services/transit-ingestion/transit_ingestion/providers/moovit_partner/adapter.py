@@ -18,6 +18,10 @@ from iridium_schemas.transit import (
 
 PROVIDER_ID = "moovit_partner"
 ENV_MOOVIT_PARTNER_KEY = "MOOVIT_PARTNER_API_KEY"
+ENV_IRIDIUM_MOOVIT_KEY = "IRIDIUM_MOOVIT__API_KEY"
+ENV_MOOVIT_API_KEY = "MOOVIT_API_KEY"
+ENV_MOOVIT_BASE_URL = "MOOVIT_BASE_URL"
+ENV_MOOVIT_PARTNER_BASE_URL = "MOOVIT_PARTNER_BASE_URL"
 STATUS_AVAILABLE = "available"
 STATUS_PARTNER_REQUIRED = "partner_required"
 
@@ -32,11 +36,12 @@ class MoovitConfig:
 
 
 def get_moovit_config() -> MoovitConfig:
-    """Return current Moovit partner configuration. No credentials assumed."""
-    key = os.environ.get(ENV_MOOVIT_PARTNER_KEY)
+    """Return current Moovit partner configuration. Reads IRIDIUM_* or legacy env."""
+    key = os.environ.get(ENV_IRIDIUM_MOOVIT_KEY) or os.environ.get(ENV_MOOVIT_API_KEY) or os.environ.get(ENV_MOOVIT_PARTNER_KEY)
+    base_url = os.environ.get(ENV_MOOVIT_PARTNER_BASE_URL) or os.environ.get(ENV_MOOVIT_BASE_URL)
     return MoovitConfig(
         api_key=key,
-        base_url=os.environ.get("MOOVIT_PARTNER_BASE_URL"),
+        base_url=base_url or None,
         enabled=bool(key),
     )
 

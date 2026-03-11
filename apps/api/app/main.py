@@ -17,6 +17,7 @@ for sub in (
     "services/traffic-provider",
     "services/transit-ingestion",
     "services/network-import",
+    "services/earth-observation",
 ):
     p = ROOT / sub
     if p.exists() and str(p) not in sys.path:

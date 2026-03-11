@@ -17,14 +17,20 @@ from iridium_schemas.transit import (
 
 PROVIDER_ID = "twogis_public_transport"
 ENV_2GIS_API_KEY = "TWOGIS_API_KEY"
+ENV_IRIDIUM_2GIS_KEY = "IRIDIUM_TWOGIS__API_KEY"
 # Documented 2GIS Public Transport API base (example; verify against current 2GIS docs).
 TWOGIS_ROUTING_URL = "https://routing.api.2gis.com/public_transport/1.0"
 DEFAULT_TIMEOUT = 15.0
 
 
+def _get_twogis_api_key() -> Optional[str]:
+    """Read API key from IRIDIUM_* or legacy env."""
+    return os.environ.get(ENV_IRIDIUM_2GIS_KEY) or os.environ.get(ENV_2GIS_API_KEY)
+
+
 def get_twogis_status() -> str:
     """Return configured | unavailable."""
-    return "configured" if os.environ.get(ENV_2GIS_API_KEY) else "unavailable"
+    return "configured" if _get_twogis_api_key() else "unavailable"
 
 
 def fetch_route_alternatives(
@@ -39,7 +45,7 @@ def fetch_route_alternatives(
     Query 2GIS Public Transport API for route alternatives between two points.
     Returns empty list if API key not set or request fails.
     """
-    api_key = os.environ.get(ENV_2GIS_API_KEY)
+    api_key = _get_twogis_api_key()
     if not api_key:
         return []
     modes = modes or ["bus", "metro"]

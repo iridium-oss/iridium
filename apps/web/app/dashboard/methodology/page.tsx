@@ -18,6 +18,12 @@ export default function MethodologyPage() {
           </p>
         </section>
         <section className="rounded-xl border border-surface-border bg-surface-card/80 p-6">
+          <h2 className="font-medium text-text-primary">Earth observation (Sentinel-2)</h2>
+          <p className="mt-2 text-sm text-text-secondary">
+            Sentinel-2 is used as a spatial intelligence layer for urban footprint, green cover, water context, and land-use around mobility corridors. Search uses Copernicus Data Space Ecosystem STAC with Earth Search STAC as fallback. Indices (NDVI, NDWI, NDBI) are derived from standard band math. Every layer exposes source provider, acquisition date, and cloud cover. Satellite context is not realtime traffic or transit data; it is near-recent earth observation for environmental and equity context only. See docs/sentinel2-integration.md and docs/eo-limitations.md.
+          </p>
+        </section>
+        <section className="rounded-xl border border-surface-border bg-surface-card/80 p-6">
           <h2 className="font-medium text-text-primary">Limitations</h2>
           <p className="mt-2 text-sm text-text-secondary">
             Transit feeds require operator provision; traffic requires a licensed provider. No forecasting accuracy, routing quality, or equity validation is reported where not measured. The platform does not claim production readiness or regulatory compliance. Deployers must conduct their own assessment.

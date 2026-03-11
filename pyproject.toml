@@ -69,7 +69,7 @@ exclude = ["\\.venv", "node_modules"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
-testpaths = ["tests"]
+testpaths = ["tests", "services/earth-observation/earth_observation/sentinel2/tests"]
 python_files = ["test_*.py"]
 python_functions = ["test_*"]
 addopts = "-v --tb=short"

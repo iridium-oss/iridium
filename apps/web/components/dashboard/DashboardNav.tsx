@@ -12,7 +12,9 @@ const LINKS = [
   { href: "/dashboard/transit", label: "Transit", icon: "directions_bus" as const },
   { href: "/dashboard/equity", label: "Equity", icon: "balance" as const },
   { href: "/dashboard/anomalies", label: "Anomalies", icon: "warning" as const },
+  { href: "/dashboard/satellite", label: "Satellite context", icon: "satellite_alt" as const },
   { href: "/dashboard/provenance", label: "Provenance", icon: "source" as const },
+  { href: "/dashboard/providers", label: "Providers", icon: "link" as const },
   { href: "/dashboard/status", label: "System status", icon: "monitor_heart" as const },
   { href: "/dashboard/methodology", label: "Methodology", icon: "menu_book" as const },
 ];

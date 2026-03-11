@@ -39,7 +39,7 @@ IRIDIUM is a real-time urban mobility prediction and optimization platform for A
 
 - **Problem**: Urban mobility faces congestion, inequitable access, and data fragmentation. Combining data for prediction and optimization often conflicts with privacy and data sovereignty.
 - **Approach**: Federated learning (data stays local; only model updates are shared), a digital twin (graph of network and state), and modular services for forecast, routing, equity, and anomalies.
-- **Current implementation**: FastAPI backend, digital twin state assembler (real sources only), heuristic forecast, baseline routing, equity from configured data, rule-based anomaly detection, ingestion validation, React dashboard. Data is real or recorded when configured; otherwise status is explicit. Synthetic data is only in isolated test fixtures.
+- **Current implementation**: FastAPI backend, digital twin state assembler (real sources only), heuristic forecast with Graph WaveNet/DCRNN extension points, baseline routing, equity from configured data, rule-based anomaly detection, ingestion validation, Next.js dashboard. Data is real or recorded when configured; otherwise status is explicit. Synthetic data is only in isolated test fixtures.
 - **Audience**: Transport planners, researchers, hackathon judges, and future open source contributors.
 
 ## Quick start
@@ -70,7 +70,7 @@ Open http://localhost:3000 for the dashboard; http://localhost:8000/docs for the
 | Mobility Equity Score | District-level indicators from EQUITY_DATA_PATH when set; otherwise data_status unavailable. |
 | Anomaly detection | Rule-based (incident flags, high occupancy). |
 | Ingestion | Validation and file-based load; no central raw-data store. |
-| Frontend | React + TypeScript dashboard; all modules. |
+| Frontend | Next.js 14 + TypeScript dashboard; all modules. |
 | Federated learning | Not implemented; architecture and docs only. |
 | Persistence | PostgreSQL schema provided; API uses in-memory state. |
 
@@ -139,9 +139,9 @@ O. Y. Laitinen Imanov et al. (2026). "IRIDIUM: A Provenance-Aware Urban Mobility
 
 ```
 apps/api          FastAPI application
-apps/web          React dashboard (Vite)
+apps/web          Next.js 14 dashboard
 packages/schemas  Pydantic data contracts
-services/         ingestion, digital-twin, forecasting, routing, equity, anomaly-detection
+services/         ingestion, digital-twin, forecasting, routing, equity, anomaly-detection, transit-ingestion, weather-ingestion, earth-observation
 infrastructure/   db schema, Dockerfiles
 data/synthetic    Test fixtures only; not used in main runtime path
 docs/             Architecture, API spec, local dev, demo, reviewer guide, product scope

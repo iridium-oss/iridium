@@ -15,15 +15,15 @@ Honest statement of what is and is not implemented or guaranteed in the current 
 
 ## Not Implemented (Gaps)
 
-- **Network import into PostGIS**: Fetch script exists; service to load OSM PBF into PostGIS (network-import) is not fully implemented. Graph remains empty until that step is done.
+- **Network import into PostGIS**: Fetch script and network-import service (load_network_from_db) exist. Graph remains empty until OSM is fetched, imported into PostGIS, and DB is enabled; then digital twin uses it.
 - **GTFS load**: When operator provides feed, GTFS load and validation pipeline to be added. No invented feed.
 - **Traffic provider adapter**: Interface exists; TomTom (or other) adapter implementation is not done. When key is set, status remains configuration_required until adapter is implemented.
 - **Traccar integration**: Documented; integration code not in place. Telemetry layer unavailable until implemented.
 - **Event ingestion**: Documented; adapters for iTicket/CityLife not implemented. Event layer unavailable or permission_required.
 - **Energy context pipeline**: Documented; no implementation. Unavailable until added.
 - **OpenTripPlanner and Valhalla**: Not integrated. Routing still uses baseline path when graph is empty; no OTP/Valhalla in main path yet.
-- **Federated learning (Flower)**: Not implemented. Architecture and docs only.
-- **ST-GNN training and inference**: Not implemented. Heuristic forecast only; no real training data pipeline or model.
+- **Federated learning (Flower)**: Simulation and institution-lab use only; API returns honest status (active False, runs/models empty). See services/forecasting/federated.
+- **Learned forecast model**: Graph WaveNet and DCRNN code and inference wrapper exist; training and artifact production are separate. API uses deterministic baseline when no artifact or historical inputs; model_loaded in forecast/status reflects FORECAST_ARTIFACT_DIR.
 - **Recorded real snapshots**: Mechanism for storing and serving recorded snapshots with provenance is not fully in place; when implemented, must follow docs/data-provenance.md.
 
 ## Dependencies on External Agreements

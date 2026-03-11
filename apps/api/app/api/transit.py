@@ -136,6 +136,62 @@ def get_network(bakubus_limit: int = Query(0, ge=0, le=50)):
 
 
 @router.get(
+    "/transit/partner-routes",
+    summary="Partner route alternatives (2GIS, Moovit)",
+    description="Schedule-aware route alternatives from configured licensed providers. Requires 2GIS or Moovit API key when enabled.",
+)
+def get_partner_routes(
+    from_lat: float = Query(..., ge=-90, le=90, description="Origin latitude"),
+    from_lon: float = Query(..., ge=-180, le=180, description="Origin longitude"),
+    to_lat: float = Query(..., ge=-90, le=90, description="Destination latitude"),
+    to_lon: float = Query(..., ge=-180, le=180, description="Destination longitude"),
+):
+    from transit_ingestion.providers.twogis_public_transport import get_twogis_status, fetch_route_alternatives as twogis_fetch
+    from transit_ingestion.providers.moovit_partner import get_moovit_config, fetch_moovit_route_alternatives
+
+    alternatives = []
+    providers_used = []
+
+    if get_twogis_status() == "configured":
+        try:
+            twogis_results = twogis_fetch(from_lat, from_lon, to_lat, to_lon, timeout=15.0)
+            if twogis_results:
+                alternatives.extend(twogis_results)
+                providers_used.append("twogis_public_transport")
+        except Exception:
+            pass
+
+    if get_moovit_config().enabled:
+        try:
+            moovit_results = fetch_moovit_route_alternatives(from_lat, from_lon, to_lat, to_lon)
+            if moovit_results:
+                alternatives.extend(moovit_results)
+                providers_used.append("moovit_partner")
+        except Exception:
+            pass
+
+    return {
+        "alternatives": [
+            {
+                "result_id": r.result_id,
+                "total_duration_seconds": r.total_duration_seconds,
+                "transfer_count": r.transfer_count,
+                "source_provider": r.source_provider,
+                "source_family": r.source_family,
+                "source_status": r.source_status,
+                "observed_at": r.observed_at.isoformat() if r.observed_at else None,
+                "schedules_returned": r.schedules_returned,
+                "confidence": r.confidence,
+                "validation_note": r.validation_note,
+            }
+            for r in alternatives
+        ],
+        "providers_used": providers_used,
+        "note": "Licensed partner APIs; not operator-issued GTFS-RT.",
+    }
+
+
+@router.get(
     "/transit/readiness",
     summary="Transit readiness for OTP",
     description="Static stop discovery, route visualization, transfer graph, timetable routing. Honest about missing stop_times.",

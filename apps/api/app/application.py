@@ -25,6 +25,7 @@ from app.api import (
     digital_twin,
     alerts,
     federated,
+    eo,
 )
 from app.schemas import ErrorDetail, ErrorResponse
 from app.observability.logging import configure_logging
@@ -32,11 +33,30 @@ from app.middleware.request_id import RequestIdMiddleware, RequestLoggingMiddlew
 from app.middleware.security import RequestSizeLimitMiddleware, SecurityHeadersMiddleware
 
 
+def _propagate_provider_env(settings) -> None:
+    """Propagate IRIDIUM_* and legacy credentials into os.environ for adapters that read env directly."""
+    import os
+    if settings.twogis.api_key and not os.environ.get("TWOGIS_API_KEY"):
+        os.environ["TWOGIS_API_KEY"] = settings.twogis.api_key.get_secret_value()
+    if settings.twogis.api_key and not os.environ.get("IRIDIUM_TWOGIS__API_KEY"):
+        os.environ["IRIDIUM_TWOGIS__API_KEY"] = settings.twogis.api_key.get_secret_value()
+    if settings.moovit.api_key:
+        if not os.environ.get("MOOVIT_PARTNER_API_KEY"):
+            os.environ["MOOVIT_PARTNER_API_KEY"] = settings.moovit.api_key.get_secret_value()
+        if not os.environ.get("MOOVIT_API_KEY"):
+            os.environ["MOOVIT_API_KEY"] = settings.moovit.api_key.get_secret_value()
+    if settings.moovit.base_url and not os.environ.get("MOOVIT_PARTNER_BASE_URL"):
+        os.environ["MOOVIT_PARTNER_BASE_URL"] = settings.moovit.base_url
+    if settings.gomap.api_key and not os.environ.get("GOMAP_API_KEY"):
+        os.environ["GOMAP_API_KEY"] = settings.gomap.api_key.get_secret_value()
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Startup and shutdown. Placeholder for DB pool, caches."""
     settings = get_settings()
     configure_logging(settings.LOG_LEVEL)
+    _propagate_provider_env(settings)
     # Trigger optional engine creation early for fail-fast behavior when enabled
     from app.db.engine import get_engine
 
@@ -122,4 +142,5 @@ def create_app() -> FastAPI:
     app.include_router(ingestion.router, prefix="/api/v1", tags=["ingestion"])
     app.include_router(transit.router, prefix="/api/v1", tags=["transit"])
     app.include_router(federated.router, prefix="/api/v1", tags=["federated"])
+    app.include_router(eo.router, prefix="/api/v1", tags=["earth-observation"])
     return app

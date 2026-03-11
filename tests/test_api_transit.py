@@ -207,3 +207,48 @@ def test_build_snapshot_logic():
         call_kw = mock_merge.call_args[1]
         assert call_kw.get("bakubus_routes") is not None
         assert len(call_kw["bakubus_routes"]) == 1
+
+
+def test_partner_routes_structure():
+    """GET /transit/partner-routes returns alternatives and providers_used; empty when no credentials."""
+    response = client.get(
+        "/api/v1/transit/partner-routes",
+        params={"from_lat": 40.4093, "from_lon": 49.8671, "to_lat": 40.3764, "to_lon": 49.8530},
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert "alternatives" in data
+    assert "providers_used" in data
+    assert "note" in data
+    assert isinstance(data["alternatives"], list)
+    assert isinstance(data["providers_used"], list)
+
+
+def test_partner_routes_with_mock_twogis():
+    """With 2GIS configured (mocked), partner-routes can return alternatives."""
+    from iridium_schemas.transit import TransitPartnerRouteResult, SourceFamily, SourceStatus
+    with patch("transit_ingestion.providers.twogis_public_transport.get_twogis_status", return_value="configured"), \
+         patch("transit_ingestion.providers.twogis_public_transport.fetch_route_alternatives") as mock_fetch:
+        mock_fetch.return_value = [
+            TransitPartnerRouteResult(
+                result_id="twogis_1",
+                total_duration_seconds=1200,
+                transfer_count=1,
+                route_variants=[],
+                schedules_returned=True,
+                observed_at=datetime.now(timezone.utc),
+                source_provider="twogis_public_transport",
+                source_family=SourceFamily.LICENSED_API.value,
+                source_status=SourceStatus.LICENSED_PARTNER.value,
+                confidence="licensed_partner",
+                validation_note="From 2GIS API",
+            )
+        ]
+        response = client.get(
+            "/api/v1/transit/partner-routes",
+            params={"from_lat": 40.41, "from_lon": 49.87, "to_lat": 40.37, "to_lon": 49.85},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data["alternatives"]) >= 1
+        assert "twogis_public_transport" in data["providers_used"]

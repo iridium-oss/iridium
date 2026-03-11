@@ -46,6 +46,19 @@ from iridium_schemas.transit import (
     TravelTimeContext,
     TransitPartnerRouteResult,
 )
+from iridium_schemas.earth_observation import (
+    EOSourceStatus,
+    EOAreaPreset,
+    EOBandAsset,
+    EOSceneMetadata,
+    EOScene,
+    EOSceneSearchResult,
+    EOIndexLayer,
+    EOTileLayer,
+    EOOverlayDescriptor,
+    EOProcessingJob,
+    EOAreaPresetDefinition,
+)
 
 __all__ = [
     "SensorEvent",
@@ -88,4 +101,15 @@ __all__ = [
     "SegmentCongestionLevel",
     "TravelTimeContext",
     "TransitPartnerRouteResult",
+    "EOSourceStatus",
+    "EOAreaPreset",
+    "EOBandAsset",
+    "EOSceneMetadata",
+    "EOScene",
+    "EOSceneSearchResult",
+    "EOIndexLayer",
+    "EOTileLayer",
+    "EOOverlayDescriptor",
+    "EOProcessingJob",
+    "EOAreaPresetDefinition",
 ]

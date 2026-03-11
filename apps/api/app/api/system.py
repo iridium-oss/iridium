@@ -1,14 +1,22 @@
 """
-System endpoints: status, data sources, and provenance.
+System endpoints: status, data sources, provenance, and unified provider registry.
 """
 
 from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 from app.config import get_settings
+from app.providers.registry import (
+    get_all_providers,
+    get_provider,
+    check_provider_health,
+    verify_provider,
+    get_integrations_status,
+    get_integrations_report,
+)
 
 router = APIRouter()
 
@@ -126,4 +134,104 @@ def get_data_provenance() -> dict:
             "Public web observed outputs are not equivalent to operator realtime feeds.",
         ],
     }
+
+
+@router.get(
+    "/system/providers",
+    summary="Unified provider registry",
+    description="All external APIs and data sources with source_family, capabilities, and validation status.",
+)
+def list_providers() -> dict:
+    providers = get_all_providers()
+    return {
+        "providers": [
+            {
+                "id": p.id,
+                "display_name": p.display_name,
+                "source_family": p.source_family,
+                "source_status": p.source_status,
+                "domain": p.domain,
+                "required_env_vars": p.required_env_vars,
+                "healthcheck_mode": p.healthcheck_mode,
+                "backend_adapter_module": p.backend_adapter_module,
+                "frontend_consumer_surfaces": p.frontend_consumer_surfaces,
+                "capabilities": p.capabilities.to_dict(),
+                "last_checked_at": p.last_checked_at.isoformat() if p.last_checked_at else None,
+                "validation_status": p.validation_status,
+                "note": p.note,
+            }
+            for p in providers
+        ],
+        "total": len(providers),
+    }
+
+
+@router.get(
+    "/system/providers/{provider_id}",
+    summary="Provider by id",
+    description="Single provider entry from registry. 404 if unknown.",
+)
+def get_provider_by_id(provider_id: str) -> dict:
+    p = get_provider(provider_id)
+    if not p:
+        raise HTTPException(status_code=404, detail={"error": "not_found", "message": "Unknown provider id"})
+    return {
+        "id": p.id,
+        "display_name": p.display_name,
+        "source_family": p.source_family,
+        "source_status": p.source_status,
+        "domain": p.domain,
+        "required_env_vars": p.required_env_vars,
+        "healthcheck_mode": p.healthcheck_mode,
+        "backend_adapter_module": p.backend_adapter_module,
+        "frontend_consumer_surfaces": p.frontend_consumer_surfaces,
+        "capabilities": p.capabilities.to_dict(),
+        "last_checked_at": p.last_checked_at.isoformat() if p.last_checked_at else None,
+        "validation_status": p.validation_status,
+        "note": p.note,
+    }
+
+
+@router.get(
+    "/system/providers/{provider_id}/health",
+    summary="Provider health",
+    description="Current health/validation status for the provider. Runs verification.",
+)
+def provider_health(provider_id: str) -> dict:
+    return check_provider_health(provider_id)
+
+
+@router.post(
+    "/system/providers/{provider_id}/verify",
+    summary="Verify provider",
+    description="Run verification (e.g. sample request) for the provider. Returns validation_status.",
+)
+def provider_verify(provider_id: str) -> dict:
+    if not get_provider(provider_id):
+        raise HTTPException(status_code=404, detail={"error": "not_found", "message": "Unknown provider id"})
+    validation_status, last_checked_at, message = verify_provider(provider_id)
+    return {
+        "provider_id": provider_id,
+        "validation_status": validation_status,
+        "last_checked_at": last_checked_at.isoformat() if last_checked_at else None,
+        "message": message,
+    }
+
+
+@router.get(
+    "/system/integrations/status",
+    summary="Integrations status",
+    description="Aggregate status of all providers by domain. No live checks.",
+)
+def integrations_status() -> dict:
+    return get_integrations_status()
+
+
+@router.get(
+    "/system/integrations/report",
+    summary="Integrations report",
+    description="Full report with verification result per provider. Runs live checks; may be slow.",
+)
+def integrations_report() -> dict:
+    return get_integrations_report()
 
