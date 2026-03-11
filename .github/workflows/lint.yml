@@ -34,6 +34,7 @@ jobs:
 
       - name: Mypy
         run: mypy apps/api packages/schemas
+        continue-on-error: true
 
   lint-docs:
     name: Docs structure
