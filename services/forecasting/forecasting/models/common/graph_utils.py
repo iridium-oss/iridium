@@ -4,8 +4,6 @@ Graph utilities for PyTorch models. Normalized adjacency and sparse handling.
 
 from __future__ import annotations
 
-from typing import Optional
-
 import torch
 
 
@@ -19,9 +17,10 @@ def normalize_adj_torch(adj: torch.Tensor, add_self_loop: bool = True) -> torch.
     return d_inv_sqrt.unsqueeze(1) * a * d_inv_sqrt.unsqueeze(0)
 
 
-def sparse_to_torch(adj_np, device: Optional[torch.device] = None) -> torch.Tensor:
+def sparse_to_torch(adj_np, device: torch.device | None = None) -> torch.Tensor:
     """Convert numpy adjacency to torch float tensor."""
     import numpy as np
+
     t = torch.from_numpy(np.asarray(adj_np, dtype=np.float32))
     if device is not None:
         t = t.to(device)

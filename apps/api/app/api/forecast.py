@@ -4,18 +4,17 @@ Forecast endpoints. Responses distinguish learned model, statistical baseline, d
 
 import os
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import APIRouter, Query
-
+from forecasting.features.schema import build_feature_schema
 from forecasting.pipeline import get_congestion_forecast
 from forecasting.task import DEFAULT_TASK_SPEC
-from forecasting.features.schema import build_feature_schema
 
 router = APIRouter()
 
 
-def _artifact_dir() -> Optional[Path]:
+def _artifact_dir() -> Path | None:
     p = os.environ.get("FORECAST_ARTIFACT_DIR")
     return Path(p) if p and p.strip() else None
 
@@ -52,13 +51,19 @@ def get_forecast_models() -> dict[str, Any]:
     meta = None
     if reg_path.exists():
         import json
+
         with open(reg_path) as f:
             meta = json.load(f)
     elif meta_path.exists():
         import json
+
         with open(meta_path) as f:
             data = json.load(f)
-            meta = {"model_family": data.get("model_family", "unknown"), "model_version": "v1", "maturity": "candidate"}
+            meta = {
+                "model_family": data.get("model_family", "unknown"),
+                "model_version": "v1",
+                "maturity": "candidate",
+            }
     if meta:
         return {"models": [meta], "note": "Single artifact dir; one active model."}
     return {"models": [], "note": "No registry or training metadata found."}
@@ -89,7 +94,11 @@ def get_forecast_coverage() -> dict[str, Any]:
 def get_forecast_features() -> dict[str, Any]:
     """Return active feature schema version and names."""
     schema = build_feature_schema()
-    return {"schema_version": schema.get("version"), "names": schema.get("names", []), "compatible": schema.get("compatible", True)}
+    return {
+        "schema_version": schema.get("version"),
+        "names": schema.get("names", []),
+        "compatible": schema.get("compatible", True),
+    }
 
 
 @router.get(
@@ -99,7 +108,9 @@ def get_forecast_features() -> dict[str, Any]:
 )
 def get_congestion(
     horizon_minutes: int = Query(120, ge=1, le=180, description="Forecast horizon in minutes"),
-    segment_ids: Optional[str] = Query(None, description="Comma-separated segment IDs; omit for default segment"),
+    segment_ids: str | None = Query(
+        None, description="Comma-separated segment IDs; omit for default segment"
+    ),
 ):
     """Congestion forecast. Learned model output when artifact and history available; else deterministic baseline or unavailable."""
     seg_list = [s.strip() for s in (segment_ids or "").split(",") if s.strip()] or None

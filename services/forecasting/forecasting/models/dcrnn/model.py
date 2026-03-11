@@ -5,7 +5,7 @@ Same I/O contract as Graph WaveNet; modular and separate from production path.
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 import torch
 import torch.nn as nn
@@ -50,7 +50,7 @@ class DCRNN(BaseForecastModel):
         num_nodes: int,
         input_len: int = 12,
         horizon: int = 8,
-        input_dim: Optional[int] = None,
+        input_dim: int | None = None,
         hidden_dim: int = 32,
         num_layers: int = 2,
         dropout: float = 0.3,
@@ -76,12 +76,12 @@ class DCRNN(BaseForecastModel):
     def forward(
         self,
         x: torch.Tensor,
-        adj: Optional[torch.Tensor] = None,
-        support: Optional[torch.Tensor] = None,
+        adj: torch.Tensor | None = None,
+        support: torch.Tensor | None = None,
         **kwargs: Any,
     ) -> torch.Tensor:
         B, T_in, N = x.shape
-        if N != self._num_nodes:
+        if self._num_nodes != N:
             raise ValueError(f"Expected {self._num_nodes} nodes, got {N}")
         if support is None and adj is not None:
             support = normalize_adj_torch(adj, add_self_loop=True)
@@ -89,7 +89,9 @@ class DCRNN(BaseForecastModel):
             support = torch.eye(N, device=x.device, dtype=x.dtype)
         if support.dim() == 3:
             support = support.mean(dim=0)
-        h = [torch.zeros(B, N, self._hidden_dim, device=x.device, dtype=x.dtype) for _ in self.cells]
+        h = [
+            torch.zeros(B, N, self._hidden_dim, device=x.device, dtype=x.dtype) for _ in self.cells
+        ]
         for t in range(T_in):
             xt = x[:, t].unsqueeze(-1)
             for i, cell in enumerate(self.cells):

@@ -4,7 +4,7 @@ Health check endpoint.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
@@ -30,7 +30,7 @@ def get_health() -> dict:
 )
 def get_ready() -> dict:
     settings = get_settings()
-    now = datetime.now(timezone.utc).isoformat()
+    now = datetime.now(UTC).isoformat()
 
     checks: dict[str, dict] = {}
     ok = True

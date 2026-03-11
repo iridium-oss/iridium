@@ -4,15 +4,13 @@ Simple temporal linear regression baseline (per entity): fit y = a * t + b on la
 
 from __future__ import annotations
 
-from typing import Optional
-
 import numpy as np
 
 
 def linear_temporal_forecast(
     history: np.ndarray,
     horizon: int,
-    window: Optional[int] = None,
+    window: int | None = None,
 ) -> np.ndarray:
     """
     Per-column: fit linear trend on last `window` steps (or all), extrapolate for horizon steps.

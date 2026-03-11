@@ -1,11 +1,13 @@
 """Partitioning tests: manifest, generation, load."""
 
-from pathlib import Path
 import tempfile
+from pathlib import Path
 
-import pytest
-
-from federated.partitioning import PartitionManifest, PartitionStrategy, generate_partitions, load_partition_manifest
+from federated.partitioning import (
+    PartitionStrategy,
+    generate_partitions,
+    load_partition_manifest,
+)
 from federated.partitioning.partition import load_partition_data
 
 

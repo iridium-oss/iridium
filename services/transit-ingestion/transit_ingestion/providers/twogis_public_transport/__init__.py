@@ -5,8 +5,8 @@ Used for route-planning and ETA enrichment; not operator-issued ground truth.
 """
 
 from transit_ingestion.providers.twogis_public_transport.adapter import (
-    get_twogis_status,
     fetch_route_alternatives,
+    get_twogis_status,
 )
 
 __all__ = ["get_twogis_status", "fetch_route_alternatives"]

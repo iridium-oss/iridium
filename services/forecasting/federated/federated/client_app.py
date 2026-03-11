@@ -8,7 +8,6 @@ updates and metrics. Fails gracefully if local data is insufficient.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
 from flwr.client import Client, NumPyClient
@@ -20,9 +19,8 @@ try:
 except ImportError:
     from flwr.client import ClientApp  # type: ignore
 
-from .model import LinearModel
-from .task import build_model, get_model_input_dim, get_model_output_dim
 from .datasets.loader import load_client_data
+from .task import build_model, get_model_input_dim, get_model_output_dim
 
 
 def _get_partition_id(context: Context, num_partitions: int) -> str:
@@ -32,7 +30,7 @@ def _get_partition_id(context: Context, num_partitions: int) -> str:
     return f"p_by_district_{idx}"
 
 
-def _get_data_dir(context: Context) -> Optional[Path]:
+def _get_data_dir(context: Context) -> Path | None:
     run_config = getattr(context, "run_config", None) or {}
     data_dir = run_config.get("data_dir")
     if data_dir is None:
@@ -46,8 +44,8 @@ class IridiumNumPyClient(NumPyClient):
     def __init__(
         self,
         partition_id: str,
-        x: Optional[np.ndarray],
-        y: Optional[np.ndarray],
+        x: np.ndarray | None,
+        y: np.ndarray | None,
         local_epochs: int = 1,
         batch_size: int = 32,
         learning_rate: float = 0.01,
@@ -60,12 +58,12 @@ class IridiumNumPyClient(NumPyClient):
         self.learning_rate = learning_rate
         self.model, _ = build_model(seed=42)
 
-    def get_parameters(self, config: Config) -> List[np.ndarray]:
+    def get_parameters(self, config: Config) -> list[np.ndarray]:
         return self.model.get_parameters()
 
     def fit(
-        self, parameters: List[np.ndarray], config: Config
-    ) -> Tuple[List[np.ndarray], int, Dict[str, Scalar]]:
+        self, parameters: list[np.ndarray], config: Config
+    ) -> tuple[list[np.ndarray], int, dict[str, Scalar]]:
         if self.x is None or self.y is None or self.x.shape[0] < 10:
             return self.model.get_parameters(), 0, {"insufficient_data": 1.0, "num_samples": 0}
         self.model.set_parameters(list(parameters))
@@ -74,9 +72,7 @@ class IridiumNumPyClient(NumPyClient):
         total_loss = 0.0
         total_samples = 0
         for _ in range(epochs):
-            loss, n = self.model.fit_epoch(
-                self.x, self.y, lr=lr, batch_size=self.batch_size
-            )
+            loss, n = self.model.fit_epoch(self.x, self.y, lr=lr, batch_size=self.batch_size)
             total_loss += loss
             total_samples = n
         mse, mae = self.model.evaluate(self.x, self.y)
@@ -93,8 +89,8 @@ class IridiumNumPyClient(NumPyClient):
         )
 
     def evaluate(
-        self, parameters: List[np.ndarray], config: Config
-    ) -> Tuple[float, int, Dict[str, Scalar]]:
+        self, parameters: list[np.ndarray], config: Config
+    ) -> tuple[float, int, dict[str, Scalar]]:
         if self.x is None or self.y is None or self.x.shape[0] < 5:
             return 0.0, 0, {"mae": 0.0, "num_samples": 0}
         self.model.set_parameters(parameters)
@@ -102,7 +98,7 @@ class IridiumNumPyClient(NumPyClient):
         n = self.x.shape[0]
         return float(mse), n, {"mae": mae, "num_samples": n, "partition_id": self.partition_id}
 
-    def get_properties(self, config: Config) -> Dict[str, Scalar]:
+    def get_properties(self, config: Config) -> dict[str, Scalar]:
         return {
             "partition_id": self.partition_id,
             "input_dim": get_model_input_dim(),
@@ -122,7 +118,9 @@ def client_fn(context: Context) -> Client:
     local_epochs = int((getattr(context, "run_config", None) or {}).get("local_epochs", 1))
     batch_size = int((getattr(context, "run_config", None) or {}).get("batch_size", 32))
     lr = float((getattr(context, "run_config", None) or {}).get("learning_rate", 0.01))
-    client = IridiumNumPyClient(partition_id, x, y, local_epochs=local_epochs, batch_size=batch_size, learning_rate=lr)
+    client = IridiumNumPyClient(
+        partition_id, x, y, local_epochs=local_epochs, batch_size=batch_size, learning_rate=lr
+    )
     return client.to_client()
 
 

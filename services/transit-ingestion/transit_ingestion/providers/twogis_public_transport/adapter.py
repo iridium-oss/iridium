@@ -4,15 +4,13 @@ Supports bus and metro modes; total_duration, transfer_count, route variants, sc
 """
 
 import os
-from datetime import datetime, timezone
-from typing import Optional
+from datetime import UTC, datetime
 
 import httpx
-
 from iridium_schemas.transit import (
-    TransitPartnerRouteResult,
     SourceFamily,
     SourceStatus,
+    TransitPartnerRouteResult,
 )
 
 PROVIDER_ID = "twogis_public_transport"
@@ -23,7 +21,7 @@ TWOGIS_ROUTING_URL = "https://routing.api.2gis.com/public_transport/1.0"
 DEFAULT_TIMEOUT = 15.0
 
 
-def _get_twogis_api_key() -> Optional[str]:
+def _get_twogis_api_key() -> str | None:
     """Read API key from IRIDIUM_* or legacy env."""
     return os.environ.get(ENV_IRIDIUM_2GIS_KEY) or os.environ.get(ENV_2GIS_API_KEY)
 
@@ -38,7 +36,7 @@ def fetch_route_alternatives(
     from_lon: float,
     to_lat: float,
     to_lon: float,
-    modes: Optional[list[str]] = None,
+    modes: list[str] | None = None,
     timeout: float = DEFAULT_TIMEOUT,
 ) -> list[TransitPartnerRouteResult]:
     """
@@ -49,7 +47,7 @@ def fetch_route_alternatives(
     if not api_key:
         return []
     modes = modes or ["bus", "metro"]
-    observed_at = datetime.now(timezone.utc)
+    observed_at = datetime.now(UTC)
     results: list[TransitPartnerRouteResult] = []
     try:
         # 2GIS routing API pattern: check current 2GIS documentation for exact endpoint and params.

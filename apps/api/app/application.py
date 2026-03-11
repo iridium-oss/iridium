@@ -5,37 +5,38 @@ FastAPI application factory: config, CORS, routes, middleware, error handling.
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from fastapi.exceptions import RequestValidationError
 
-from app.config import get_settings
 from app.api import (
-    health,
-    version,
-    network,
-    forecast,
-    routing,
-    equity,
-    anomalies,
-    ingestion,
-    transit,
-    system,
-    weather,
-    digital_twin,
     alerts,
-    federated,
+    anomalies,
+    digital_twin,
     eo,
+    equity,
+    federated,
+    forecast,
+    health,
+    ingestion,
+    network,
+    routing,
+    system,
+    transit,
+    version,
+    weather,
 )
-from app.schemas import ErrorDetail, ErrorResponse
-from app.observability.logging import configure_logging
+from app.config import get_settings
 from app.middleware.request_id import RequestIdMiddleware, RequestLoggingMiddleware
 from app.middleware.security import RequestSizeLimitMiddleware, SecurityHeadersMiddleware
+from app.observability.logging import configure_logging
+from app.schemas import ErrorDetail, ErrorResponse
 
 
 def _propagate_provider_env(settings) -> None:
     """Propagate IRIDIUM_* and legacy credentials into os.environ for adapters that read env directly."""
     import os
+
     if settings.twogis.api_key and not os.environ.get("TWOGIS_API_KEY"):
         os.environ["TWOGIS_API_KEY"] = settings.twogis.api_key.get_secret_value()
     if settings.twogis.api_key and not os.environ.get("IRIDIUM_TWOGIS__API_KEY"):

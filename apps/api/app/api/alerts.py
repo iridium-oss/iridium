@@ -8,16 +8,15 @@ It does not claim GTFS Realtime support when only observed web sources exist.
 from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException, Query
-
 from iridium_schemas.transit import Alert
 
 router = APIRouter()
 
 
 def _fetch_transit_alerts() -> list[Alert]:
+    from transit_ingestion.provenance.priority import merge_alerts_by_priority
     from transit_ingestion.providers.bakubus_official_alerts import fetch_bakubus_alerts
     from transit_ingestion.providers.bakumetro_official_alerts import fetch_metro_alerts
-    from transit_ingestion.provenance.priority import merge_alerts_by_priority
 
     bus_alerts = fetch_bakubus_alerts(timeout=15.0)
     metro_alerts = fetch_metro_alerts(timeout=15.0)
@@ -60,5 +59,7 @@ def get_alert(alert_id: str) -> dict:
     for a in alerts:
         if a.alert_id == alert_id:
             return {"alert": a.model_dump(mode="json")}
-    raise HTTPException(status_code=404, detail={"error": {"code": "not_found", "message": "Alert not found", "details": None}})
-
+    raise HTTPException(
+        status_code=404,
+        detail={"error": {"code": "not_found", "message": "Alert not found", "details": None}},
+    )

@@ -35,7 +35,9 @@ def test_equity_scores_data_dir_no_file():
 
 def test_equity_scores_filter_districts():
     data_dir = root / "data" / "synthetic"
-    result = get_equity_scores(district_ids=["d1", "d2"], data_dir=data_dir if data_dir.exists() else None)
+    result = get_equity_scores(
+        district_ids=["d1", "d2"], data_dir=data_dir if data_dir.exists() else None
+    )
     if result.data_status == "unavailable":
         assert result.districts == []
     else:

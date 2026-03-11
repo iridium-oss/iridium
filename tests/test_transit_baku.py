@@ -12,13 +12,13 @@ for p in ("packages/schemas", "services/transit-ingestion"):
     if path.exists() and str(path) not in sys.path:
         sys.path.insert(0, str(path))
 
-import pytest
+from datetime import UTC
+
 from iridium_schemas.transit import (
-    TransitAgency,
-    TransitRoute,
-    TransitStop,
     SourceFamily,
     SourceStatus,
+    TransitAgency,
+    TransitStop,
 )
 
 
@@ -27,11 +27,13 @@ class TestBakubusNormalize:
 
     def test_normalize_bus_list_empty(self):
         from transit_ingestion.providers.bakubus_ayna.normalize import normalize_bus_list
+
         assert normalize_bus_list(None) == []
         assert normalize_bus_list([]) == []
 
     def test_normalize_bus_list_from_list(self):
         from transit_ingestion.providers.bakubus_ayna.normalize import normalize_bus_list
+
         raw = [{"id": "1", "number": "5"}, {"busId": "2", "number": "12"}]
         out = normalize_bus_list(raw)
         assert len(out) == 2
@@ -40,6 +42,7 @@ class TestBakubusNormalize:
 
     def test_normalize_bakubus_route_none(self):
         from transit_ingestion.providers.bakubus_ayna.normalize import normalize_bakubus_route
+
         ag, r, v, stops, seq, shapes, fp = normalize_bakubus_route(None)
         assert ag is None
         assert r is None
@@ -51,6 +54,7 @@ class TestBakubusNormalize:
 
     def test_normalize_bakubus_route_minimal(self):
         from transit_ingestion.providers.bakubus_ayna.normalize import normalize_bakubus_route
+
         raw = {
             "id": "42",
             "number": "18",
@@ -83,6 +87,7 @@ class TestBakumetroStatic:
 
     def test_metro_agency(self):
         from transit_ingestion.providers.bakumetro_official.static_network import get_metro_agency
+
         a = get_metro_agency()
         assert a.agency_id == "baku_metro"
         assert a.source_provider == "bakumetro_official"
@@ -90,6 +95,7 @@ class TestBakumetroStatic:
 
     def test_metro_lines(self):
         from transit_ingestion.providers.bakumetro_official.static_network import get_metro_lines
+
         lines = get_metro_lines()
         assert len(lines) >= 3
         ids = {r.route_id for r in lines}
@@ -99,6 +105,7 @@ class TestBakumetroStatic:
 
     def test_metro_stations(self):
         from transit_ingestion.providers.bakumetro_official.static_network import get_metro_stations
+
         stops = get_metro_stations()
         assert len(stops) > 0
         for s in stops:
@@ -108,6 +115,7 @@ class TestBakumetroStatic:
 
     def test_build_static_metro_network(self):
         from transit_ingestion.providers.bakumetro_official import build_static_metro_network
+
         net = build_static_metro_network()
         assert "agency" in net
         assert "routes" in net
@@ -120,15 +128,19 @@ class TestReadiness:
     """Readiness report."""
 
     def test_readiness_metro_only(self):
-        from transit_ingestion.providers.bakumetro_official import build_static_metro_network
         from transit_ingestion.normalization.merge import build_unified_transit_snapshot
+        from transit_ingestion.providers.bakumetro_official import build_static_metro_network
         from transit_ingestion.validation.readiness import compute_readiness_report
+
         snapshot = build_unified_transit_snapshot(bakumetro_network=build_static_metro_network())
         report = compute_readiness_report(snapshot)
         assert report.static_stop_discovery is True
         assert report.route_visualization is True
         assert report.timetable_routing is False
-        assert "stop_times" in str(report.missing_for_otp).lower() or "timetable" in str(report.missing_for_otp).lower()
+        assert (
+            "stop_times" in str(report.missing_for_otp).lower()
+            or "timetable" in str(report.missing_for_otp).lower()
+        )
 
 
 class TestCanonicalSchema:
@@ -169,9 +181,10 @@ class TestGtfsBuilder:
     """GTFS builder produces only defensible files."""
 
     def test_build_gtfs_static_writes_core_files(self, tmp_path):
-        from transit_ingestion.providers.bakumetro_official import build_static_metro_network
-        from transit_ingestion.normalization.merge import build_unified_transit_snapshot
         from transit_ingestion.gtfs_builder.build import build_gtfs_static
+        from transit_ingestion.normalization.merge import build_unified_transit_snapshot
+        from transit_ingestion.providers.bakumetro_official import build_static_metro_network
+
         net = build_static_metro_network()
         snapshot = build_unified_transit_snapshot(bakumetro_network=net)
         out = build_gtfs_static(snapshot, output_dir=tmp_path)
@@ -183,9 +196,10 @@ class TestGtfsBuilder:
         assert "Not operator-issued" in (out / "README.txt").read_text()
 
     def test_build_gtfs_static_no_stop_times(self, tmp_path):
-        from transit_ingestion.providers.bakumetro_official import build_static_metro_network
-        from transit_ingestion.normalization.merge import build_unified_transit_snapshot
         from transit_ingestion.gtfs_builder.build import build_gtfs_static
+        from transit_ingestion.normalization.merge import build_unified_transit_snapshot
+        from transit_ingestion.providers.bakumetro_official import build_static_metro_network
+
         snapshot = build_unified_transit_snapshot(bakumetro_network=build_static_metro_network())
         out = build_gtfs_static(snapshot, output_dir=tmp_path)
         assert not (out / "stop_times.txt").exists()
@@ -197,6 +211,7 @@ class TestProviderStatus:
 
     def test_registry_returns_bakubus_ayna_and_bakumetro(self):
         from transit_ingestion.registry import get_provider_registry
+
         entries = get_provider_registry()
         ids = [e.provider_id for e in entries]
         assert "bakubus_ayna" in ids
@@ -204,6 +219,7 @@ class TestProviderStatus:
 
     def test_registry_live_status(self):
         from transit_ingestion.registry import get_provider_registry
+
         entries = get_provider_registry()
         bakubus = next(e for e in entries if e.provider_id == "bakubus_ayna")
         metro = next(e for e in entries if e.provider_id == "bakumetro_official")
@@ -212,6 +228,7 @@ class TestProviderStatus:
 
     def test_registry_permission_required_for_operator_gtfs(self):
         from transit_ingestion.registry import get_provider_registry
+
         entries = get_provider_registry()
         baku_metro = next(e for e in entries if e.provider_id == "baku_metro")
         assert baku_metro.status == "permission_required"
@@ -221,8 +238,10 @@ class TestOsmResolution:
     """OSM station resolution and ambiguous-match validation. No live network in tests."""
 
     def test_resolve_station_empty_name_returns_none_confidence(self):
-        from datetime import datetime, timezone
+        from datetime import datetime
+
         from transit_ingestion.providers.bakumetro_official.osm_resolution import resolve_station
+
         # Stop with empty name and empty stop_id so no Nominatim call is made.
         stop = TransitStop(
             stop_id="",
@@ -232,7 +251,7 @@ class TestOsmResolution:
             source_provider="bakumetro_official",
             source_family="official_website",
             source_status="static_schedule_only",
-            fetched_at=datetime.now(timezone.utc),
+            fetched_at=datetime.now(UTC),
         )
         res = resolve_station(stop)
         assert res.confidence == "none"
@@ -244,6 +263,7 @@ class TestOsmResolution:
             OsmValidationReport,
             flag_ambiguous_for_manual_review,
         )
+
         report = OsmValidationReport(
             ambiguous_stop_ids=["bakumetro_red_1_Station_A"],
             unresolved_stop_ids=["bakumetro_red_2_Station_B"],
@@ -254,11 +274,15 @@ class TestOsmResolution:
         assert len(review) == 1
 
     def test_resolve_metro_stations_with_mock_no_candidates(self):
-        from datetime import datetime, timezone
+        from datetime import datetime
         from unittest.mock import patch
+
         from transit_ingestion.providers.bakumetro_official import osm_resolution
-        from transit_ingestion.providers.bakumetro_official.osm_resolution import resolve_metro_stations
-        t = datetime.now(timezone.utc)
+        from transit_ingestion.providers.bakumetro_official.osm_resolution import (
+            resolve_metro_stations,
+        )
+
+        t = datetime.now(UTC)
         stops = [
             TransitStop(
                 stop_id="test_1",
@@ -279,10 +303,12 @@ class TestOsmResolution:
         assert "test_1" in report.unresolved_stop_ids
 
     def test_resolve_station_single_candidate_high_confidence(self):
-        from datetime import datetime, timezone
+        from datetime import datetime
         from unittest.mock import patch
+
         from transit_ingestion.providers.bakumetro_official import osm_resolution
         from transit_ingestion.providers.bakumetro_official.osm_resolution import resolve_station
+
         stop = TransitStop(
             stop_id="test_s1",
             name="28 May",
@@ -291,9 +317,11 @@ class TestOsmResolution:
             source_provider="bakumetro_official",
             source_family="official_website",
             source_status="static_schedule_only",
-            fetched_at=datetime.now(timezone.utc),
+            fetched_at=datetime.now(UTC),
         )
-        with patch.object(osm_resolution, "_search_nominatim", return_value=[{"lat": "40.4093", "lon": "49.8671"}]):
+        with patch.object(
+            osm_resolution, "_search_nominatim", return_value=[{"lat": "40.4093", "lon": "49.8671"}]
+        ):
             res = resolve_station(stop)
         assert res.confidence == "high"
         assert res.stop.lat == 40.4093
@@ -305,28 +333,58 @@ class TestOfficialAlerts:
     """Official BakuBus and Baku Metro alert parsing."""
 
     def test_normalize_bakubus_alerts_empty_on_error(self):
+        from datetime import datetime
+
         from transit_ingestion.providers.bakubus_official_alerts.fetcher import FetchedPage
-        from transit_ingestion.providers.bakubus_official_alerts.normalize import normalize_bakubus_alerts
-        from datetime import datetime, timezone
-        fetched = FetchedPage(url="https://bakubus.az", html="", fetched_at=datetime.now(timezone.utc), status_code=200, error="fail")
+        from transit_ingestion.providers.bakubus_official_alerts.normalize import (
+            normalize_bakubus_alerts,
+        )
+
+        fetched = FetchedPage(
+            url="https://bakubus.az",
+            html="",
+            fetched_at=datetime.now(UTC),
+            status_code=200,
+            error="fail",
+        )
         assert normalize_bakubus_alerts(fetched) == []
 
     def test_normalize_bakubus_alerts_extracts_links(self):
+        from datetime import datetime
+
         from transit_ingestion.providers.bakubus_official_alerts.fetcher import FetchedPage
-        from transit_ingestion.providers.bakubus_official_alerts.normalize import normalize_bakubus_alerts
-        from datetime import datetime, timezone
+        from transit_ingestion.providers.bakubus_official_alerts.normalize import (
+            normalize_bakubus_alerts,
+        )
+
         html = '<a href="/az/news/1">Route 5 change</a><a href="https://bakubus.az/az/news/2">Interval update</a>'
-        fetched = FetchedPage(url="https://bakubus.az/az/news", html=html, fetched_at=datetime.now(timezone.utc), status_code=200, error=None)
+        fetched = FetchedPage(
+            url="https://bakubus.az/az/news",
+            html=html,
+            fetched_at=datetime.now(UTC),
+            status_code=200,
+            error=None,
+        )
         alerts = normalize_bakubus_alerts(fetched)
         assert len(alerts) >= 2
         assert all(a.source_provider == "bakubus_official_alerts" for a in alerts)
         assert all(a.source_status == "official_alerts_only" for a in alerts)
 
     def test_normalize_metro_alerts_empty_on_error(self):
+        from datetime import datetime
+
         from transit_ingestion.providers.bakumetro_official_alerts.fetcher import FetchedMetroPage
-        from transit_ingestion.providers.bakumetro_official_alerts.normalize import normalize_metro_alerts
-        from datetime import datetime, timezone
-        fetched = FetchedMetroPage(url="https://metro.gov.az", html="", fetched_at=datetime.now(timezone.utc), status_code=500, error="fail")
+        from transit_ingestion.providers.bakumetro_official_alerts.normalize import (
+            normalize_metro_alerts,
+        )
+
+        fetched = FetchedMetroPage(
+            url="https://metro.gov.az",
+            html="",
+            fetched_at=datetime.now(UTC),
+            status_code=500,
+            error="fail",
+        )
         assert normalize_metro_alerts(fetched) == []
 
 
@@ -334,20 +392,40 @@ class TestYandexObserved:
     """Yandex stop-page predicted arrival and observation normalization."""
 
     def test_normalize_yandex_extracts_arrival_hints(self):
+        from datetime import datetime
+
         from transit_ingestion.providers.yandex_transport_observed.fetcher import FetchedYandexPage
-        from transit_ingestion.providers.yandex_transport_observed.normalize import normalize_yandex_stop_observations
-        from datetime import datetime, timezone
+        from transit_ingestion.providers.yandex_transport_observed.normalize import (
+            normalize_yandex_stop_observations,
+        )
+
         html = "Bus in 5 min and 12 minutes."
-        fetched = FetchedYandexPage(url="https://yandex.az/maps", html=html, fetched_at=datetime.now(timezone.utc), status_code=200, error=None)
+        fetched = FetchedYandexPage(
+            url="https://yandex.az/maps",
+            html=html,
+            fetched_at=datetime.now(UTC),
+            status_code=200,
+            error=None,
+        )
         arrivals, statuses, _ = normalize_yandex_stop_observations(fetched, stop_id="test_stop")
         assert len(arrivals) >= 2
         assert all(a.source_status == "public_web_observed" for a in arrivals)
 
     def test_normalize_yandex_empty_page_returns_stop_status_unknown(self):
+        from datetime import datetime
+
         from transit_ingestion.providers.yandex_transport_observed.fetcher import FetchedYandexPage
-        from transit_ingestion.providers.yandex_transport_observed.normalize import normalize_yandex_stop_observations
-        from datetime import datetime, timezone
-        fetched = FetchedYandexPage(url="https://yandex.az/maps", html="<div>no minutes</div>", fetched_at=datetime.now(timezone.utc), status_code=200, error=None)
+        from transit_ingestion.providers.yandex_transport_observed.normalize import (
+            normalize_yandex_stop_observations,
+        )
+
+        fetched = FetchedYandexPage(
+            url="https://yandex.az/maps",
+            html="<div>no minutes</div>",
+            fetched_at=datetime.now(UTC),
+            status_code=200,
+            error=None,
+        )
         arrivals, statuses, _ = normalize_yandex_stop_observations(fetched)
         assert len(arrivals) == 0
         assert len(statuses) == 1
@@ -358,11 +436,21 @@ class TestMetroOperational:
     """Yandex metro operational notice normalization."""
 
     def test_normalize_metro_operational_extracts_closed_hints(self):
+        from datetime import datetime
+
         from transit_ingestion.providers.yandex_metro_operational.fetcher import FetchedMetroPage
-        from transit_ingestion.providers.yandex_metro_operational.normalize import normalize_yandex_metro_operational
-        from datetime import datetime, timezone
+        from transit_ingestion.providers.yandex_metro_operational.normalize import (
+            normalize_yandex_metro_operational,
+        )
+
         html = "Station closed for maintenance. Entrance closed."
-        fetched = FetchedMetroPage(url="https://yandex.az/maps/metro", html=html, fetched_at=datetime.now(timezone.utc), status_code=200, error=None)
+        fetched = FetchedMetroPage(
+            url="https://yandex.az/maps/metro",
+            html=html,
+            fetched_at=datetime.now(UTC),
+            status_code=200,
+            error=None,
+        )
         notices, constraints = normalize_yandex_metro_operational(fetched)
         assert len(notices) >= 1
         assert all(n.source_status == "public_web_operational_context" for n in notices)
@@ -373,22 +461,39 @@ class TestProviderPriority:
 
     def test_alert_priority_order(self):
         from transit_ingestion.provenance.priority import get_alert_priority_order
+
         order = get_alert_priority_order()
         assert "bakubus_official_alerts" in order
         assert "bakumetro_official_alerts" in order
         assert order.index("bakubus_official_alerts") < order.index("moovit_partner")
 
     def test_merge_alerts_by_priority(self):
+        from datetime import datetime
+
         from iridium_schemas.transit import Alert
         from transit_ingestion.provenance.priority import merge_alerts_by_priority
-        from datetime import datetime, timezone
-        t = datetime.now(timezone.utc)
-        a1 = Alert(alert_id="id1", title="Bus", source_provider="bakubus_official_alerts", source_family="", source_status="")
-        a2 = Alert(alert_id="id2", title="Metro", source_provider="bakumetro_official_alerts", source_family="", source_status="")
-        merged = merge_alerts_by_priority([
-            ("moovit_partner", [a2]),
-            ("bakubus_official_alerts", [a1]),
-        ])
+
+        t = datetime.now(UTC)
+        a1 = Alert(
+            alert_id="id1",
+            title="Bus",
+            source_provider="bakubus_official_alerts",
+            source_family="",
+            source_status="",
+        )
+        a2 = Alert(
+            alert_id="id2",
+            title="Metro",
+            source_provider="bakumetro_official_alerts",
+            source_family="",
+            source_status="",
+        )
+        merged = merge_alerts_by_priority(
+            [
+                ("moovit_partner", [a2]),
+                ("bakubus_official_alerts", [a1]),
+            ]
+        )
         assert len(merged) == 2
         assert merged[0].source_provider == "bakubus_official_alerts"
         assert merged[1].source_provider == "bakumetro_official_alerts"
@@ -399,15 +504,18 @@ class TestSourceStatus:
 
     def test_yandex_traffic_status(self):
         from transit_ingestion.providers.yandex_traffic_context import get_traffic_context_status
+
         status = get_traffic_context_status()
         assert status in ("web_observed", "licensed_api", "unavailable")
 
     def test_twogis_status(self):
         from transit_ingestion.providers.twogis_public_transport import get_twogis_status
+
         status = get_twogis_status()
         assert status in ("configured", "unavailable")
 
     def test_moovit_status(self):
         from transit_ingestion.providers.moovit_partner import get_moovit_status
+
         status = get_moovit_status()
         assert status in ("available", "partner_required")

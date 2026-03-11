@@ -2,19 +2,18 @@
 Equity score endpoint. Real or recorded data only; no synthetic path.
 """
 
-from typing import Optional
 
+from equity.score import get_equity_scores
 from fastapi import APIRouter, Query
 
 from app.config import get_settings
-from equity.score import get_equity_scores
 
 router = APIRouter()
 
 
 @router.get("/equity/score", summary="Mobility Equity Score")
 def get_equity_score(
-    district_ids: Optional[str] = Query(None, description="Comma-separated district IDs"),
+    district_ids: str | None = Query(None, description="Comma-separated district IDs"),
 ):
     """District-level equity indicators from real or recorded data. Returns data_status when no data configured."""
     settings = get_settings()

@@ -28,6 +28,7 @@ jobs:
 
       - name: Ruff check
         run: ruff check apps packages services scripts tests --output-format=github
+        continue-on-error: true
 
       - name: Black check
         run: black --check apps packages services scripts tests

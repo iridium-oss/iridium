@@ -7,14 +7,13 @@ Responses include explicit data_status and provenance.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
-from fastapi import APIRouter
-from pydantic import BaseModel, Field
-
 from digital_twin.state_assembler import get_assembled_snapshot
+from fastapi import APIRouter
 from iridium_schemas.network import DigitalTwinSnapshot
+from pydantic import BaseModel, Field
 
 router = APIRouter()
 
@@ -61,7 +60,7 @@ def get_status() -> DigitalTwinStatusResponse:
     if snap.data_status != "live":
         note = "Digital twin is incomplete or unavailable. See provenance for details."
     return DigitalTwinStatusResponse(
-        snapshot_at=snap.snapshot_at or datetime.now(timezone.utc),
+        snapshot_at=snap.snapshot_at or datetime.now(UTC),
         data_status=snap.data_status,
         node_count=len(snap.nodes),
         edge_count=len(snap.edges),
@@ -82,7 +81,7 @@ def get_coverage() -> DigitalTwinCoverageResponse:
         "sources_reported": len(snap.source_provenance or []),
     }
     return DigitalTwinCoverageResponse(
-        snapshot_at=snap.snapshot_at or datetime.now(timezone.utc),
+        snapshot_at=snap.snapshot_at or datetime.now(UTC),
         data_status=snap.data_status,
         coverage=coverage,
     )
@@ -97,8 +96,7 @@ def get_coverage() -> DigitalTwinCoverageResponse:
 def get_provenance() -> DigitalTwinProvenanceResponse:
     snap = get_assembled_snapshot()
     return DigitalTwinProvenanceResponse(
-        snapshot_at=snap.snapshot_at or datetime.now(timezone.utc),
+        snapshot_at=snap.snapshot_at or datetime.now(UTC),
         data_status=snap.data_status,
         sources=list(snap.source_provenance or []),
     )
-

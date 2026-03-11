@@ -3,8 +3,7 @@ Fetch Yandex Metro Baku page for operational context. Public web; not operator f
 """
 
 from dataclasses import dataclass
-from datetime import datetime, timezone
-from typing import Optional
+from datetime import UTC, datetime
 
 import httpx
 
@@ -20,16 +19,16 @@ class FetchedMetroPage:
     html: str
     fetched_at: datetime
     status_code: int
-    error: Optional[str] = None
+    error: str | None = None
 
 
 def fetch_yandex_metro_page(
-    url: Optional[str] = None,
+    url: str | None = None,
     timeout: float = DEFAULT_TIMEOUT,
 ) -> FetchedMetroPage:
     """Fetch Yandex Metro Baku page. Content may be JS-rendered."""
     target = url or YANDEX_METRO_BAKU
-    fetched_at = datetime.now(timezone.utc)
+    fetched_at = datetime.now(UTC)
     try:
         r = httpx.get(
             target,

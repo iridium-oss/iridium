@@ -3,17 +3,18 @@ Forecasting pipeline: data prep, feature assembly, baseline predictor.
 Uses digital twin from state assembler when available. Sets data_status from twin; no fabricated metrics.
 """
 
-from datetime import datetime, timedelta, timezone
-from typing import Optional
+from datetime import UTC, datetime, timedelta
 
+from digital_twin.state_assembler import get_assembled_snapshot
 from iridium_schemas.forecast import CongestionForecastResponse, ForecastSegment
 from iridium_schemas.provenance import DATA_STATUS_CONFIGURATION_REQUIRED
-from digital_twin.state_assembler import get_assembled_snapshot
 
 
-def _baseline_congestion(segment_id: str, horizon_minutes: int, snapshot_edges: list, step_min: int = 15) -> list[ForecastSegment]:
+def _baseline_congestion(
+    segment_id: str, horizon_minutes: int, snapshot_edges: list, step_min: int = 15
+) -> list[ForecastSegment]:
     """Heuristic baseline from twin edges when present. No trained model; no fabricated observations."""
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     segments: list[ForecastSegment] = []
     base_speed = 30.0
     base_occupancy = 0.2
@@ -43,7 +44,7 @@ def _baseline_congestion(segment_id: str, horizon_minutes: int, snapshot_edges: 
 
 def get_congestion_forecast(
     horizon_minutes: int = 120,
-    segment_ids: Optional[list[str]] = None,
+    segment_ids: list[str] | None = None,
 ) -> CongestionForecastResponse:
     """Return congestion forecast. Data status from twin; heuristic when no real model."""
     snapshot = get_assembled_snapshot()
@@ -61,7 +62,7 @@ def get_congestion_forecast(
     return CongestionForecastResponse(
         segments=segments,
         horizon_minutes=horizon_minutes,
-        generated_at=datetime.now(timezone.utc),
+        generated_at=datetime.now(UTC),
         model_version="baseline-heuristic",
         model_type="deterministic_baseline",
         model_maturity="production_baseline",

@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -38,9 +38,9 @@ class EOBandAsset(BaseModel):
     """Single band or asset reference (e.g. B04, B08)."""
 
     band_name: str = Field(..., description="Band identifier, e.g. B04, B08")
-    asset_key: Optional[str] = Field(None, description="STAC asset key if different")
-    resolution_m: Optional[int] = Field(None, description="Spatial resolution in metres")
-    href: Optional[str] = Field(None, description="Direct link when available")
+    asset_key: str | None = Field(None, description="STAC asset key if different")
+    resolution_m: int | None = Field(None, description="Spatial resolution in metres")
+    href: str | None = Field(None, description="Direct link when available")
 
 
 class EOSceneMetadata(BaseModel):
@@ -49,13 +49,13 @@ class EOSceneMetadata(BaseModel):
     source_provider: str = Field(..., description="Provider id, e.g. copernicus_stac, earth_search")
     source_family: str = Field(default="stac_catalog", description="Source family")
     source_status: EOSourceStatus = Field(..., description="Availability status")
-    acquired_at: Optional[datetime] = Field(None, description="Scene acquisition datetime (UTC)")
-    processed_at: Optional[datetime] = Field(None, description="Processing time if derived")
-    cloud_cover: Optional[float] = Field(None, ge=0, le=100, description="Cloud cover percentage")
-    bbox: Optional[list[float]] = Field(None, description="Bounding box [minx, miny, maxx, maxy]")
-    geometry: Optional[dict[str, Any]] = Field(None, description="GeoJSON geometry when available")
-    confidence_note: Optional[str] = Field(None, description="Confidence or interpretation note")
-    validation_note: Optional[str] = Field(None, description="Validation or quality note")
+    acquired_at: datetime | None = Field(None, description="Scene acquisition datetime (UTC)")
+    processed_at: datetime | None = Field(None, description="Processing time if derived")
+    cloud_cover: float | None = Field(None, ge=0, le=100, description="Cloud cover percentage")
+    bbox: list[float] | None = Field(None, description="Bounding box [minx, miny, maxx, maxy]")
+    geometry: dict[str, Any] | None = Field(None, description="GeoJSON geometry when available")
+    confidence_note: str | None = Field(None, description="Confidence or interpretation note")
+    validation_note: str | None = Field(None, description="Validation or quality note")
 
 
 class EOScene(BaseModel):
@@ -65,22 +65,24 @@ class EOScene(BaseModel):
     collection: str = Field(..., description="STAC collection id")
     metadata: EOSceneMetadata
     assets: list[EOBandAsset] = Field(default_factory=list)
-    asset_links: dict[str, str] = Field(default_factory=dict, description="Asset key to href mapping")
+    asset_links: dict[str, str] = Field(
+        default_factory=dict, description="Asset key to href mapping"
+    )
 
 
 class EOSceneSearchResult(BaseModel):
     """Result of an EO scene search with provenance."""
 
     scenes: list[EOScene] = Field(default_factory=list)
-    total_count: Optional[int] = None
+    total_count: int | None = None
     source_provider: str
     source_status: EOSourceStatus
-    searched_at: Optional[datetime] = None
-    bbox: Optional[list[float]] = None
-    date_start: Optional[datetime] = None
-    date_end: Optional[datetime] = None
-    cloud_cover_max: Optional[float] = None
-    note: Optional[str] = None
+    searched_at: datetime | None = None
+    bbox: list[float] | None = None
+    date_start: datetime | None = None
+    date_end: datetime | None = None
+    cloud_cover_max: float | None = None
+    note: str | None = None
 
 
 class EOIndexLayer(BaseModel):
@@ -89,13 +91,13 @@ class EOIndexLayer(BaseModel):
     layer_id: str = Field(..., description="Layer identifier, e.g. ndvi, ndwi, ndbi")
     name: str
     description: str = Field(..., description="Human-readable description and formula")
-    formula_note: Optional[str] = Field(None, description="Formula or interpretation")
-    scene_id: Optional[str] = None
+    formula_note: str | None = Field(None, description="Formula or interpretation")
+    scene_id: str | None = None
     metadata: EOSceneMetadata
-    min_value: Optional[float] = None
-    max_value: Optional[float] = None
-    legend_units: Optional[str] = None
-    misuse_warning: Optional[str] = Field(
+    min_value: float | None = None
+    max_value: float | None = None
+    legend_units: str | None = None
+    misuse_warning: str | None = Field(
         None,
         description="Warning that this is not traffic or realtime data",
     )
@@ -107,11 +109,11 @@ class EOTileLayer(BaseModel):
     layer_id: str
     name: str
     description: str
-    scene_id: Optional[str] = None
+    scene_id: str | None = None
     metadata: EOSceneMetadata
     type: str = Field(..., description="e.g. true_color, false_color")
-    tile_url_template: Optional[str] = None
-    misuse_warning: Optional[str] = None
+    tile_url_template: str | None = None
+    misuse_warning: str | None = None
 
 
 class EOOverlayDescriptor(BaseModel):
@@ -121,14 +123,14 @@ class EOOverlayDescriptor(BaseModel):
     name: str
     description: str
     layer_type: str = Field(..., description="index or tile")
-    index_layer: Optional[EOIndexLayer] = None
-    tile_layer: Optional[EOTileLayer] = None
+    index_layer: EOIndexLayer | None = None
+    tile_layer: EOTileLayer | None = None
     source_provider: str
     source_status: EOSourceStatus
-    acquired_at: Optional[datetime] = None
-    cloud_cover: Optional[float] = None
-    intended_interpretation: Optional[str] = None
-    misuse_warning: Optional[str] = None
+    acquired_at: datetime | None = None
+    cloud_cover: float | None = None
+    intended_interpretation: str | None = None
+    misuse_warning: str | None = None
 
 
 class EOProcessingJob(BaseModel):
@@ -136,11 +138,11 @@ class EOProcessingJob(BaseModel):
 
     job_id: str
     status: str = Field(..., description="pending, running, completed, failed")
-    scene_id: Optional[str] = None
-    layer_id: Optional[str] = None
-    created_at: Optional[datetime] = None
-    completed_at: Optional[datetime] = None
-    note: Optional[str] = None
+    scene_id: str | None = None
+    layer_id: str | None = None
+    created_at: datetime | None = None
+    completed_at: datetime | None = None
+    note: str | None = None
 
 
 class EOAreaPresetDefinition(BaseModel):
@@ -149,4 +151,4 @@ class EOAreaPresetDefinition(BaseModel):
     preset_id: str
     name: str
     bbox: list[float] = Field(..., min_length=4, max_length=4)
-    description: Optional[str] = None
+    description: str | None = None

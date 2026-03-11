@@ -1,8 +1,8 @@
 """Anomaly detection tests."""
 
 import sys
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from datetime import datetime, timedelta, timezone
 from unittest.mock import patch
 
 root = Path(__file__).resolve().parents[1]
@@ -11,8 +11,8 @@ for p in ("packages/schemas", "services/digital-twin", "services/anomaly-detecti
     if path.exists() and str(path) not in sys.path:
         sys.path.insert(0, str(path))
 
-from iridium_schemas.network import NetworkEdge, DigitalTwinSnapshot
 from anomaly_detection.detector import get_anomalies
+from iridium_schemas.network import DigitalTwinSnapshot, NetworkEdge
 
 
 def test_get_anomalies_returns_list():
@@ -21,7 +21,7 @@ def test_get_anomalies_returns_list():
 
 
 def test_get_anomalies_since_filter():
-    since = datetime.now(timezone.utc) - timedelta(hours=1)
+    since = datetime.now(UTC) - timedelta(hours=1)
     result = get_anomalies(since=since)
     for a in result:
         assert a.detected_at >= since

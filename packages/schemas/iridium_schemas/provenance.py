@@ -3,11 +3,10 @@ Data status and provenance: used in API and UI to show real vs unavailable vs co
 """
 
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from iridium_schemas.source_status import DataStatus, ConfidenceLevel
+from iridium_schemas.source_status import ConfidenceLevel, DataStatus
 
 # Allowed values for data status in responses and UI
 DATA_STATUS_LIVE = "live"
@@ -32,10 +31,10 @@ class SourceProvenance(BaseModel):
 
     source_name: str
     status: str = Field(..., description="One of DATA_STATUS_VALUES")
-    fetched_at: Optional[datetime] = None
-    provider: Optional[str] = None
-    confidence: Optional[str] = None  # e.g. high, medium, low
-    note: Optional[str] = None  # e.g. "Credentials missing", "Operator feed not yet provided"
+    fetched_at: datetime | None = None
+    provider: str | None = None
+    confidence: str | None = None  # e.g. high, medium, low
+    note: str | None = None  # e.g. "Credentials missing", "Operator feed not yet provided"
 
     def to_canonical_status(self) -> DataStatus:
         try:
@@ -56,6 +55,6 @@ class ProviderRegistryEntry(BaseModel):
     provider_id: str
     name: str
     status: str = Field(..., description="live | permission_required | unavailable | disabled")
-    feed_url: Optional[str] = None
-    updated_at: Optional[datetime] = None
-    note: Optional[str] = None
+    feed_url: str | None = None
+    updated_at: datetime | None = None
+    note: str | None = None

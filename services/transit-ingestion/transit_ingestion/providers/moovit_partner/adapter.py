@@ -5,15 +5,14 @@ Credentials can be added later without redesign.
 
 import os
 from dataclasses import dataclass
-from datetime import datetime, timezone
-from typing import Optional
+from datetime import UTC, datetime
 
 from iridium_schemas.transit import (
-    TransitPartnerRouteResult,
-    PredictedArrival,
     Alert,
+    PredictedArrival,
     SourceFamily,
     SourceStatus,
+    TransitPartnerRouteResult,
 )
 
 PROVIDER_ID = "moovit_partner"
@@ -30,14 +29,18 @@ STATUS_PARTNER_REQUIRED = "partner_required"
 class MoovitConfig:
     """Configuration model for Moovit partner integration."""
 
-    api_key: Optional[str] = None
-    base_url: Optional[str] = None
+    api_key: str | None = None
+    base_url: str | None = None
     enabled: bool = False
 
 
 def get_moovit_config() -> MoovitConfig:
     """Return current Moovit partner configuration. Reads IRIDIUM_* or legacy env."""
-    key = os.environ.get(ENV_IRIDIUM_MOOVIT_KEY) or os.environ.get(ENV_MOOVIT_API_KEY) or os.environ.get(ENV_MOOVIT_PARTNER_KEY)
+    key = (
+        os.environ.get(ENV_IRIDIUM_MOOVIT_KEY)
+        or os.environ.get(ENV_MOOVIT_API_KEY)
+        or os.environ.get(ENV_MOOVIT_PARTNER_KEY)
+    )
     base_url = os.environ.get(ENV_MOOVIT_PARTNER_BASE_URL) or os.environ.get(ENV_MOOVIT_BASE_URL)
     return MoovitConfig(
         api_key=key,
@@ -60,7 +63,7 @@ def fetch_moovit_route_alternatives(
     """Placeholder: returns empty list until partner credentials and API are configured."""
     if not get_moovit_config().enabled:
         return []
-    observed_at = datetime.now(timezone.utc)
+    observed_at = datetime.now(UTC)
     return [
         TransitPartnerRouteResult(
             result_id=f"{PROVIDER_ID}_placeholder",

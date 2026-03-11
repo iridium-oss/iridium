@@ -7,7 +7,6 @@ import json
 import os
 import sys
 from pathlib import Path
-from typing import Optional
 
 try:
     import osmium
@@ -23,9 +22,20 @@ except ImportError:
 
 # Highway tag values we consider for road network (extend as needed)
 HIGHWAY_ROAD = {
-    "motorway", "trunk", "primary", "secondary", "tertiary",
-    "unclassified", "residential", "living_street", "service",
-    "motorway_link", "trunk_link", "primary_link", "secondary_link", "tertiary_link",
+    "motorway",
+    "trunk",
+    "primary",
+    "secondary",
+    "tertiary",
+    "unclassified",
+    "residential",
+    "living_street",
+    "service",
+    "motorway_link",
+    "trunk_link",
+    "primary_link",
+    "secondary_link",
+    "tertiary_link",
 }
 
 
@@ -41,7 +51,7 @@ def _get_dsn() -> str:
     return f"postgresql://{user}:{password}@{host}:{port}/{db}"
 
 
-def _load_manifest(pbf_dir: Path) -> Optional[dict]:
+def _load_manifest(pbf_dir: Path) -> dict | None:
     manifest_path = pbf_dir / "manifest.json"
     if not manifest_path.exists():
         return None
@@ -53,8 +63,12 @@ class OSMNetworkBuilder:
 
     def __init__(self) -> None:
         self.node_coords: dict[int, tuple[float, float]] = {}
-        self.nodes_out: list[tuple[str, str, float, float, Optional[str], str]] = []  # node_id, type, lat, lon, name, mode
-        self.edges_out: list[tuple[str, str, str, str, Optional[float], Optional[float]]] = []  # edge_id, from_node, to_node, mode, length_km, travel_time_min
+        self.nodes_out: list[tuple[str, str, float, float, str | None, str]] = (
+            []
+        )  # node_id, type, lat, lon, name, mode
+        self.edges_out: list[tuple[str, str, str, str, float | None, float | None]] = (
+            []
+        )  # edge_id, from_node, to_node, mode, length_km, travel_time_min
 
     def node(self, n: "osmium.Node") -> None:
         self.node_coords[n.id] = (n.location.lat, n.location.lon)
@@ -88,23 +102,29 @@ class OSMNetworkBuilder:
             lat2, lon2 = coords[i + 1]
             length_km = _haversine_km(lat1, lon1, lat2, lon2)
             travel_time_min = length_km / 30.0 * 60.0 if length_km else 0.0  # 30 km/h default
-            self.edges_out.append((edge_id, a, b, mode, round(length_km, 6), round(travel_time_min, 4)))
+            self.edges_out.append(
+                (edge_id, a, b, mode, round(length_km, 6), round(travel_time_min, 4))
+            )
 
 
 def _haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     import math
+
     R = 6371.0
     dlat = math.radians(lat2 - lat1)
     dlon = math.radians(lon2 - lon1)
-    a = math.sin(dlat / 2) ** 2 + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlon / 2) ** 2
+    a = (
+        math.sin(dlat / 2) ** 2
+        + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlon / 2) ** 2
+    )
     c = 2 * math.asin(math.sqrt(a))
     return R * c
 
 
 def run_import(
     pbf_path: Path,
-    dsn: Optional[str] = None,
-    manifest: Optional[dict] = None,
+    dsn: str | None = None,
+    manifest: dict | None = None,
     batch_size: int = 5000,
 ) -> tuple[int, int]:
     """
@@ -112,9 +132,13 @@ def run_import(
     Raises if pyosmium or psycopg2 missing or on DB error.
     """
     if not osmium:
-        raise RuntimeError("pyosmium is required for network-import. Install with: pip install pyosmium")
+        raise RuntimeError(
+            "pyosmium is required for network-import. Install with: pip install pyosmium"
+        )
     if not psycopg2:
-        raise RuntimeError("psycopg2 is required for network-import. Install with: pip install psycopg2-binary")
+        raise RuntimeError(
+            "psycopg2 is required for network-import. Install with: pip install psycopg2-binary"
+        )
 
     pbf_path = Path(pbf_path)
     if not pbf_path.exists():
@@ -130,7 +154,7 @@ def run_import(
 
     # Deduplicate nodes by node_id (keep first)
     seen_nodes: set[str] = set()
-    unique_nodes: list[tuple[str, str, float, float, Optional[str], str]] = []
+    unique_nodes: list[tuple[str, str, float, float, str | None, str]] = []
     for row in builder.nodes_out:
         nid = row[0]
         if nid not in seen_nodes:
@@ -187,7 +211,9 @@ def run_import(
 def main() -> int:
     """CLI: run_import from default paths and env."""
     repo_root = Path(__file__).resolve().parents[2]
-    osm_dir = Path(os.environ.get("OSM_DATA_DIR", repo_root / "infrastructure" / "raw-sources" / "osm"))
+    osm_dir = Path(
+        os.environ.get("OSM_DATA_DIR", repo_root / "infrastructure" / "raw-sources" / "osm")
+    )
     pbf = osm_dir / "azerbaijan-latest.osm.pbf"
     if not pbf.exists():
         print(f"PBF not found: {pbf}. Run scripts/fetch_osm_azerbaijan.py first.", file=sys.stderr)

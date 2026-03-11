@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any, Optional
 
 import numpy as np
 
@@ -21,8 +20,8 @@ def generate_partitions(
     num_partitions: int = 3,
     samples_per_partition: int = 100,
     feature_dim: int = 8,
-    seed: Optional[int] = 42,
-    output_dir: Optional[Path] = None,
+    seed: int | None = 42,
+    output_dir: Path | None = None,
 ) -> list[PartitionManifest]:
     """
     Generate partition manifests and, if output_dir is set, write manifest and data.
@@ -61,12 +60,14 @@ def generate_partitions(
             manifest_path.write_text(m.model_dump_json(indent=2), encoding="utf-8")
             data_path = output_dir / f"{pid}_data.npz"
             x = np.random.randn(n, feature_dim).astype(np.float32)
-            y = (x @ np.random.randn(feature_dim, 1) + 0.1 * np.random.randn(n, 1)).astype(np.float32)
+            y = (x @ np.random.randn(feature_dim, 1) + 0.1 * np.random.randn(n, 1)).astype(
+                np.float32
+            )
             np.savez(data_path, x=x, y=y)
     return manifests
 
 
-def load_partition_manifest(partition_id: str, manifests_dir: Path) -> Optional[PartitionManifest]:
+def load_partition_manifest(partition_id: str, manifests_dir: Path) -> PartitionManifest | None:
     """Load a single partition manifest by ID."""
     path = manifests_dir / f"{partition_id}_manifest.json"
     if not path.exists():
@@ -75,7 +76,9 @@ def load_partition_manifest(partition_id: str, manifests_dir: Path) -> Optional[
     return PartitionManifest.model_validate(data)
 
 
-def load_partition_data(partition_id: str, data_dir: Path) -> Optional[tuple[np.ndarray, np.ndarray]]:
+def load_partition_data(
+    partition_id: str, data_dir: Path
+) -> tuple[np.ndarray, np.ndarray] | None:
     """Load (x, y) for a partition. Returns None if missing or insufficient."""
     path = data_dir / f"{partition_id}_data.npz"
     if not path.exists():

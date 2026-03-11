@@ -6,10 +6,8 @@ No fabricated coordinates. Rate limit 1 req/s for public Nominatim.
 
 import time
 from dataclasses import dataclass, field
-from typing import Optional
 
 import httpx
-
 from iridium_schemas.transit import TransitStop
 
 NOMINATIM_URL = "https://nominatim.openstreetmap.org/search"
@@ -39,7 +37,7 @@ class OsmValidationReport:
 def _search_nominatim(
     station_name: str,
     timeout: float = DEFAULT_TIMEOUT,
-    client: Optional[httpx.Client] = None,
+    client: httpx.Client | None = None,
 ) -> list[dict]:
     """Query Nominatim for station in Baku. Returns list of place dicts (lat, lon, display_name)."""
     q = f"{station_name}, Baku Metro, Baku, Azerbaijan"
@@ -60,8 +58,8 @@ def _search_nominatim(
 def resolve_station(
     stop: TransitStop,
     timeout: float = DEFAULT_TIMEOUT,
-    client: Optional[httpx.Client] = None,
-    last_request_time: Optional[list[float]] = None,
+    client: httpx.Client | None = None,
+    last_request_time: list[float] | None = None,
 ) -> OsmResolutionResult:
     """
     Resolve one metro station to coordinates via OSM.
@@ -91,7 +89,9 @@ def resolve_station(
             lat_f = float(lat)
             lon_f = float(lon)
         except (TypeError, ValueError):  # pragma: no cover
-            return OsmResolutionResult(stop=stop, confidence="none", candidates_count=len(candidates))
+            return OsmResolutionResult(
+                stop=stop, confidence="none", candidates_count=len(candidates)
+            )
     else:
         return OsmResolutionResult(stop=stop, confidence="none", candidates_count=len(candidates))
 
@@ -103,7 +103,9 @@ def resolve_station(
             "osm_match_confidence": confidence,
         }
     )
-    return OsmResolutionResult(stop=updated, confidence=confidence, candidates_count=len(candidates))
+    return OsmResolutionResult(
+        stop=updated, confidence=confidence, candidates_count=len(candidates)
+    )
 
 
 def resolve_metro_stations(

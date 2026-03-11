@@ -6,24 +6,23 @@ Primary: Copernicus STAC. Fallback: Earth Search STAC.
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Optional
 
 from iridium_schemas.earth_observation import (
     EOSceneSearchResult,
     EOSourceStatus,
 )
 
+from earth_observation.sentinel2.manifests.areas import get_bbox_for_preset
 from earth_observation.sentinel2.providers.copernicus_stac import CopernicusStacProvider
 from earth_observation.sentinel2.providers.earth_search_stac import EarthSearchStacProvider
-from earth_observation.sentinel2.manifests.areas import get_bbox_for_preset
 
 
 def search_scenes(
-    bbox: Optional[tuple[float, float, float, float]] = None,
-    preset: Optional[str] = None,
-    date_start: Optional[datetime] = None,
-    date_end: Optional[datetime] = None,
-    cloud_cover_max: Optional[float] = None,
+    bbox: tuple[float, float, float, float] | None = None,
+    preset: str | None = None,
+    date_start: datetime | None = None,
+    date_end: datetime | None = None,
+    cloud_cover_max: float | None = None,
     limit: int = 20,
     prefer_copernicus: bool = True,
 ) -> EOSceneSearchResult:
@@ -49,7 +48,7 @@ def search_scenes(
         providers.append(EarthSearchStacProvider())
         providers.append(CopernicusStacProvider())
 
-    last_result: Optional[EOSceneSearchResult] = None
+    last_result: EOSceneSearchResult | None = None
     for prov in providers:
         if prov.status() == EOSourceStatus.unavailable:
             continue

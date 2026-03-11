@@ -5,7 +5,14 @@ from pathlib import Path
 
 root = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(root / "packages" / "schemas"))
-for p in ("services/digital-twin", "services/forecasting", "services/routing", "services/equity", "services/anomaly-detection", "services/ingestion"):
+for p in (
+    "services/digital-twin",
+    "services/forecasting",
+    "services/routing",
+    "services/equity",
+    "services/anomaly-detection",
+    "services/ingestion",
+):
     path = root / p
     if path.exists():
         sys.path.insert(0, str(path))
@@ -13,12 +20,12 @@ sys.path.insert(0, str(root / "apps" / "api"))
 
 from datetime import datetime
 from unittest.mock import patch
-import pytest
-from fastapi.testclient import TestClient
-from fastapi import HTTPException
 
-from app.main import app
+import pytest
 from app.api.ingestion import post_ingestion_events
+from app.main import app
+from fastapi import HTTPException
+from fastapi.testclient import TestClient
 from iridium_schemas.events import IngestionEventBatch, SensorEvent
 
 client = TestClient(app)
@@ -95,7 +102,13 @@ def test_anomalies():
 def test_ingestion_events_validate():
     r = client.post(
         "/api/v1/ingestion/events",
-        json={"sensor_events": [], "gnss_points": [], "weather": [], "public_events": [], "energy_signals": []},
+        json={
+            "sensor_events": [],
+            "gnss_points": [],
+            "weather": [],
+            "public_events": [],
+            "energy_signals": [],
+        },
     )
     assert r.status_code == 200
     data = r.json()
@@ -105,7 +118,9 @@ def test_ingestion_events_validate():
 def test_ingestion_events_validation_error():
     """Cover ingestion 400 path: batch that passes Pydantic but fails validate_batch."""
     bad = IngestionEventBatch.model_construct(
-        sensor_events=[SensorEvent.model_construct(segment_id="e1", timestamp=datetime.now(), speed_kmh=300)]
+        sensor_events=[
+            SensorEvent.model_construct(segment_id="e1", timestamp=datetime.now(), speed_kmh=300)
+        ]
     )
     with pytest.raises(HTTPException) as exc_info:
         post_ingestion_events(bad)

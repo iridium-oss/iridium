@@ -8,7 +8,7 @@ from __future__ import annotations
 import hashlib
 import json
 import time
-from typing import Any, Optional
+from typing import Any
 
 from iridium_schemas.earth_observation import EOSceneSearchResult
 
@@ -22,7 +22,9 @@ def _cache_key(prefix: str, *parts: Any) -> str:
     return f"{prefix}:{hashlib.sha256(raw.encode()).hexdigest()[:24]}"
 
 
-def get_cached_search(key_parts: tuple[Any, ...], ttl: int = _DEFAULT_TTL_SECONDS) -> Optional[EOSceneSearchResult]:
+def get_cached_search(
+    key_parts: tuple[Any, ...], ttl: int = _DEFAULT_TTL_SECONDS
+) -> EOSceneSearchResult | None:
     """Return cached EOSceneSearchResult if present and not expired."""
     k = _cache_key("eo_search", key_parts)
     if k not in _CACHE:
@@ -34,13 +36,17 @@ def get_cached_search(key_parts: tuple[Any, ...], ttl: int = _DEFAULT_TTL_SECOND
     return data
 
 
-def set_cached_search(key_parts: tuple[Any, ...], result: EOSceneSearchResult, ttl: int = _DEFAULT_TTL_SECONDS) -> None:
+def set_cached_search(
+    key_parts: tuple[Any, ...], result: EOSceneSearchResult, ttl: int = _DEFAULT_TTL_SECONDS
+) -> None:
     """Store search result in cache."""
     k = _cache_key("eo_search", key_parts)
     _CACHE[k] = (result, time.time() + ttl)
 
 
-def get_cached_layer_descriptor(key_parts: tuple[Any, ...], ttl: int = _LAYER_TTL_SECONDS) -> Optional[dict[str, Any]]:
+def get_cached_layer_descriptor(
+    key_parts: tuple[Any, ...], ttl: int = _LAYER_TTL_SECONDS
+) -> dict[str, Any] | None:
     """Return cached layer descriptor dict if present and not expired."""
     k = _cache_key("eo_layer", key_parts)
     if k not in _CACHE:

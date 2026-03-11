@@ -11,10 +11,8 @@ from __future__ import annotations
 import os
 from functools import lru_cache
 from pathlib import Path
-from typing import Optional
 
-from pydantic import Field, SecretStr
-from pydantic import model_validator
+from pydantic import Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -62,7 +60,9 @@ class CoreAppSettings(BaseSettings):
     log_level: str = Field("INFO", description="Log level")
 
     data_samples_dir: str = Field("data/samples", description="Recorded or sample data directory")
-    data_synthetic_dir: str = Field("data/synthetic", description="Synthetic data directory for tests")
+    data_synthetic_dir: str = Field(
+        "data/synthetic", description="Synthetic data directory for tests"
+    )
     equity_data_path: str = Field("", description="Path to recorded equity data directory")
 
     def cors_origins_list(self) -> list[str]:
@@ -80,7 +80,7 @@ class CoreAppSettings(BaseSettings):
     def data_synthetic_path(self) -> Path:
         return Path(self.data_synthetic_dir)
 
-    def equity_path(self) -> Optional[Path]:
+    def equity_path(self) -> Path | None:
         p = Path(self.equity_data_path).resolve() if self.equity_data_path else None
         return p if p and p.exists() else None
 
@@ -89,7 +89,7 @@ class DatabaseSettings(BaseSettings):
     model_config = SettingsConfigDict(extra="ignore")
 
     enabled: bool = Field(False, description="Enable database integration")
-    dsn: Optional[SecretStr] = Field(
+    dsn: SecretStr | None = Field(
         default=None,
         description="PostgreSQL DSN, for example postgresql+psycopg://user:pass@host:5432/db",
     )
@@ -99,7 +99,7 @@ class CacheSettings(BaseSettings):
     model_config = SettingsConfigDict(extra="ignore")
 
     enabled: bool = Field(False, description="Enable Redis caching")
-    redis_url: Optional[SecretStr] = Field(default=None, description="Redis URL")
+    redis_url: SecretStr | None = Field(default=None, description="Redis URL")
 
 
 class ProviderSettings(BaseSettings):
@@ -127,16 +127,24 @@ class WeatherSettings(BaseSettings):
     enabled: bool = Field(True, description="Enable weather provider integration")
     provider_id: str = Field("open_meteo", description="Weather provider identifier")
     timeout_seconds: float = Field(10.0, ge=1.0, le=60.0, description="Weather provider timeout")
-    cache_ttl_seconds: int = Field(300, ge=0, le=86400, description="Cache TTL for weather responses")
+    cache_ttl_seconds: int = Field(
+        300, ge=0, le=86400, description="Cache TTL for weather responses"
+    )
 
 
 class TransitSettings(BaseSettings):
     model_config = SettingsConfigDict(extra="ignore")
 
     enabled: bool = Field(True, description="Enable transit aggregation endpoints")
-    bakubus_ayna_enabled: bool = Field(True, description="Enable AYNA public-undocumented connector")
-    yandex_observed_enabled: bool = Field(True, description="Enable Yandex public-web observed connector")
-    cache_ttl_seconds: int = Field(120, ge=0, le=86400, description="Cache TTL for web observed sources")
+    bakubus_ayna_enabled: bool = Field(
+        True, description="Enable AYNA public-undocumented connector"
+    )
+    yandex_observed_enabled: bool = Field(
+        True, description="Enable Yandex public-web observed connector"
+    )
+    cache_ttl_seconds: int = Field(
+        120, ge=0, le=86400, description="Cache TTL for web observed sources"
+    )
 
 
 class YandexObservedSettings(BaseSettings):
@@ -154,7 +162,7 @@ class TwoGisSettings(BaseSettings):
     model_config = SettingsConfigDict(extra="ignore")
 
     enabled: bool = Field(False, description="Enable 2GIS partner integration")
-    api_key: Optional[SecretStr] = Field(default=None, description="2GIS API key (partner)")
+    api_key: SecretStr | None = Field(default=None, description="2GIS API key (partner)")
     base_url: str = Field("", description="2GIS API base URL when applicable")
 
 
@@ -162,17 +170,19 @@ class MoovitSettings(BaseSettings):
     model_config = SettingsConfigDict(extra="ignore")
 
     enabled: bool = Field(False, description="Enable Moovit partner integration")
-    api_key: Optional[SecretStr] = Field(default=None, description="Moovit API key (partner)")
+    api_key: SecretStr | None = Field(default=None, description="Moovit API key (partner)")
     base_url: str = Field("", description="Moovit API base URL when applicable")
 
 
 class TelemetrySettings(BaseSettings):
     model_config = SettingsConfigDict(extra="ignore")
 
-    enabled: bool = Field(False, description="Enable telemetry ingestion from a consent-based system")
+    enabled: bool = Field(
+        False, description="Enable telemetry ingestion from a consent-based system"
+    )
     traccar_host: str = Field("", description="Traccar base URL")
-    traccar_user: Optional[SecretStr] = Field(default=None, description="Traccar username")
-    traccar_password: Optional[SecretStr] = Field(default=None, description="Traccar password")
+    traccar_user: SecretStr | None = Field(default=None, description="Traccar username")
+    traccar_password: SecretStr | None = Field(default=None, description="Traccar password")
 
 
 class ObservabilitySettings(BaseSettings):
@@ -186,7 +196,9 @@ class EarthObservationSettings(BaseSettings):
     model_config = SettingsConfigDict(extra="ignore")
 
     enabled: bool = Field(True, description="Enable earth observation (Sentinel-2) endpoints")
-    prefer_copernicus: bool = Field(True, description="Use Copernicus STAC first, then Earth Search")
+    prefer_copernicus: bool = Field(
+        True, description="Use Copernicus STAC first, then Earth Search"
+    )
     copernicus_stac_url: str = Field(
         "https://catalogue.dataspace.copernicus.eu/stac",
         description="Copernicus Data Space Ecosystem STAC base URL",
@@ -196,22 +208,38 @@ class EarthObservationSettings(BaseSettings):
         description="Earth Search STAC base URL (fallback)",
     )
     search_cache_ttl_seconds: int = Field(300, ge=0, le=86400, description="Scene search cache TTL")
-    sentinel_hub_instance_id: Optional[str] = Field(None, description="Sentinel Hub instance ID for Process API when set")
-    sentinel_hub_base_url: Optional[str] = Field(None, description="Sentinel Hub Process API base URL when set")
-    sentinel_hub_client_id: Optional[SecretStr] = Field(None, description="Sentinel Hub OAuth2 client ID for token acquisition")
-    sentinel_hub_client_secret: Optional[SecretStr] = Field(None, description="Sentinel Hub OAuth2 client secret")
-    cdse_username: Optional[SecretStr] = Field(None, description="Copernicus Data Space username for authenticated STAC")
-    cdse_password: Optional[SecretStr] = Field(None, description="Copernicus Data Space password")
-    cdse_client_id: Optional[SecretStr] = Field(None, description="CDSE OAuth2 client ID (alternative to username/password)")
-    cdse_client_secret: Optional[SecretStr] = Field(None, description="CDSE OAuth2 client secret")
+    sentinel_hub_instance_id: str | None = Field(
+        None, description="Sentinel Hub instance ID for Process API when set"
+    )
+    sentinel_hub_base_url: str | None = Field(
+        None, description="Sentinel Hub Process API base URL when set"
+    )
+    sentinel_hub_client_id: SecretStr | None = Field(
+        None, description="Sentinel Hub OAuth2 client ID for token acquisition"
+    )
+    sentinel_hub_client_secret: SecretStr | None = Field(
+        None, description="Sentinel Hub OAuth2 client secret"
+    )
+    cdse_username: SecretStr | None = Field(
+        None, description="Copernicus Data Space username for authenticated STAC"
+    )
+    cdse_password: SecretStr | None = Field(None, description="Copernicus Data Space password")
+    cdse_client_id: SecretStr | None = Field(
+        None, description="CDSE OAuth2 client ID (alternative to username/password)"
+    )
+    cdse_client_secret: SecretStr | None = Field(None, description="CDSE OAuth2 client secret")
 
 
 class GoMapSettings(BaseSettings):
     model_config = SettingsConfigDict(extra="ignore")
 
-    api_key: Optional[SecretStr] = Field(None, description="GoMap API key when integration is enabled")
+    api_key: SecretStr | None = Field(
+        None, description="GoMap API key when integration is enabled"
+    )
     base_url: str = Field("", description="GoMap API base URL when set")
-    allowed_server_ip: Optional[str] = Field(None, description="Optional server IP allowlist for GoMap")
+    allowed_server_ip: str | None = Field(
+        None, description="Optional server IP allowlist for GoMap"
+    )
 
 
 class Settings(BaseSettings):
@@ -283,11 +311,15 @@ class Settings(BaseSettings):
             raise ValueError("Moovit is enabled but IRIDIUM_MOOVIT__API_KEY is not configured")
         if self.telemetry.enabled:
             if not self.telemetry.traccar_host:
-                raise ValueError("Telemetry is enabled but IRIDIUM_TELEMETRY__TRACCAR_HOST is not configured")
+                raise ValueError(
+                    "Telemetry is enabled but IRIDIUM_TELEMETRY__TRACCAR_HOST is not configured"
+                )
             if not self.telemetry.traccar_user or not self.telemetry.traccar_password:
                 raise ValueError("Telemetry is enabled but Traccar credentials are not configured")
         if self.yandex.enabled is False and self.transit.yandex_observed_enabled:
-            raise ValueError("Transit requires Yandex observed but IRIDIUM_YANDEX__ENABLED is false")
+            raise ValueError(
+                "Transit requires Yandex observed but IRIDIUM_YANDEX__ENABLED is false"
+            )
         return self
 
     # Backward compatible aliases for existing code and tests
@@ -336,11 +368,11 @@ class Settings(BaseSettings):
     def data_synthetic_path(self) -> Path:
         return self.core.data_synthetic_path()
 
-    def equity_data_path(self) -> Optional[Path]:
+    def equity_data_path(self) -> Path | None:
         return self.core.equity_path()
 
 
-def _secret_from_env(key: str) -> Optional[SecretStr]:
+def _secret_from_env(key: str) -> SecretStr | None:
     v = os.getenv(key)
     return SecretStr(v) if v else None
 
@@ -379,18 +411,26 @@ def get_settings() -> Settings:
     moovit_key = s.moovit.api_key or _secret_from_env("MOOVIT_API_KEY")
     moovit_url = s.moovit.base_url or os.getenv("MOOVIT_BASE_URL") or ""
     if moovit_key is not None or moovit_url:
-        s = s.model_copy(update={
-            "moovit": s.moovit.model_copy(update={
-                "api_key": moovit_key or s.moovit.api_key,
-                "base_url": moovit_url or s.moovit.base_url,
-            })
-        })
+        s = s.model_copy(
+            update={
+                "moovit": s.moovit.model_copy(
+                    update={
+                        "api_key": moovit_key or s.moovit.api_key,
+                        "base_url": moovit_url or s.moovit.base_url,
+                    }
+                )
+            }
+        )
 
     eo_updates: dict[str, object] = {}
     if not s.eo.sentinel_hub_client_id:
-        eo_updates["sentinel_hub_client_id"] = _secret_from_env("SENTINEL_HUB_CLIENT_ID") or s.eo.sentinel_hub_client_id
+        eo_updates["sentinel_hub_client_id"] = (
+            _secret_from_env("SENTINEL_HUB_CLIENT_ID") or s.eo.sentinel_hub_client_id
+        )
     if not s.eo.sentinel_hub_client_secret:
-        eo_updates["sentinel_hub_client_secret"] = _secret_from_env("SENTINEL_HUB_CLIENT_SECRET") or s.eo.sentinel_hub_client_secret
+        eo_updates["sentinel_hub_client_secret"] = (
+            _secret_from_env("SENTINEL_HUB_CLIENT_SECRET") or s.eo.sentinel_hub_client_secret
+        )
     if not s.eo.cdse_username:
         eo_updates["cdse_username"] = _secret_from_env("CDSE_USERNAME") or s.eo.cdse_username
     if not s.eo.cdse_password:
@@ -398,19 +438,24 @@ def get_settings() -> Settings:
     if not s.eo.cdse_client_id:
         eo_updates["cdse_client_id"] = _secret_from_env("CDSE_CLIENT_ID") or s.eo.cdse_client_id
     if not s.eo.cdse_client_secret:
-        eo_updates["cdse_client_secret"] = _secret_from_env("CDSE_CLIENT_SECRET") or s.eo.cdse_client_secret
+        eo_updates["cdse_client_secret"] = (
+            _secret_from_env("CDSE_CLIENT_SECRET") or s.eo.cdse_client_secret
+        )
     if eo_updates:
         s = s.model_copy(update={"eo": s.eo.model_copy(update=eo_updates)})
 
     gomap_key = s.gomap.api_key or _secret_from_env("GOMAP_API_KEY")
     gomap_ip = s.gomap.allowed_server_ip or os.getenv("GOMAP_ALLOWED_SERVER_IP")
     if gomap_key is not None or gomap_ip:
-        s = s.model_copy(update={
-            "gomap": s.gomap.model_copy(update={
-                "api_key": gomap_key or s.gomap.api_key,
-                "allowed_server_ip": gomap_ip or s.gomap.allowed_server_ip,
-            })
-        })
+        s = s.model_copy(
+            update={
+                "gomap": s.gomap.model_copy(
+                    update={
+                        "api_key": gomap_key or s.gomap.api_key,
+                        "allowed_server_ip": gomap_ip or s.gomap.allowed_server_ip,
+                    }
+                )
+            }
+        )
 
     return s
-

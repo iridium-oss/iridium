@@ -1,8 +1,6 @@
 """Model tests: create, get/set parameters, fit_epoch, evaluate."""
 
 import numpy as np
-import pytest
-
 from federated.model import LinearModel, create_model
 from federated.task import build_model, get_initial_parameters
 

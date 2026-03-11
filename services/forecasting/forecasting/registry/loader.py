@@ -6,10 +6,10 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 
-def load_registry_metadata(artifact_dir: Path) -> Optional[dict[str, Any]]:
+def load_registry_metadata(artifact_dir: Path) -> dict[str, Any] | None:
     """Load metadata from artifact dir. Expects training_metadata.json and optional registry_metadata.json."""
     artifact_dir = Path(artifact_dir)
     reg_path = artifact_dir / "registry_metadata.json"
@@ -31,7 +31,7 @@ def load_registry_metadata(artifact_dir: Path) -> Optional[dict[str, Any]]:
     return None
 
 
-def validate_artifact(metadata: Optional[dict[str, Any]], entity_order: list[str]) -> bool:
+def validate_artifact(metadata: dict[str, Any] | None, entity_order: list[str]) -> bool:
     """Validate artifact is usable for given entity order. No load without validation."""
     if metadata is None:
         return False

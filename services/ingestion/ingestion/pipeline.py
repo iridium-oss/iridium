@@ -7,11 +7,11 @@ from pathlib import Path
 from typing import Any
 
 from iridium_schemas.events import (
-    SensorEvent,
     GNSSPoint,
-    WeatherSnapshot,
-    PublicEventRecord,
     IngestionEventBatch,
+    PublicEventRecord,
+    SensorEvent,
+    WeatherSnapshot,
 )
 from pydantic import ValidationError
 
@@ -33,6 +33,7 @@ def _load_json_or_csv(path: Path) -> list[dict[str, Any]]:
     if not path.exists():
         return []
     import json
+
     text = path.read_text(encoding="utf-8")
     if path.suffix.lower() == ".json":
         data = json.loads(text)
@@ -40,6 +41,7 @@ def _load_json_or_csv(path: Path) -> list[dict[str, Any]]:
     if path.suffix.lower() == ".csv":
         import csv
         from io import StringIO
+
         rows = list(csv.DictReader(StringIO(text)))
         return rows
     return []

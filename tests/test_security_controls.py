@@ -9,7 +9,6 @@ sys.path.insert(0, str(root / "apps" / "api"))
 from app.main import app  # noqa: E402
 from app.observability.redaction import REDACTED, redact_event_dict  # noqa: E402
 
-
 client = TestClient(app)
 
 
@@ -47,4 +46,3 @@ def test_structlog_redaction_processor():
     assert out["nested"]["ok"] == "value"
     assert out["list"][0]["token"] == REDACTED
     assert out["list"][1]["safe"] == "s"
-

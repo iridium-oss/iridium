@@ -4,12 +4,10 @@ Exposes: web_observed, licensed_api, or unavailable.
 """
 
 import os
-from datetime import datetime, timezone
-from typing import Optional
+from datetime import UTC, datetime
 
 from iridium_schemas.transit import (
     RoadTrafficContext,
-    SegmentCongestionLevel,
     SourceFamily,
     SourceStatus,
 )
@@ -30,14 +28,14 @@ def get_traffic_context_status() -> str:
 
 
 def fetch_traffic_context(
-    bbox: Optional[tuple[float, float, float, float]] = None,
-) -> Optional[RoadTrafficContext]:
+    bbox: tuple[float, float, float, float] | None = None,
+) -> RoadTrafficContext | None:
     """
     Fetch road traffic context for Baku. Returns None if unavailable.
     When licensed API key is set, could call Yandex; currently returns empty context or None.
     """
     status = get_traffic_context_status()
-    observed_at = datetime.now(timezone.utc)
+    observed_at = datetime.now(UTC)
     if status == STATUS_UNAVAILABLE:
         return None
     context_id = f"{PROVIDER_ID}_{int(observed_at.timestamp())}"

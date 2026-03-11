@@ -1,20 +1,16 @@
 """Tests for earth observation schemas."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
-
 from iridium_schemas.earth_observation import (
-    EOSourceStatus,
-    EOAreaPreset,
-    EOBandAsset,
-    EOSceneMetadata,
-    EOScene,
-    EOSceneSearchResult,
-    EOIndexLayer,
-    EOTileLayer,
-    EOOverlayDescriptor,
     EOAreaPresetDefinition,
+    EOBandAsset,
+    EOIndexLayer,
+    EOScene,
+    EOSceneMetadata,
+    EOSceneSearchResult,
+    EOSourceStatus,
 )
 
 
@@ -25,7 +21,9 @@ def test_eo_source_status_values():
 
 
 def test_eo_band_asset():
-    a = EOBandAsset(band_name="B04", asset_key="B04", resolution_m=10, href="https://example.com/b04.tif")
+    a = EOBandAsset(
+        band_name="B04", asset_key="B04", resolution_m=10, href="https://example.com/b04.tif"
+    )
     assert a.band_name == "B04"
     assert a.resolution_m == 10
 
@@ -35,7 +33,7 @@ def test_eo_scene_metadata():
         source_provider="earth_search_stac",
         source_family="stac_catalog",
         source_status=EOSourceStatus.live,
-        acquired_at=datetime(2024, 1, 15, 12, 0, tzinfo=timezone.utc),
+        acquired_at=datetime(2024, 1, 15, 12, 0, tzinfo=UTC),
         cloud_cover=10.5,
         bbox=[49.8, 40.3, 49.9, 40.4],
         confidence_note="Test",

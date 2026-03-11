@@ -4,14 +4,13 @@ When real network is not loaded, returns empty snapshot with data_status configu
 """
 
 import os
-from datetime import datetime, timezone
-from typing import Optional
+from datetime import UTC, datetime
 
-from iridium_schemas.network import DigitalTwinSnapshot, NetworkNode, NetworkEdge
+from iridium_schemas.network import DigitalTwinSnapshot, NetworkEdge, NetworkNode
 from iridium_schemas.provenance import (
+    DATA_STATUS_CONFIGURATION_REQUIRED,
     DATA_STATUS_LIVE,
     DATA_STATUS_UNAVAILABLE,
-    DATA_STATUS_CONFIGURATION_REQUIRED,
     SourceProvenance,
 )
 
@@ -37,7 +36,7 @@ def _load_network_from_env_or_db() -> tuple[list[NetworkNode], list[NetworkEdge]
             SourceProvenance(
                 source_name="network",
                 status=DATA_STATUS_CONFIGURATION_REQUIRED,
-                fetched_at=datetime.now(timezone.utc),
+                fetched_at=datetime.now(UTC),
                 note="PostgreSQL/PostGIS not configured. Run OSM fetch and network-import to load real network.",
             ).model_dump(mode="json")
         )
@@ -45,6 +44,7 @@ def _load_network_from_env_or_db() -> tuple[list[NetworkNode], list[NetworkEdge]
 
     try:
         from network_import.db_loader import load_network_from_db  # pragma: no cover
+
         raw_nodes, raw_edges = load_network_from_db(dsn)  # pragma: no cover
         nodes = [NetworkNode(**r) for r in raw_nodes]  # pragma: no cover
         edges = [NetworkEdge(**r) for r in raw_edges]  # pragma: no cover
@@ -54,7 +54,7 @@ def _load_network_from_env_or_db() -> tuple[list[NetworkNode], list[NetworkEdge]
                 SourceProvenance(
                     source_name="network",
                     status=DATA_STATUS_LIVE,
-                    fetched_at=datetime.now(timezone.utc),
+                    fetched_at=datetime.now(UTC),
                     note="Loaded from PostgreSQL (network-import from OSM).",
                 ).model_dump(mode="json")
             )
@@ -67,7 +67,7 @@ def _load_network_from_env_or_db() -> tuple[list[NetworkNode], list[NetworkEdge]
         SourceProvenance(
             source_name="network",
             status=status,
-            fetched_at=datetime.now(timezone.utc),
+            fetched_at=datetime.now(UTC),
             note="Network not loaded. Run scripts/fetch_osm_azerbaijan.py and network-import to load OSM.",
         ).model_dump(mode="json")
     )
@@ -87,6 +87,7 @@ def get_assembled_snapshot(
     if include_weather_provenance:
         try:
             from weather_ingestion import fetch_weather
+
             result = fetch_weather()
             provenance.append(result.to_provenance().model_dump(mode="json"))
         except Exception:  # pragma: no cover
@@ -94,7 +95,7 @@ def get_assembled_snapshot(
                 SourceProvenance(
                     source_name="weather",
                     status=DATA_STATUS_UNAVAILABLE,
-                    fetched_at=datetime.now(timezone.utc),
+                    fetched_at=datetime.now(UTC),
                     note="Weather ingestion not available.",
                 ).model_dump(mode="json")
             )
@@ -102,6 +103,7 @@ def get_assembled_snapshot(
     if include_traffic_provenance:
         try:
             from traffic_provider import get_traffic_status
+
             prov = get_traffic_status()
             provenance.append(prov.model_dump(mode="json"))
         except Exception:  # pragma: no cover
@@ -109,7 +111,7 @@ def get_assembled_snapshot(
                 SourceProvenance(
                     source_name="traffic",
                     status=DATA_STATUS_CONFIGURATION_REQUIRED,
-                    fetched_at=datetime.now(timezone.utc),
+                    fetched_at=datetime.now(UTC),
                     note="Traffic provider not configured.",
                 ).model_dump(mode="json")
             )
@@ -117,7 +119,7 @@ def get_assembled_snapshot(
     return DigitalTwinSnapshot(
         nodes=nodes,
         edges=edges,
-        snapshot_at=datetime.now(timezone.utc),
+        snapshot_at=datetime.now(UTC),
         version="0.2.0",
         data_status=data_status,
         source_provenance=provenance,

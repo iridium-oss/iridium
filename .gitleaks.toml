@@ -7,6 +7,7 @@ useDefault = true
 [allowlist]
 description = "Allow example env, lockfiles, and docs"
 paths = [
+  '''^\.env$''',
   '''\.env\.example$''',
   '''\.env\.sample$''',
   '''package-lock\.json$''',

@@ -1,15 +1,13 @@
 """Tests for STAC provider parsing and normalization."""
 
-from datetime import datetime, timezone
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
-import pytest
+from iridium_schemas.earth_observation import EOSourceStatus
 
 from earth_observation.sentinel2.providers.earth_search_stac import (
     EarthSearchStacProvider,
     _scene_from_feature,
 )
-from iridium_schemas.earth_observation import EOSourceStatus
 
 
 def test_scene_from_feature_minimal():
@@ -56,7 +54,11 @@ def test_earth_search_search(mock_client_class):
         "features": [
             {
                 "id": "S2A_Item_1",
-                "properties": {"datetime": "2024-06-01T10:00:00Z", "eo:cloud_cover": 5, "collection": "sentinel-2-l2a"},
+                "properties": {
+                    "datetime": "2024-06-01T10:00:00Z",
+                    "eo:cloud_cover": 5,
+                    "collection": "sentinel-2-l2a",
+                },
                 "bbox": [49.8, 40.3, 49.9, 40.4],
                 "geometry": None,
                 "assets": {"B04": {"href": "https://x.com/B04.tif"}},

@@ -1,9 +1,9 @@
 """Tests for area presets and bbox resolution."""
 
 from earth_observation.sentinel2.manifests.areas import (
+    PRESETS,
     get_area_presets,
     get_bbox_for_preset,
-    PRESETS,
 )
 
 

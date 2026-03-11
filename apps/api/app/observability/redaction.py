@@ -9,7 +9,6 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any
 
-
 REDACTED = "[REDACTED]"
 
 SENSITIVE_KEY_PARTS = {
@@ -37,7 +36,10 @@ def _is_sensitive_key(key: str) -> bool:
 
 def redact_value(value: Any) -> Any:
     if isinstance(value, Mapping):
-        return {k: (REDACTED if _is_sensitive_key(str(k)) else redact_value(v)) for k, v in value.items()}
+        return {
+            k: (REDACTED if _is_sensitive_key(str(k)) else redact_value(v))
+            for k, v in value.items()
+        }
     if isinstance(value, list):
         return [redact_value(v) for v in value]
     if isinstance(value, tuple):
@@ -46,5 +48,6 @@ def redact_value(value: Any) -> Any:
 
 
 def redact_event_dict(event_dict: dict[str, Any]) -> dict[str, Any]:
-    return {k: (REDACTED if _is_sensitive_key(k) else redact_value(v)) for k, v in event_dict.items()}
-
+    return {
+        k: (REDACTED if _is_sensitive_key(k) else redact_value(v)) for k, v in event_dict.items()
+    }

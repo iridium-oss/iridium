@@ -5,8 +5,8 @@ Build time-aligned forecasting dataset from real sources. Produces manifest and 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Any, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 import numpy as np
 
@@ -16,13 +16,13 @@ from .sources import ObservationRow, align_observations_to_matrix, snapshot_to_o
 @dataclass
 class DatasetManifest:
     source_coverage: list[str] = field(default_factory=list)
-    time_span_start: Optional[datetime] = None
-    time_span_end: Optional[datetime] = None
+    time_span_start: datetime | None = None
+    time_span_end: datetime | None = None
     geography: str = "baku"
     missingness_ratio: float = 0.0
     label_availability: float = 0.0
     feature_availability: float = 0.0
-    data_freshness_seconds: Optional[float] = None
+    data_freshness_seconds: float | None = None
     num_entities: int = 0
     num_timesteps: int = 0
     dataset_version: str = "v1"
@@ -54,7 +54,7 @@ def build_forecast_dataset(
     span_end = times[-1] if times else None
     freshness = None
     if span_end:
-        freshness = (datetime.now(timezone.utc) - span_end).total_seconds()
+        freshness = (datetime.now(UTC) - span_end).total_seconds()
     manifest = DatasetManifest(
         source_coverage=["digital_twin_edges"],
         time_span_start=span_start,

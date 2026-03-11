@@ -3,9 +3,8 @@ Ingestion endpoint: accept event batches.
 """
 
 from fastapi import APIRouter, HTTPException
-
-from iridium_schemas.events import IngestionEventBatch
 from ingestion.pipeline import validate_batch
+from iridium_schemas.events import IngestionEventBatch
 
 router = APIRouter()
 

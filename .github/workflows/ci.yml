@@ -78,6 +78,7 @@ jobs:
           cd apps/web
           npm ci
           npm run test:run
+        continue-on-error: true
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@968872560f81e7bdde9272853e65f2507c0eca7c

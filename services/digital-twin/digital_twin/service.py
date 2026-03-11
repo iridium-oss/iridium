@@ -4,20 +4,19 @@ Primary API path should use get_assembled_snapshot (state_assembler) for real-da
 This module retains get_graph/update_state/get_snapshot for legacy or test use only when explicitly enabled.
 """
 
-from datetime import datetime, timezone
-from typing import Optional
+from datetime import UTC, datetime
 
 from iridium_schemas.network import (
     DigitalTwinSnapshot,
-    NetworkNode,
     NetworkEdge,
+    NetworkNode,
 )
 
 # In-memory cache when real network is loaded via network-import (optional). Not used for synthetic default in main path.
 _nodes: list[NetworkNode] = []
 _edges: list[NetworkEdge] = []
 _version = "0.2.0"
-_snapshot_at: Optional[datetime] = None
+_snapshot_at: datetime | None = None
 
 
 def get_graph() -> tuple[list[NetworkNode], list[NetworkEdge]]:
@@ -33,9 +32,9 @@ def set_graph(nodes: list[NetworkNode], edges: list[NetworkEdge]) -> None:
 
 
 def update_state(
-    segment_speeds: Optional[dict[str, float]] = None,
-    segment_occupancy: Optional[dict[str, float]] = None,
-    incident_edges: Optional[list[str]] = None,
+    segment_speeds: dict[str, float] | None = None,
+    segment_occupancy: dict[str, float] | None = None,
+    incident_edges: list[str] | None = None,
 ) -> None:
     """Overlay dynamic state onto edges."""
     global _edges, _snapshot_at
@@ -48,7 +47,7 @@ def update_state(
     if incident_edges:
         for e in _edges:
             e.incident = e.edge_id in incident_edges
-    _snapshot_at = datetime.now(timezone.utc)
+    _snapshot_at = datetime.now(UTC)
 
 
 def get_snapshot() -> DigitalTwinSnapshot:
@@ -60,6 +59,6 @@ def get_snapshot() -> DigitalTwinSnapshot:
     return DigitalTwinSnapshot(
         nodes=nodes,
         edges=edges,
-        snapshot_at=_snapshot_at or datetime.now(timezone.utc),
+        snapshot_at=_snapshot_at or datetime.now(UTC),
         version=_version,
     )

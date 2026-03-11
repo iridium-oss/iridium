@@ -37,10 +37,18 @@ def measure(url: str, count: int) -> list[float]:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Measure API latency for paper.")
     parser.add_argument("--count", type=int, default=50, help="Requests per endpoint")
-    parser.add_argument("--base", default=os.environ.get("IRIDIUM_API_BASE", "http://127.0.0.1:8000"), help="API base URL")
+    parser.add_argument(
+        "--base",
+        default=os.environ.get("IRIDIUM_API_BASE", "http://127.0.0.1:8000"),
+        help="API base URL",
+    )
     parser.add_argument("--plot", action="store_true", help="Plot ECDF to paper/figures/")
     parser.add_argument("--out", type=str, default="", help="Output CSV path (default: stdout)")
-    parser.add_argument("--dummy", action="store_true", help="Plot ECDF from dummy data (for build; run without --dummy for real data)")
+    parser.add_argument(
+        "--dummy",
+        action="store_true",
+        help="Plot ECDF from dummy data (for build; run without --dummy for real data)",
+    )
     args = parser.parse_args()
 
     if urllib is None:
@@ -66,7 +74,10 @@ def main() -> int:
                 n = len(valid)
                 median = valid[n // 2] if n else 0
                 p95 = valid[int(0.95 * n)] if n else 0
-                print(f"{name}: median={median:.1f} ms, 95th={p95:.1f} ms (n={len(valid)})", file=sys.stderr)
+                print(
+                    f"{name}: median={median:.1f} ms, 95th={p95:.1f} ms (n={len(valid)})",
+                    file=sys.stderr,
+                )
 
         out_path = args.out or None
         if out_path:
@@ -83,6 +94,7 @@ def main() -> int:
     if args.plot or args.dummy:
         try:
             import matplotlib
+
             matplotlib.use("Agg")
             import matplotlib.pyplot as plt
             import numpy as np
@@ -93,7 +105,11 @@ def main() -> int:
         if args.dummy:
             # Placeholder ECDFs from typical latency ranges (for paper build without API)
             np.random.seed(42)
-            for name, (lo, hi) in [("health", (1, 6)), ("network_graph", (30, 130)), ("forecast_congestion", (40, 160))]:
+            for name, (lo, hi) in [
+                ("health", (1, 6)),
+                ("network_graph", (30, 130)),
+                ("forecast_congestion", (40, 160)),
+            ]:
                 valid = np.random.uniform(lo, hi, args.count)
                 valid.sort()
                 y = np.arange(1, len(valid) + 1) / len(valid)

@@ -3,7 +3,6 @@ Forecast API response schemas.
 """
 
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -13,9 +12,9 @@ class ForecastSegment(BaseModel):
 
     segment_id: str
     timestamp: datetime
-    speed_kmh: Optional[float] = None
-    congestion_score: Optional[float] = Field(None, ge=0, le=1)
-    occupancy_pct: Optional[float] = Field(None, ge=0, le=100)
+    speed_kmh: float | None = None
+    congestion_score: float | None = Field(None, ge=0, le=1)
+    occupancy_pct: float | None = Field(None, ge=0, le=100)
 
 
 class CongestionForecastResponse(BaseModel):
@@ -24,20 +23,20 @@ class CongestionForecastResponse(BaseModel):
     segments: list[ForecastSegment] = Field(default_factory=list)
     horizon_minutes: int = Field(..., ge=1, le=180)
     generated_at: datetime = Field(default_factory=datetime.utcnow)
-    model_version: Optional[str] = None
-    model_type: Optional[str] = Field(
+    model_version: str | None = None
+    model_type: str | None = Field(
         None,
         description="deterministic_baseline | statistical_baseline | ml_baseline | experimental",
     )
-    model_maturity: Optional[str] = Field(
+    model_maturity: str | None = Field(
         None,
         description="production_baseline | experimental | inactive",
     )
-    source_coverage: Optional[str] = Field(
+    source_coverage: str | None = Field(
         None,
         description="Summary of upstream data coverage (e.g. twin_edges, segment_count).",
     )
-    confidence_note: Optional[str] = Field(
+    confidence_note: str | None = Field(
         None,
         description="Explanation of confidence or uncertainty; baseline has no calibrated uncertainty.",
     )
@@ -45,8 +44,8 @@ class CongestionForecastResponse(BaseModel):
         False,
         description="True if a fallback or degraded path was used.",
     )
-    note: Optional[str] = None
-    data_status: Optional[str] = Field(
+    note: str | None = None
+    data_status: str | None = Field(
         None,
         description="live | recorded_real_snapshot | unavailable | configuration_required",
     )

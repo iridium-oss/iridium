@@ -9,8 +9,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Generic, Optional, TypeVar
-
+from typing import Generic, TypeVar
 
 T = TypeVar("T")
 
@@ -21,15 +20,15 @@ class ProviderResult(Generic[T]):
     source_family: str
     source_status: str
     fetched_at: datetime
-    source_url: Optional[str]
+    source_url: str | None
     success: bool
-    status_code: Optional[int] = None
-    duration_ms: Optional[int] = None
-    data: Optional[T] = None
-    error_class: Optional[str] = None
-    error_message: Optional[str] = None
-    confidence: Optional[str] = None
-    validation_note: Optional[str] = None
+    status_code: int | None = None
+    duration_ms: int | None = None
+    data: T | None = None
+    error_class: str | None = None
+    error_message: str | None = None
+    confidence: str | None = None
+    validation_note: str | None = None
 
 
 class ProviderBase(Generic[T]):
@@ -39,4 +38,3 @@ class ProviderBase(Generic[T]):
 
     def fetch(self) -> ProviderResult[T]:
         raise NotImplementedError
-

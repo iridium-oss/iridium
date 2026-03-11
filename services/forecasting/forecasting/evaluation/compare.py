@@ -4,7 +4,7 @@ Compare models: Graph WaveNet, DCRNN, simple baselines. Same dataset version.
 
 from __future__ import annotations
 
-from typing import Any, Callable, Optional
+from typing import Any
 
 import numpy as np
 
@@ -14,7 +14,7 @@ from .metrics import compute_metrics, horizon_metrics
 def compare_models(
     y_true: np.ndarray,
     predictions: dict[str, np.ndarray],
-    mask: Optional[np.ndarray] = None,
+    mask: np.ndarray | None = None,
     per_horizon: bool = False,
 ) -> dict[str, Any]:
     """

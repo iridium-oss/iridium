@@ -1,11 +1,10 @@
 """Tests for Earth Observation API endpoints."""
 
 import sys
+from datetime import UTC, datetime
 from pathlib import Path
-from unittest.mock import patch, MagicMock
-from datetime import datetime, timezone
+from unittest.mock import MagicMock, patch
 
-import pytest
 from fastapi.testclient import TestClient
 
 root = Path(__file__).resolve().parents[1]
@@ -14,11 +13,11 @@ sys.path.insert(0, str(root / "apps" / "api"))
 
 from app.main import app
 from iridium_schemas.earth_observation import (
-    EOSceneSearchResult,
+    EOBandAsset,
     EOScene,
     EOSceneMetadata,
+    EOSceneSearchResult,
     EOSourceStatus,
-    EOBandAsset,
 )
 
 client = TestClient(app)
@@ -32,7 +31,7 @@ def _make_scene(scene_id: str = "S2A_Test_001") -> EOScene:
             source_provider="earth_search_stac",
             source_family="stac_catalog",
             source_status=EOSourceStatus.live,
-            acquired_at=datetime(2024, 6, 1, 10, 0, tzinfo=timezone.utc),
+            acquired_at=datetime(2024, 6, 1, 10, 0, tzinfo=UTC),
             cloud_cover=15.0,
             bbox=[49.8, 40.3, 49.95, 40.45],
         ),
@@ -79,7 +78,7 @@ def test_eo_scenes_search_with_preset():
             total_count=1,
             source_provider="earth_search_stac",
             source_status=EOSourceStatus.live,
-            searched_at=datetime.now(timezone.utc),
+            searched_at=datetime.now(UTC),
             bbox=[49.72, 40.28, 50.05, 40.48],
         )
         response = client.get("/api/v1/eo/scenes/search?preset=baku&limit=5")
@@ -112,7 +111,8 @@ def test_eo_provenance_scene_not_found():
 
 def test_eo_layer_ndvi():
     with patch("app.api.eo._build_layer_descriptor") as mock:
-        from iridium_schemas.earth_observation import EOOverlayDescriptor, EOIndexLayer
+        from iridium_schemas.earth_observation import EOIndexLayer, EOOverlayDescriptor
+
         desc = MagicMock(spec=EOOverlayDescriptor)
         desc.index_layer = EOIndexLayer(
             layer_id="ndvi",
@@ -125,7 +125,7 @@ def test_eo_layer_ndvi():
         )
         desc.source_provider = "earth_search_stac"
         desc.source_status = EOSourceStatus.live
-        desc.acquired_at = datetime(2024, 6, 1, tzinfo=timezone.utc)
+        desc.acquired_at = datetime(2024, 6, 1, tzinfo=UTC)
         desc.cloud_cover = 10.0
         mock.return_value = desc
         response = client.get("/api/v1/eo/layers/ndvi?scene_id=S2A_Test")

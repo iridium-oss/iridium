@@ -3,7 +3,6 @@ Routing endpoint.
 """
 
 from fastapi import APIRouter
-
 from iridium_schemas.routing import RouteRequest, RouteResponse
 from routing.plan import plan_routes
 

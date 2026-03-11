@@ -8,8 +8,8 @@ healthcheck_mode, capabilities, and verification logic. No fabricated status.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Any, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 VALIDATION_WORKING = "working"
 VALIDATION_PARTIALLY_WORKING = "partially_working"
@@ -61,7 +61,7 @@ class ProviderEntry:
     backend_adapter_module: str = ""
     frontend_consumer_surfaces: list[str] = field(default_factory=list)
     capabilities: ProviderCapabilities = field(default_factory=ProviderCapabilities)
-    last_checked_at: Optional[datetime] = None
+    last_checked_at: datetime | None = None
     validation_status: str = VALIDATION_NOT_CHECKED
     note: str = ""
     domain: str = ""
@@ -117,7 +117,9 @@ def _build_registry() -> list[ProviderEntry]:
             healthcheck_mode="on_demand",
             backend_adapter_module="",
             frontend_consumer_surfaces=["dashboard/satellite"],
-            capabilities=ProviderCapabilities(supports_tiles=True, supports_analytics=True, supports_auth=True),
+            capabilities=ProviderCapabilities(
+                supports_tiles=True, supports_analytics=True, supports_auth=True
+            ),
             note="Optional. For tile rendering and statistics when configured.",
             domain="earth_observation",
         ),
@@ -182,7 +184,9 @@ def _build_registry() -> list[ProviderEntry]:
             healthcheck_mode="on_demand",
             backend_adapter_module="transit_ingestion.providers.yandex_transport_observed",
             frontend_consumer_surfaces=["dashboard/transit", "live_arrivals", "provider_status"],
-            capabilities=ProviderCapabilities(supports_metadata=True, supports_realtime=True, supports_web_observation=True),
+            capabilities=ProviderCapabilities(
+                supports_metadata=True, supports_realtime=True, supports_web_observation=True
+            ),
             note="Stop-level predictions from Yandex Baku pages. Not operator feed.",
             domain="transit",
         ),
@@ -195,7 +199,9 @@ def _build_registry() -> list[ProviderEntry]:
             healthcheck_mode="on_demand",
             backend_adapter_module="transit_ingestion.providers.yandex_metro_operational",
             frontend_consumer_surfaces=["dashboard/transit", "provider_status"],
-            capabilities=ProviderCapabilities(supports_metadata=True, supports_web_observation=True),
+            capabilities=ProviderCapabilities(
+                supports_metadata=True, supports_web_observation=True
+            ),
             note="Closed stations etc. from Yandex Metro Baku. Not operator feed.",
             domain="transit",
         ),
@@ -221,7 +227,9 @@ def _build_registry() -> list[ProviderEntry]:
             healthcheck_mode="on_demand",
             backend_adapter_module="transit_ingestion.providers.twogis_public_transport",
             frontend_consumer_surfaces=["dashboard/transit", "routing", "provider_status"],
-            capabilities=ProviderCapabilities(supports_routing=True, supports_metadata=True, supports_auth=True),
+            capabilities=ProviderCapabilities(
+                supports_routing=True, supports_metadata=True, supports_auth=True
+            ),
             note="Licensed partner. Requires API key when enabled.",
             domain="transit",
         ),
@@ -256,7 +264,11 @@ def _build_registry() -> list[ProviderEntry]:
             display_name="Traccar telemetry",
             source_family="permission_required",
             source_status="configuration_required",
-            required_env_vars=["IRIDIUM_TELEMETRY__TRACCAR_HOST", "IRIDIUM_TELEMETRY__TRACCAR_USER", "IRIDIUM_TELEMETRY__TRACCAR_PASSWORD"],
+            required_env_vars=[
+                "IRIDIUM_TELEMETRY__TRACCAR_HOST",
+                "IRIDIUM_TELEMETRY__TRACCAR_USER",
+                "IRIDIUM_TELEMETRY__TRACCAR_PASSWORD",
+            ],
             healthcheck_mode="on_demand",
             backend_adapter_module="",
             frontend_consumer_surfaces=[],
@@ -312,14 +324,16 @@ def _build_registry() -> list[ProviderEntry]:
             healthcheck_mode="on_demand",
             backend_adapter_module="",
             frontend_consumer_surfaces=[],
-            capabilities=ProviderCapabilities(supports_search=True, supports_routing=True, supports_metadata=True),
+            capabilities=ProviderCapabilities(
+                supports_search=True, supports_routing=True, supports_metadata=True
+            ),
             note="Search, region lookup, route XML. Not implemented; add when API or partnership available.",
             domain="map_routing",
         ),
     ]
 
 
-_PROVIDERS: Optional[list[ProviderEntry]] = None
+_PROVIDERS: list[ProviderEntry] | None = None
 
 
 def get_all_providers() -> list[ProviderEntry]:
@@ -329,118 +343,134 @@ def get_all_providers() -> list[ProviderEntry]:
     return list(_PROVIDERS)
 
 
-def get_provider(provider_id: str) -> Optional[ProviderEntry]:
+def get_provider(provider_id: str) -> ProviderEntry | None:
     for p in get_all_providers():
         if p.id == provider_id:
             return p
     return None
 
 
-def _verify_open_meteo() -> tuple[str, Optional[datetime]]:
+def _verify_open_meteo() -> tuple[str, datetime | None]:
     try:
         from weather_ingestion.open_meteo import fetch_weather
+
         r = fetch_weather(timeout_seconds=5.0)
         if r.status == "live" and r.snapshots:
-            return VALIDATION_WORKING, datetime.now(timezone.utc)
+            return VALIDATION_WORKING, datetime.now(UTC)
         if r.status == "unavailable":
-            return VALIDATION_UNAVAILABLE, datetime.now(timezone.utc)
-        return VALIDATION_PARTIALLY_WORKING, datetime.now(timezone.utc)
+            return VALIDATION_UNAVAILABLE, datetime.now(UTC)
+        return VALIDATION_PARTIALLY_WORKING, datetime.now(UTC)
     except Exception:
-        return VALIDATION_UNAVAILABLE, datetime.now(timezone.utc)
+        return VALIDATION_UNAVAILABLE, datetime.now(UTC)
 
 
-def _verify_copernicus_stac() -> tuple[str, Optional[datetime]]:
+def _verify_copernicus_stac() -> tuple[str, datetime | None]:
     try:
         from earth_observation.sentinel2.providers.copernicus_stac import CopernicusStacProvider
         from iridium_schemas.earth_observation import EOSourceStatus
+
         p = CopernicusStacProvider()
         s = p.status()
         if s == EOSourceStatus.live:
-            return VALIDATION_WORKING, datetime.now(timezone.utc)
-        return VALIDATION_UNAVAILABLE, datetime.now(timezone.utc)
+            return VALIDATION_WORKING, datetime.now(UTC)
+        return VALIDATION_UNAVAILABLE, datetime.now(UTC)
     except Exception:
-        return VALIDATION_UNAVAILABLE, datetime.now(timezone.utc)
+        return VALIDATION_UNAVAILABLE, datetime.now(UTC)
 
 
-def _verify_earth_search_stac() -> tuple[str, Optional[datetime]]:
+def _verify_earth_search_stac() -> tuple[str, datetime | None]:
     try:
         from earth_observation.sentinel2.providers.earth_search_stac import EarthSearchStacProvider
         from iridium_schemas.earth_observation import EOSourceStatus
+
         p = EarthSearchStacProvider()
         s = p.status()
         if s == EOSourceStatus.live:
-            return VALIDATION_WORKING, datetime.now(timezone.utc)
-        return VALIDATION_UNAVAILABLE, datetime.now(timezone.utc)
+            return VALIDATION_WORKING, datetime.now(UTC)
+        return VALIDATION_UNAVAILABLE, datetime.now(UTC)
     except Exception:
-        return VALIDATION_UNAVAILABLE, datetime.now(timezone.utc)
+        return VALIDATION_UNAVAILABLE, datetime.now(UTC)
 
 
-def _verify_bakubus_ayna() -> tuple[str, Optional[datetime]]:
+def _verify_bakubus_ayna() -> tuple[str, datetime | None]:
     try:
         from transit_ingestion.providers.bakubus_ayna import fetch_bus_list
+
         result = fetch_bus_list(timeout=8.0)
         if result is not None and getattr(result, "error", None) is None:
-            return VALIDATION_WORKING, datetime.now(timezone.utc)
-        return VALIDATION_UNAVAILABLE, datetime.now(timezone.utc)
+            return VALIDATION_WORKING, datetime.now(UTC)
+        return VALIDATION_UNAVAILABLE, datetime.now(UTC)
     except Exception:
-        return VALIDATION_UNAVAILABLE, datetime.now(timezone.utc)
+        return VALIDATION_UNAVAILABLE, datetime.now(UTC)
 
 
-def _verify_bakumetro_official() -> tuple[str, Optional[datetime]]:
+def _verify_bakumetro_official() -> tuple[str, datetime | None]:
     try:
-        from transit_ingestion.providers.bakumetro_official import get_metro_lines, get_metro_stations
+        from transit_ingestion.providers.bakumetro_official import (
+            get_metro_lines,
+            get_metro_stations,
+        )
+
         lines = get_metro_lines()
         stations = get_metro_stations()
         if (lines and len(lines) > 0) or (stations and len(stations) > 0):
-            return VALIDATION_WORKING, datetime.now(timezone.utc)
-        return VALIDATION_PARTIALLY_WORKING, datetime.now(timezone.utc)
+            return VALIDATION_WORKING, datetime.now(UTC)
+        return VALIDATION_PARTIALLY_WORKING, datetime.now(UTC)
     except Exception:
-        return VALIDATION_UNAVAILABLE, datetime.now(timezone.utc)
+        return VALIDATION_UNAVAILABLE, datetime.now(UTC)
 
 
-def _verify_alerts(module_name: str) -> tuple[str, Optional[datetime]]:
+def _verify_alerts(module_name: str) -> tuple[str, datetime | None]:
     try:
         if "bakubus" in module_name:
             from transit_ingestion.providers.bakubus_official_alerts import fetch_bakubus_alerts
+
             alerts = fetch_bakubus_alerts(timeout=10.0)
         else:
             from transit_ingestion.providers.bakumetro_official_alerts import fetch_metro_alerts
+
             alerts = fetch_metro_alerts(timeout=10.0)
-        return VALIDATION_WORKING, datetime.now(timezone.utc)
+        return VALIDATION_WORKING, datetime.now(UTC)
     except Exception:
-        return VALIDATION_UNAVAILABLE, datetime.now(timezone.utc)
+        return VALIDATION_UNAVAILABLE, datetime.now(UTC)
 
 
-def _verify_twogis() -> tuple[str, Optional[datetime]]:
+def _verify_twogis() -> tuple[str, datetime | None]:
     try:
-        from transit_ingestion.providers.twogis_public_transport import get_twogis_status, fetch_route_alternatives
+        from transit_ingestion.providers.twogis_public_transport import (
+            fetch_route_alternatives,
+            get_twogis_status,
+        )
+
         if get_twogis_status() != "configured":
-            return VALIDATION_CONFIGURATION_REQUIRED, datetime.now(timezone.utc)
+            return VALIDATION_CONFIGURATION_REQUIRED, datetime.now(UTC)
         # Minimal verification: Baku area short route request
         results = fetch_route_alternatives(40.4093, 49.8671, 40.3764, 49.8530, timeout=10.0)
         if results is not None:
-            return VALIDATION_WORKING, datetime.now(timezone.utc)
-        return VALIDATION_PARTIALLY_WORKING, datetime.now(timezone.utc)
+            return VALIDATION_WORKING, datetime.now(UTC)
+        return VALIDATION_PARTIALLY_WORKING, datetime.now(UTC)
     except Exception:
-        return VALIDATION_UNAVAILABLE, datetime.now(timezone.utc)
+        return VALIDATION_UNAVAILABLE, datetime.now(UTC)
 
 
-def _verify_moovit() -> tuple[str, Optional[datetime]]:
+def _verify_moovit() -> tuple[str, datetime | None]:
     try:
         from transit_ingestion.providers.moovit_partner import get_moovit_config
+
         cfg = get_moovit_config()
         if not cfg.enabled:
-            return VALIDATION_CONFIGURATION_REQUIRED, datetime.now(timezone.utc)
+            return VALIDATION_CONFIGURATION_REQUIRED, datetime.now(UTC)
         # Adapter is interface-only; no real API call yet
-        return VALIDATION_PARTIALLY_WORKING, datetime.now(timezone.utc)
+        return VALIDATION_PARTIALLY_WORKING, datetime.now(UTC)
     except Exception:
-        return VALIDATION_UNAVAILABLE, datetime.now(timezone.utc)
+        return VALIDATION_UNAVAILABLE, datetime.now(UTC)
 
 
-def _verify_sentinel_hub() -> tuple[str, Optional[datetime]]:
+def _verify_sentinel_hub() -> tuple[str, datetime | None]:
     """Check Sentinel Hub: instance_id + client credentials; try OAuth2 token."""
     try:
         from app.config import get_settings
+
         settings = get_settings()
         instance_id = settings.eo.sentinel_hub_instance_id
         cid = settings.eo.sentinel_hub_client_id
@@ -448,26 +478,32 @@ def _verify_sentinel_hub() -> tuple[str, Optional[datetime]]:
         client_id = cid.get_secret_value() if cid else None
         client_secret = csec.get_secret_value() if csec else None
         if not instance_id:
-            return VALIDATION_CONFIGURATION_REQUIRED, datetime.now(timezone.utc)
+            return VALIDATION_CONFIGURATION_REQUIRED, datetime.now(UTC)
         if not client_id or not client_secret:
-            return VALIDATION_CONFIGURATION_REQUIRED, datetime.now(timezone.utc)
+            return VALIDATION_CONFIGURATION_REQUIRED, datetime.now(UTC)
         import httpx
+
         r = httpx.post(
             "https://auth.sentinel-hub.com/oauth/token",
-            data={"grant_type": "client_credentials", "client_id": client_id, "client_secret": client_secret},
+            data={
+                "grant_type": "client_credentials",
+                "client_id": client_id,
+                "client_secret": client_secret,
+            },
             headers={"Content-Type": "application/x-www-form-urlencoded"},
             timeout=10.0,
         )
         if r.status_code == 200 and r.json().get("access_token"):
-            return VALIDATION_WORKING, datetime.now(timezone.utc)
-        return VALIDATION_PARTIALLY_WORKING, datetime.now(timezone.utc)
+            return VALIDATION_WORKING, datetime.now(UTC)
+        return VALIDATION_PARTIALLY_WORKING, datetime.now(UTC)
     except Exception:
-        return VALIDATION_UNAVAILABLE, datetime.now(timezone.utc)
+        return VALIDATION_UNAVAILABLE, datetime.now(UTC)
 
 
 def _credential_satisfied(provider_id: str, required: list[str]) -> bool:
     """Return True if any of the required or legacy env vars for this provider are set."""
     import os
+
     legacy_map = {
         "twogis_public_transport": ["IRIDIUM_TWOGIS__API_KEY", "TWOGIS_API_KEY"],
         "moovit_partner": ["IRIDIUM_MOOVIT__API_KEY", "MOOVIT_API_KEY", "MOOVIT_PARTNER_API_KEY"],
@@ -477,17 +513,21 @@ def _credential_satisfied(provider_id: str, required: list[str]) -> bool:
     return any(os.environ.get(k) for k in keys_to_check)
 
 
-def verify_provider(provider_id: str) -> tuple[str, Optional[datetime], str]:
+def verify_provider(provider_id: str) -> tuple[str, datetime | None, str]:
     """
     Run verification for a provider. Returns (validation_status, last_checked_at, message).
     Does not mutate global state; caller can store last_checked_at.
     """
-    import os
+
     entry = get_provider(provider_id)
     if not entry:
         return VALIDATION_UNAVAILABLE, None, "Unknown provider id"
     if entry.required_env_vars and not _credential_satisfied(provider_id, entry.required_env_vars):
-        return VALIDATION_CONFIGURATION_REQUIRED, datetime.now(timezone.utc), "Missing credentials (set API key or partner env)"
+        return (
+            VALIDATION_CONFIGURATION_REQUIRED,
+            datetime.now(UTC),
+            "Missing credentials (set API key or partner env)",
+        )
     handlers = {
         "open_meteo": _verify_open_meteo,
         "copernicus_stac": _verify_copernicus_stac,
@@ -502,7 +542,7 @@ def verify_provider(provider_id: str) -> tuple[str, Optional[datetime], str]:
     }
     handler = handlers.get(provider_id)
     if not handler:
-        return VALIDATION_NOT_CHECKED, datetime.now(timezone.utc), "No verification implemented"
+        return VALIDATION_NOT_CHECKED, datetime.now(UTC), "No verification implemented"
     status, checked = handler()
     return status, checked, status
 
@@ -511,7 +551,11 @@ def check_provider_health(provider_id: str) -> dict[str, Any]:
     """Return health dict for provider: status, last_checked_at, message, validation_status."""
     entry = get_provider(provider_id)
     if not entry:
-        return {"provider_id": provider_id, "validation_status": VALIDATION_UNAVAILABLE, "message": "Unknown provider"}
+        return {
+            "provider_id": provider_id,
+            "validation_status": VALIDATION_UNAVAILABLE,
+            "message": "Unknown provider",
+        }
     validation_status, last_checked_at, message = verify_provider(provider_id)
     return {
         "provider_id": provider_id,
@@ -532,14 +576,16 @@ def get_integrations_status() -> dict[str, Any]:
         domain = p.domain or "other"
         if domain not in by_domain:
             by_domain[domain] = []
-        by_domain[domain].append({
-            "id": p.id,
-            "display_name": p.display_name,
-            "source_family": p.source_family,
-            "source_status": p.source_status,
-            "validation_status": p.validation_status,
-            "required_env_vars": p.required_env_vars,
-        })
+        by_domain[domain].append(
+            {
+                "id": p.id,
+                "display_name": p.display_name,
+                "source_family": p.source_family,
+                "source_status": p.source_status,
+                "validation_status": p.validation_status,
+                "required_env_vars": p.required_env_vars,
+            }
+        )
     return {
         "domains": by_domain,
         "total_providers": len(providers),
@@ -553,20 +599,22 @@ def get_integrations_report() -> dict[str, Any]:
     results = []
     for p in providers:
         status, checked, msg = verify_provider(p.id)
-        results.append({
-            "provider_id": p.id,
-            "display_name": p.display_name,
-            "domain": p.domain,
-            "source_family": p.source_family,
-            "source_status": p.source_status,
-            "validation_status": status,
-            "last_checked_at": checked.isoformat() if checked else None,
-            "message": msg,
-            "required_env_vars": p.required_env_vars,
-            "capabilities": p.capabilities.to_dict(),
-        })
+        results.append(
+            {
+                "provider_id": p.id,
+                "display_name": p.display_name,
+                "domain": p.domain,
+                "source_family": p.source_family,
+                "source_status": p.source_status,
+                "validation_status": status,
+                "last_checked_at": checked.isoformat() if checked else None,
+                "message": msg,
+                "required_env_vars": p.required_env_vars,
+                "capabilities": p.capabilities.to_dict(),
+            }
+        )
     return {
-        "report_generated_at": datetime.now(timezone.utc).isoformat(),
+        "report_generated_at": datetime.now(UTC).isoformat(),
         "providers": results,
         "note": "Verification runs live checks. Failures indicate provider unreachable or misconfigured.",
     }

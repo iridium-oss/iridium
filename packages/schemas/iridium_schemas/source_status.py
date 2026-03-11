@@ -9,7 +9,6 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -57,11 +56,15 @@ class SourceMetadata(BaseModel):
     source_provider: str = Field(..., description="Provider identifier, for example bakubus_ayna")
     source_family: SourceFamily = Field(..., description="High-level source family")
     source_status: SourceStatus = Field(..., description="Truthful availability and rights status")
-    fetched_at: Optional[datetime] = Field(None, description="Fetch time for provider calls")
-    observed_at: Optional[datetime] = Field(None, description="Observation time for web observed context")
-    source_url: Optional[str] = Field(None, description="Public URL when applicable")
-    confidence: ConfidenceLevel = Field(ConfidenceLevel.unknown, description="Confidence in mapping or parsing")
-    validation_note: Optional[str] = Field(None, description="Non-sensitive validation note")
+    fetched_at: datetime | None = Field(None, description="Fetch time for provider calls")
+    observed_at: datetime | None = Field(
+        None, description="Observation time for web observed context"
+    )
+    source_url: str | None = Field(None, description="Public URL when applicable")
+    confidence: ConfidenceLevel = Field(
+        ConfidenceLevel.unknown, description="Confidence in mapping or parsing"
+    )
+    validation_note: str | None = Field(None, description="Non-sensitive validation note")
 
 
 class DataStatus(str, Enum):
@@ -80,5 +83,4 @@ class ProvenanceSummary(BaseModel):
 
     data_status: DataStatus
     sources: list[SourceMetadata] = Field(default_factory=list)
-    note: Optional[str] = None
-
+    note: str | None = None

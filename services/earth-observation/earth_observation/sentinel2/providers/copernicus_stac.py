@@ -7,40 +7,43 @@ Reads CDSE_USERNAME/CDSE_PASSWORD or CDSE_CLIENT_ID/CDSE_CLIENT_SECRET from env 
 from __future__ import annotations
 
 import os
-from datetime import datetime, timedelta, timezone
-from typing import Any, Optional
+from datetime import UTC, datetime, timedelta
+from typing import Any
 
 import httpx
-
 from iridium_schemas.earth_observation import (
+    EOBandAsset,
     EOScene,
     EOSceneMetadata,
     EOSceneSearchResult,
-    EOBandAsset,
     EOSourceStatus,
 )
 
 COPERNICUS_STAC_BASE = "https://catalogue.dataspace.copernicus.eu/stac"
-CDSE_TOKEN_URL = "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token"
+CDSE_TOKEN_URL = (
+    "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token"
+)
 # New endpoint: https://stac.dataspace.copernicus.eu/ (may use /v1 or root)
 S2_L2A_COLLECTION = "SENTINEL-2"
 DEFAULT_TIMEOUT = 30.0
 
-_cdse_token_cache: Optional[tuple[str, Optional[datetime]]] = None
+_cdse_token_cache: tuple[str, datetime | None] | None = None
 
 
-def _get_cdse_bearer_token() -> Optional[str]:
+def _get_cdse_bearer_token() -> str | None:
     """Optional CDSE OAuth2 token from env. Uses client_credentials or password grant. Cached until near expiry."""
     global _cdse_token_cache
     client_id = os.environ.get("IRIDIUM_EO__CDSE_CLIENT_ID") or os.environ.get("CDSE_CLIENT_ID")
-    client_secret = os.environ.get("IRIDIUM_EO__CDSE_CLIENT_SECRET") or os.environ.get("CDSE_CLIENT_SECRET")
+    client_secret = os.environ.get("IRIDIUM_EO__CDSE_CLIENT_SECRET") or os.environ.get(
+        "CDSE_CLIENT_SECRET"
+    )
     username = os.environ.get("IRIDIUM_EO__CDSE_USERNAME") or os.environ.get("CDSE_USERNAME")
     password = os.environ.get("IRIDIUM_EO__CDSE_PASSWORD") or os.environ.get("CDSE_PASSWORD")
     if not (client_id and client_secret) and not (username and password):
         return None
     if _cdse_token_cache:
         token, expires = _cdse_token_cache
-        if expires and (expires - datetime.now(timezone.utc)).total_seconds() > 60:
+        if expires and (expires - datetime.now(UTC)).total_seconds() > 60:
             return token
         _cdse_token_cache = None
     try:
@@ -71,7 +74,7 @@ def _get_cdse_bearer_token() -> Optional[str]:
             access_token = data.get("access_token")
             expires_in = data.get("expires_in", 300)
             if access_token:
-                expires_at = datetime.now(timezone.utc) + timedelta(seconds=expires_in)
+                expires_at = datetime.now(UTC) + timedelta(seconds=expires_in)
                 _cdse_token_cache = (access_token, expires_at)
                 return access_token
     except Exception:
@@ -87,7 +90,7 @@ def _auth_headers() -> dict[str, str]:
     return {}
 
 
-def _parse_datetime(s: Optional[str]) -> Optional[datetime]:
+def _parse_datetime(s: str | None) -> datetime | None:
     if not s:
         return None
     try:
@@ -159,7 +162,7 @@ class CopernicusStacProvider:
     def __init__(
         self,
         base_url: str = COPERNICUS_STAC_BASE,
-        collection: Optional[str] = None,
+        collection: str | None = None,
         timeout: float = DEFAULT_TIMEOUT,
     ):
         self.base_url = base_url.rstrip("/")
@@ -181,9 +184,9 @@ class CopernicusStacProvider:
     def search(
         self,
         bbox: tuple[float, float, float, float],
-        date_start: Optional[datetime] = None,
-        date_end: Optional[datetime] = None,
-        cloud_cover_max: Optional[float] = None,
+        date_start: datetime | None = None,
+        date_end: datetime | None = None,
+        cloud_cover_max: float | None = None,
         limit: int = 20,
     ) -> EOSceneSearchResult:
         """Search Copernicus STAC. bbox: (minx, miny, maxx, maxy)."""
@@ -218,7 +221,7 @@ class CopernicusStacProvider:
                 scenes=[],
                 source_provider=self.provider_id,
                 source_status=EOSourceStatus.unavailable,
-                searched_at=datetime.now(timezone.utc),
+                searched_at=datetime.now(UTC),
                 bbox=list(bbox),
                 date_start=date_start,
                 date_end=date_end,
@@ -234,19 +237,22 @@ class CopernicusStacProvider:
             total_count=data.get("numberMatched"),
             source_provider=self.provider_id,
             source_status=EOSourceStatus.live,
-            searched_at=datetime.now(timezone.utc),
+            searched_at=datetime.now(UTC),
             bbox=list(bbox),
             date_start=date_start,
             date_end=date_end,
             cloud_cover_max=cloud_cover_max,
         )
 
-    def get_scene(self, scene_id: str) -> Optional[EOScene]:
+    def get_scene(self, scene_id: str) -> EOScene | None:
         """Fetch single item. Copernicus may expose /collections/{id}/items/{item_id}."""
         try:
             headers = _auth_headers()
             with httpx.Client(timeout=self.timeout) as client:
-                r = client.get(f"{self.base_url}/collections/{self.collection}/items/{scene_id}", headers=headers)
+                r = client.get(
+                    f"{self.base_url}/collections/{self.collection}/items/{scene_id}",
+                    headers=headers,
+                )
                 if r.status_code != 200:
                     return None
                 feature = r.json()

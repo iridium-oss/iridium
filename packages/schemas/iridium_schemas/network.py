@@ -3,7 +3,6 @@ Network and digital twin schemas: nodes, edges, snapshot.
 """
 
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -13,10 +12,12 @@ class NetworkNode(BaseModel):
 
     node_id: str
     node_type: str = Field(..., description="segment | junction | stop")
-    lat: Optional[float] = Field(None, ge=-90, le=90)
-    lon: Optional[float] = Field(None, ge=-180, le=180)
-    name: Optional[str] = None
-    mode: Optional[str] = Field(None, description="bus | metro | minibus | walking | cycling | road")
+    lat: float | None = Field(None, ge=-90, le=90)
+    lon: float | None = Field(None, ge=-180, le=180)
+    name: str | None = None
+    mode: str | None = Field(
+        None, description="bus | metro | minibus | walking | cycling | road"
+    )
     metadata: dict = Field(default_factory=dict)
 
 
@@ -27,14 +28,14 @@ class NetworkEdge(BaseModel):
     from_node: str
     to_node: str
     mode: str = Field(..., description="bus | metro | minibus | walking | cycling | road")
-    length_km: Optional[float] = Field(None, ge=0)
-    travel_time_min: Optional[float] = Field(None, ge=0)
-    cost: Optional[float] = Field(None, ge=0)
-    carbon_kg: Optional[float] = Field(None, ge=0)
-    speed_kmh: Optional[float] = Field(None, ge=0)
-    occupancy_pct: Optional[float] = Field(None, ge=0, le=100)
+    length_km: float | None = Field(None, ge=0)
+    travel_time_min: float | None = Field(None, ge=0)
+    cost: float | None = Field(None, ge=0)
+    carbon_kg: float | None = Field(None, ge=0)
+    speed_kmh: float | None = Field(None, ge=0)
+    occupancy_pct: float | None = Field(None, ge=0, le=100)
     incident: bool = False
-    updated_at: Optional[datetime] = None
+    updated_at: datetime | None = None
 
 
 class DigitalTwinSnapshot(BaseModel):
@@ -42,10 +43,12 @@ class DigitalTwinSnapshot(BaseModel):
 
     nodes: list[NetworkNode] = Field(default_factory=list)
     edges: list[NetworkEdge] = Field(default_factory=list)
-    snapshot_at: Optional[datetime] = None
-    version: Optional[str] = None
-    data_status: Optional[str] = Field(
+    snapshot_at: datetime | None = None
+    version: str | None = None
+    data_status: str | None = Field(
         None,
         description="live | recorded_real_snapshot | unavailable | configuration_required | permission_required | stale",
     )
-    source_provenance: Optional[list[dict]] = Field(None, description="Per-source provenance for UI and API")
+    source_provenance: list[dict] | None = Field(
+        None, description="Per-source provenance for UI and API"
+    )

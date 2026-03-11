@@ -8,8 +8,8 @@ if str(root) not in sys.path:
     sys.path.insert(0, str(root))
 
 import numpy as np
-from forecasting.graph import build_forecast_graph, ForecastGraphMetadata
-from forecasting.graph.builder import node_ids_from_network, edges_from_network_edges
+from forecasting.graph import build_forecast_graph
+from forecasting.graph.builder import edges_from_network_edges, node_ids_from_network
 
 
 def test_build_empty():
@@ -34,6 +34,7 @@ def test_edges_from_network():
             self.from_node = from_node
             self.to_node = to_node
             self.edge_id = edge_id
+
     raw = [E("n1", "n2", "e1"), E("n2", "n3", "e2")]
     edgelist, ids = edges_from_network_edges(raw)
     assert edgelist == [("n1", "n2"), ("n2", "n3")]
@@ -45,5 +46,6 @@ def test_node_ids_from_edges():
         def __init__(self, from_node, to_node):
             self.from_node = from_node
             self.to_node = to_node
+
     nodes = node_ids_from_network([], [E("x", "y"), E("y", "z")])
     assert set(nodes) == {"x", "y", "z"}

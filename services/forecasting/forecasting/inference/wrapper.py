@@ -7,15 +7,14 @@ from __future__ import annotations
 
 import logging
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Optional
 
 import numpy as np
 import torch
 
-from ..models.graph_wavenet import GraphWaveNet
 from ..models.dcrnn import DCRNN
+from ..models.graph_wavenet import GraphWaveNet
 from ..registry.loader import load_registry_metadata, validate_artifact
 
 logger = logging.getLogger(__name__)
@@ -33,7 +32,7 @@ class InferenceResult:
     coverage_note: str
     reliability_note: str
     degraded: bool
-    latency_ms: Optional[float] = None
+    latency_ms: float | None = None
 
 
 class ForecastInferenceWrapper:
@@ -44,13 +43,13 @@ class ForecastInferenceWrapper:
 
     def __init__(
         self,
-        artifact_dir: Optional[Path] = None,
-        max_latency_ms: Optional[float] = 5000.0,
+        artifact_dir: Path | None = None,
+        max_latency_ms: float | None = 5000.0,
     ):
         self._artifact_dir = Path(artifact_dir) if artifact_dir else None
         self._max_latency_ms = max_latency_ms
-        self._model: Optional[torch.nn.Module] = None
-        self._meta: Optional[dict] = None
+        self._model: torch.nn.Module | None = None
+        self._meta: dict | None = None
         self._entity_order: list[str] = []
 
     def load(self, entity_order: list[str]) -> bool:
@@ -93,8 +92,8 @@ class ForecastInferenceWrapper:
         self,
         x: np.ndarray,
         support: np.ndarray,
-        entity_ids: Optional[list[str]] = None,
-    ) -> Optional[InferenceResult]:
+        entity_ids: list[str] | None = None,
+    ) -> InferenceResult | None:
         """
         Run inference. Returns InferenceResult or None if model not loaded or error.
         x: (input_len, N). support: (N, N).

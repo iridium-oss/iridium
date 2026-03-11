@@ -4,8 +4,7 @@ Fetch BakuBus official news/notifications page. No fabricated data.
 
 import re
 from dataclasses import dataclass
-from datetime import datetime, timezone
-from typing import Optional
+from datetime import UTC, datetime
 
 import httpx
 
@@ -23,16 +22,16 @@ class FetchedPage:
     html: str
     fetched_at: datetime
     status_code: int
-    error: Optional[str] = None
+    error: str | None = None
 
 
 def fetch_bakubus_news_page(
-    url: Optional[str] = None,
+    url: str | None = None,
     timeout: float = DEFAULT_TIMEOUT,
 ) -> FetchedPage:
     """Fetch official BakuBus news/notifications page. Returns raw HTML and provenance."""
     target = url or BAKUBUS_NEWS_PAGE_URL
-    fetched_at = datetime.now(timezone.utc)
+    fetched_at = datetime.now(UTC)
     try:
         r = httpx.get(
             target,
@@ -87,6 +86,7 @@ def _extract_news_items(html: str, base_url: str) -> list[dict]:
             continue
         if not href.startswith("http"):
             from urllib.parse import urljoin
+
             href = urljoin(base_url, href)
         items.append({"url": href, "title": text})
     # Deduplicate by url

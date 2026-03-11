@@ -6,8 +6,8 @@ No synthetic data in production path.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, timezone
-from typing import Any, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 import numpy as np
 
@@ -16,14 +16,16 @@ import numpy as np
 class ObservationRow:
     timestamp_utc: datetime
     entity_id: str
-    target_value: Optional[float]
-    speed_kmh: Optional[float]
-    occupancy_pct: Optional[float]
-    congestion_score: Optional[float]
+    target_value: float | None
+    speed_kmh: float | None
+    occupancy_pct: float | None
+    congestion_score: float | None
     source_completeness: float
 
 
-def _congestion_from_speed_occupancy(speed_kmh: Optional[float], occupancy_pct: Optional[float]) -> Optional[float]:
+def _congestion_from_speed_occupancy(
+    speed_kmh: float | None, occupancy_pct: float | None
+) -> float | None:
     """Map speed and occupancy to a [0, 1] congestion score. Higher = more congested."""
     if speed_kmh is not None and occupancy_pct is not None:
         s = max(0.0, min(1.0, 1.0 - (speed_kmh or 0) / 120.0))
@@ -45,15 +47,19 @@ def snapshot_to_observations(
     Uses only real fields: speed_kmh, occupancy_pct. No synthetic values.
     """
     rows: list[ObservationRow] = []
-    ts = getattr(snapshot, "snapshot_at", None) or (snapshot.get("snapshot_at") if isinstance(snapshot, dict) else None)
+    ts = getattr(snapshot, "snapshot_at", None) or (
+        snapshot.get("snapshot_at") if isinstance(snapshot, dict) else None
+    )
     if not ts:
-        ts = datetime.now(timezone.utc)
+        ts = datetime.now(UTC)
     if isinstance(ts, str):
         try:
             ts = datetime.fromisoformat(ts.replace("Z", "+00:00"))
         except ValueError:
-            ts = datetime.now(timezone.utc)
-    edges = getattr(snapshot, "edges", None) or (snapshot.get("edges") if isinstance(snapshot, dict) else [])
+            ts = datetime.now(UTC)
+    edges = getattr(snapshot, "edges", None) or (
+        snapshot.get("edges") if isinstance(snapshot, dict) else []
+    )
     for e in edges:
         eid = getattr(e, "edge_id", None) or (e.get("edge_id") if isinstance(e, dict) else None)
         if not eid:
@@ -94,6 +100,7 @@ def align_observations_to_matrix(
     e2i = {e: i for i, e in enumerate(entity_order)}
     # Group by timestamp
     from collections import defaultdict
+
     by_ts: dict[datetime, list[ObservationRow]] = defaultdict(list)
     for r in rows:
         by_ts[r.timestamp_utc].append(r)

@@ -2,9 +2,8 @@
 Network and digital twin graph endpoint. Uses state assembler; real sources only. No synthetic graph in response.
 """
 
-from fastapi import APIRouter
-
 from digital_twin.state_assembler import get_assembled_snapshot
+from fastapi import APIRouter
 
 router = APIRouter()
 

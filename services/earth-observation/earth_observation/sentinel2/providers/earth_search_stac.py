@@ -5,16 +5,15 @@ No authentication required. Collection: sentinel-2-l2a.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
-from typing import Any, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 import httpx
-
 from iridium_schemas.earth_observation import (
+    EOBandAsset,
     EOScene,
     EOSceneMetadata,
     EOSceneSearchResult,
-    EOBandAsset,
     EOSourceStatus,
 )
 
@@ -23,7 +22,7 @@ SENTINEL_2_L2A_COLLECTION = "sentinel-2-l2a"
 DEFAULT_TIMEOUT = 30.0
 
 
-def _parse_datetime(s: Optional[str]) -> Optional[datetime]:
+def _parse_datetime(s: str | None) -> datetime | None:
     if not s:
         return None
     try:
@@ -116,9 +115,9 @@ class EarthSearchStacProvider:
     def search(
         self,
         bbox: tuple[float, float, float, float],
-        date_start: Optional[datetime] = None,
-        date_end: Optional[datetime] = None,
-        cloud_cover_max: Optional[float] = None,
+        date_start: datetime | None = None,
+        date_end: datetime | None = None,
+        cloud_cover_max: float | None = None,
         limit: int = 20,
     ) -> EOSceneSearchResult:
         """Search Earth Search STAC. bbox: (minx, miny, maxx, maxy)."""
@@ -151,7 +150,7 @@ class EarthSearchStacProvider:
                 scenes=[],
                 source_provider=self.provider_id,
                 source_status=EOSourceStatus.unavailable,
-                searched_at=datetime.now(timezone.utc),
+                searched_at=datetime.now(UTC),
                 bbox=list(bbox),
                 date_start=date_start,
                 date_end=date_end,
@@ -167,14 +166,14 @@ class EarthSearchStacProvider:
             total_count=data.get("numberMatched"),
             source_provider=self.provider_id,
             source_status=EOSourceStatus.live,
-            searched_at=datetime.now(timezone.utc),
+            searched_at=datetime.now(UTC),
             bbox=list(bbox),
             date_start=date_start,
             date_end=date_end,
             cloud_cover_max=cloud_cover_max,
         )
 
-    def get_scene(self, scene_id: str) -> Optional[EOScene]:
+    def get_scene(self, scene_id: str) -> EOScene | None:
         """Fetch single item by id. Earth Search does not expose a direct item URL; use search."""
         try:
             with httpx.Client(timeout=self.timeout) as client:

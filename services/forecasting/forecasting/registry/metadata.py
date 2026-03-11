@@ -5,7 +5,7 @@ Model registry metadata. Every artifact has family, version, dataset/feature/gra
 from __future__ import annotations
 
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 
 class ModelMaturity(str, Enum):
@@ -21,9 +21,9 @@ def registry_metadata_from_training(
     model_version: str,
     dataset_version: str,
     feature_version: str,
-    graph_version: Optional[str],
+    graph_version: str | None,
     training_config: dict[str, Any],
-    evaluation_summary: Optional[dict[str, Any]],
+    evaluation_summary: dict[str, Any] | None,
     maturity: ModelMaturity = ModelMaturity.CANDIDATE,
 ) -> dict[str, Any]:
     return {

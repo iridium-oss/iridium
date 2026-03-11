@@ -6,15 +6,12 @@ DB is optional. When disabled, the API runs in stateless mode.
 
 from __future__ import annotations
 
-from typing import Optional
-
+from app.core.settings import get_settings
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 
-from app.core.settings import get_settings
 
-
-def create_db_engine() -> Optional[Engine]:
+def create_db_engine() -> Engine | None:
     settings = get_settings()
     if not settings.db.enabled:
         return None
@@ -24,12 +21,11 @@ def create_db_engine() -> Optional[Engine]:
     return create_engine(dsn, pool_pre_ping=True)
 
 
-_ENGINE: Optional[Engine] = None
+_ENGINE: Engine | None = None
 
 
-def get_engine() -> Optional[Engine]:
+def get_engine() -> Engine | None:
     global _ENGINE
     if _ENGINE is None:
         _ENGINE = create_db_engine()
     return _ENGINE
-

@@ -5,7 +5,6 @@ Predicted arrivals: official feed first, then public web observed, then licensed
 Route planning: official/OTP first, then 2GIS, Moovit, Yandex licensed.
 """
 
-from typing import Optional
 
 # Alert priority: 1 = highest.
 ALERT_PRIORITY_ORDER = [
@@ -58,7 +57,7 @@ def _priority_rank(order: list[str], provider: str) -> int:
 
 def merge_alerts_by_priority(
     alert_lists: list[tuple[str, list]],
-    order: Optional[list[str]] = None,
+    order: list[str] | None = None,
 ) -> list:
     """
     Merge multiple (provider_id, alerts) lists and sort by source priority.

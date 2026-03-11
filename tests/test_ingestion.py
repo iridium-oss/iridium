@@ -1,22 +1,24 @@
 """Ingestion pipeline tests."""
 
-import sys
 import json
+import sys
 import tempfile
+from datetime import UTC, datetime
 from pathlib import Path
-from datetime import datetime, timezone
 
 root = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(root / "packages" / "schemas"))
 sys.path.insert(0, str(root / "services" / "ingestion"))
 
-from iridium_schemas.events import IngestionEventBatch, SensorEvent, GNSSPoint
-from ingestion.pipeline import validate_batch, run_ingestion, _load_json_or_csv
+from ingestion.pipeline import _load_json_or_csv, run_ingestion, validate_batch
+from iridium_schemas.events import GNSSPoint, IngestionEventBatch, SensorEvent
 
 
 def test_validate_batch_ok():
     batch = IngestionEventBatch(
-        sensor_events=[SensorEvent(segment_id="e1", timestamp=datetime.now(timezone.utc), speed_kmh=30.0)]
+        sensor_events=[
+            SensorEvent(segment_id="e1", timestamp=datetime.now(UTC), speed_kmh=30.0)
+        ]
     )
     ok, errors = validate_batch(batch)
     assert ok is True
@@ -27,7 +29,7 @@ def test_validate_batch_invalid_speed():
     # Use model_construct so invalid speed_kmh (300) bypasses Pydantic validation;
     # validate_batch() then catches it via its own range check.
     invalid_ev = SensorEvent.model_construct(
-        segment_id="e1", timestamp=datetime.now(timezone.utc), speed_kmh=300
+        segment_id="e1", timestamp=datetime.now(UTC), speed_kmh=300
     )
     batch = IngestionEventBatch.model_construct(sensor_events=[invalid_ev])
     ok, errors = validate_batch(batch)
@@ -46,7 +48,9 @@ def test_run_ingestion_synthetic():
 
 def test_validate_batch_gnss_missing_segment_or_lat():
     """Cover validate_batch gnss_points branch (segment_id None and lat None)."""
-    bad_gnss = GNSSPoint.model_construct(segment_id=None, lat=None, lon=49.0, timestamp=datetime.now(timezone.utc))
+    bad_gnss = GNSSPoint.model_construct(
+        segment_id=None, lat=None, lon=49.0, timestamp=datetime.now(UTC)
+    )
     batch = IngestionEventBatch.model_construct(sensor_events=[], gnss_points=[bad_gnss])
     ok, errors = validate_batch(batch)
     assert ok is False
@@ -86,10 +90,25 @@ def test_run_ingestion_weather_and_public_events():
     with tempfile.TemporaryDirectory() as d:
         base = Path(d)
         (base / "weather.json").write_text(
-            json.dumps([{"region_id": "baku", "timestamp": "2025-03-08T10:00:00Z", "temp_c": 12.0}]), encoding="utf-8"
+            json.dumps(
+                [{"region_id": "baku", "timestamp": "2025-03-08T10:00:00Z", "temp_c": 12.0}]
+            ),
+            encoding="utf-8",
         )
         (base / "events.json").write_text(
-            json.dumps([{"event_id": "ev1", "start_time": "2025-03-08T14:00:00Z", "end_time": "2025-03-08T17:00:00Z", "venue_or_zone_id": "z1", "capacity": 100, "event_type": "other"}]), encoding="utf-8"
+            json.dumps(
+                [
+                    {
+                        "event_id": "ev1",
+                        "start_time": "2025-03-08T14:00:00Z",
+                        "end_time": "2025-03-08T17:00:00Z",
+                        "venue_or_zone_id": "z1",
+                        "capacity": 100,
+                        "event_type": "other",
+                    }
+                ]
+            ),
+            encoding="utf-8",
         )
         count, errs = run_ingestion(base, Path("/nonexistent"))
         assert count >= 1

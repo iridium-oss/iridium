@@ -4,15 +4,13 @@ source_family: official_website. source_status: official_alerts_only.
 """
 
 import hashlib
-from datetime import datetime, timezone
-from typing import Optional
 
 from iridium_schemas.transit import Alert, SourceFamily, SourceStatus
 
 from transit_ingestion.providers.bakubus_official_alerts.fetcher import (
+    PROVIDER_ID,
     FetchedPage,
     _extract_news_items,
-    PROVIDER_ID,
 )
 
 SOURCE_FAMILY = SourceFamily.OFFICIAL_WEBSITE.value
@@ -68,5 +66,6 @@ def fetch_bakubus_alerts(timeout: float = 20.0) -> list[Alert]:
     from transit_ingestion.providers.bakubus_official_alerts.fetcher import (
         fetch_bakubus_news_page,
     )
+
     page = fetch_bakubus_news_page(timeout=timeout)
     return normalize_bakubus_alerts(page)

@@ -42,11 +42,11 @@ def main() -> int:
 
     # Run Flower simulation if flwr is available
     try:
-        from flwr.simulation import run_simulation
-        from flwr.client.client_app import ClientApp
-        from flwr.serverapp import ServerApp
         from federated.client_app import client_fn
         from federated.server_app import server_fn
+        from flwr.client.client_app import ClientApp
+        from flwr.serverapp import ServerApp
+        from flwr.simulation import run_simulation
     except ImportError as e:
         print("Flower not available. Install with: pip install 'flwr[simulation]'")
         print("Partitions are ready. From federated dir run: flwr run .")

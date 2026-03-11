@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Optional
 
 from iridium_schemas.earth_observation import (
     EOScene,
@@ -20,15 +19,15 @@ class Sentinel2ProviderProtocol:
     def search(
         self,
         bbox: tuple[float, float, float, float],
-        date_start: Optional[datetime] = None,
-        date_end: Optional[datetime] = None,
-        cloud_cover_max: Optional[float] = None,
+        date_start: datetime | None = None,
+        date_end: datetime | None = None,
+        cloud_cover_max: float | None = None,
         limit: int = 20,
     ) -> EOSceneSearchResult:
         """Search for Sentinel-2 scenes in the given bbox and date range."""
         raise NotImplementedError
 
-    def get_scene(self, scene_id: str) -> Optional[EOScene]:
+    def get_scene(self, scene_id: str) -> EOScene | None:
         """Fetch a single scene by id. Returns None if not found."""
         raise NotImplementedError
 

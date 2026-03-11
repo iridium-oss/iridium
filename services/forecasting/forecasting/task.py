@@ -8,9 +8,8 @@ downgrade the model path explicitly.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
-from typing import Optional
 
 
 class ForecastTarget(str, Enum):
@@ -39,11 +38,11 @@ class ForecastingTaskSpec:
     granularity: ForecastGranularity = ForecastGranularity.EDGE_LEVEL
     input_window_steps: int = 12
     input_window_minutes: int = 180
-    training_cadence_minutes: Optional[int] = 15
-    inference_cadence_minutes: Optional[int] = 15
+    training_cadence_minutes: int | None = 15
+    inference_cadence_minutes: int | None = 15
     min_coverage_ratio: float = 0.5
     feature_schema_version: str = "v1"
-    graph_version: Optional[str] = None
+    graph_version: str | None = None
 
     def __post_init__(self) -> None:
         if self.horizon_minutes <= 0 or self.input_window_minutes <= 0:

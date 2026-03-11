@@ -9,7 +9,6 @@ Feature dimension and output dimension are fixed per run; no graph structure in 
 from __future__ import annotations
 
 import numpy as np
-from typing import List, Tuple
 
 FEATURE_VERSION = "v1"
 MODEL_VERSION = "linear_v1"
@@ -19,7 +18,7 @@ def create_model(
     input_dim: int = 8,
     output_dim: int = 1,
     seed: int | None = 42,
-) -> Tuple["LinearModel", List[np.ndarray]]:
+) -> tuple[LinearModel, list[np.ndarray]]:
     """Create model and initial parameters. Deterministic if seed is set."""
     if seed is not None:
         np.random.seed(seed)
@@ -37,10 +36,10 @@ class LinearModel:
         self.w = np.random.randn(input_dim, output_dim) * 0.01
         self.b = np.zeros((output_dim,))
 
-    def get_parameters(self) -> List[np.ndarray]:
+    def get_parameters(self) -> list[np.ndarray]:
         return [self.w.copy(), self.b.copy()]
 
-    def set_parameters(self, parameters: List[np.ndarray]) -> None:
+    def set_parameters(self, parameters: list[np.ndarray]) -> None:
         if len(parameters) != 2:
             raise ValueError("Expected [W, b]")
         self.w = parameters[0].copy()
@@ -52,7 +51,7 @@ class LinearModel:
         y: np.ndarray,
         lr: float = 0.01,
         batch_size: int = 32,
-    ) -> Tuple[float, int]:
+    ) -> tuple[float, int]:
         """One epoch of MSE gradient descent. Returns (loss, num_samples)."""
         n = x.shape[0]
         if n == 0:
@@ -64,7 +63,7 @@ class LinearModel:
             y_b = y[start:end]
             pred = x_b @ self.w + self.b
             err = pred - y_b
-            loss = float(np.mean(err ** 2))
+            loss = float(np.mean(err**2))
             total_loss += loss * (end - start)
             grad_w = x_b.T @ err / (end - start)
             grad_b = np.mean(err, axis=0)
@@ -72,7 +71,7 @@ class LinearModel:
             self.b -= lr * grad_b
         return total_loss / n, n
 
-    def evaluate(self, x: np.ndarray, y: np.ndarray) -> Tuple[float, float]:
+    def evaluate(self, x: np.ndarray, y: np.ndarray) -> tuple[float, float]:
         """MSE and MAE."""
         n = x.shape[0]
         if n == 0:

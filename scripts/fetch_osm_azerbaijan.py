@@ -5,9 +5,8 @@ Records source timestamp and checksum. Raw PBF is not committed to git.
 
 import hashlib
 import json
-import os
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 # Geofabrik Europe Azerbaijan PBF (check URL for current)
@@ -23,6 +22,7 @@ def main() -> None:
 
     try:
         import urllib.request
+
         req = urllib.request.Request(GEOFABRIK_AZERBAIJAN)
         with urllib.request.urlopen(req, timeout=300) as resp:
             data = resp.read()
@@ -32,7 +32,7 @@ def main() -> None:
 
     pbf_path.write_bytes(data)
     checksum = hashlib.sha256(data).hexdigest()
-    fetched_at = datetime.now(timezone.utc).isoformat()
+    fetched_at = datetime.now(UTC).isoformat()
 
     manifest = {
         "source_name": "Geofabrik Azerbaijan",

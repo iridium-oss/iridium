@@ -3,23 +3,22 @@ Rule-based anomaly detector. Detects congestion spikes, closure flags, demand su
 Future: hybrid statistical or ML-based detection. No synthetic data; uses twin state only.
 """
 
-from datetime import datetime, timedelta, timezone
-from typing import Optional
+from datetime import UTC, datetime, timedelta
 
-from iridium_schemas.anomaly import AnomalyEvent
 from digital_twin.state_assembler import get_assembled_snapshot
+from iridium_schemas.anomaly import AnomalyEvent
 
 # Cooldown: do not re-emit same anomaly_id within this many seconds (suppression).
 ANOMALY_COOLDOWN_SECONDS = 3600
 
 
 def get_anomalies(
-    segment_ids: Optional[list[str]] = None,
-    since: Optional[datetime] = None,
+    segment_ids: list[str] | None = None,
+    since: datetime | None = None,
 ) -> list[AnomalyEvent]:
     """Return active anomalies. Baseline: rule-based on twin state (incident flags, high occupancy)."""
     snapshot = get_assembled_snapshot()
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     since = since or (now - timedelta(hours=24))
     edges = snapshot.edges or []
     out: list[AnomalyEvent] = []

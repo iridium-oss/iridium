@@ -6,7 +6,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional
 
 import numpy as np
 
@@ -40,7 +39,7 @@ def _rolling_std(x: np.ndarray, w: int) -> np.ndarray:
 
 def build_features(
     target_matrix: np.ndarray,
-    timestamps: Optional[list[datetime]] = None,
+    timestamps: list[datetime] | None = None,
     schema_version: str = "v1",
 ) -> tuple[np.ndarray, FeatureCoverage]:
     """
@@ -70,6 +69,10 @@ def build_features(
                 out[t, n, 6] = np.cos(2 * np.pi * h / 24.0)
                 out[t, n, 7] = np.sin(2 * np.pi * d / 7.0)
                 out[t, n, 8] = np.cos(2 * np.pi * d / 7.0)
-    missing_per = {name: float(np.isnan(out[..., i]).mean()) for i, name in enumerate(FEATURE_NAMES)}
+    missing_per = {
+        name: float(np.isnan(out[..., i]).mean()) for i, name in enumerate(FEATURE_NAMES)
+    }
     ratio = 1.0 - float(np.isnan(out).mean())
-    return out, FeatureCoverage(ratio=ratio, missing_per_feature=missing_per, schema_version=schema_version)
+    return out, FeatureCoverage(
+        ratio=ratio, missing_per_feature=missing_per, schema_version=schema_version
+    )

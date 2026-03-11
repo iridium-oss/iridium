@@ -6,13 +6,9 @@ All use standard band math; no thermal (Sentinel-2 does not provide thermal).
 
 from __future__ import annotations
 
-from datetime import datetime
-from typing import Optional
-
 from iridium_schemas.earth_observation import (
     EOIndexLayer,
     EOSceneMetadata,
-    EOSourceStatus,
 )
 
 MISUSE_WARNING = (
@@ -33,10 +29,10 @@ NDBI_FORMULA = (
 
 def get_index_descriptor(
     layer_id: str,
-    scene_id: Optional[str],
+    scene_id: str | None,
     metadata: EOSceneMetadata,
-    min_val: Optional[float] = None,
-    max_val: Optional[float] = None,
+    min_val: float | None = None,
+    max_val: float | None = None,
 ) -> EOIndexLayer:
     """Build EOIndexLayer for a known index id (ndvi, ndwi, ndbi)."""
     if layer_id == "ndvi":
@@ -90,7 +86,7 @@ def get_index_descriptor(
     )
 
 
-def true_color_descriptor(scene_id: Optional[str], metadata: EOSceneMetadata) -> dict:
+def true_color_descriptor(scene_id: str | None, metadata: EOSceneMetadata) -> dict:
     """Descriptor for true-color composite (B04, B03, B02)."""
     return {
         "layer_id": "true-color",

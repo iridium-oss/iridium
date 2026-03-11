@@ -4,15 +4,15 @@ Uses digital twin graph; origin/destination snapped to nearest nodes.
 Objective: minimize weighted sum of time, cost, and carbon; weights depend on optimize mode.
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
+from digital_twin.state_assembler import get_assembled_snapshot
 from iridium_schemas.routing import (
+    RouteAlternative,
     RouteRequest,
     RouteResponse,
-    RouteAlternative,
     RouteSegment,
 )
-from digital_twin.state_assembler import get_assembled_snapshot
 
 
 def _weight(optimize: str, duration_min: float, cost: float, carbon_kg: float) -> float:
@@ -28,7 +28,11 @@ def plan_routes(req: RouteRequest) -> RouteResponse:
     snapshot = get_assembled_snapshot()
     nodes = snapshot.nodes or []
     edges = snapshot.edges or []
-    data_status = snapshot.data_status if snapshot.data_status else ("live" if (nodes and edges) else "unavailable")
+    data_status = (
+        snapshot.data_status
+        if snapshot.data_status
+        else ("live" if (nodes and edges) else "unavailable")
+    )
     if not nodes or not edges:
         return RouteResponse(
             alternatives=[],
@@ -38,25 +42,33 @@ def plan_routes(req: RouteRequest) -> RouteResponse:
             data_status=data_status,
             fallback_used=False,
         )
+
     # Snap origin/dest to nearest nodes (by lat/lon distance)
     def dist(n: object, lat: float, lon: float) -> float:
         if not hasattr(n, "lat") or n.lat is None or n.lon is None:
             return 1e9
         return (n.lat - lat) ** 2 + (n.lon - lon) ** 2
+
     by_dist_orig = sorted(nodes, key=lambda n: dist(n, req.origin_lat, req.origin_lon))
     by_dist_dest = sorted(nodes, key=lambda n: dist(n, req.destination_lat, req.destination_lon))
     start_id = by_dist_orig[0].node_id if by_dist_orig else "n1"
     end_id = by_dist_dest[0].node_id if by_dist_dest else "n5"
     # Build simple path: filter edges by allowed modes, then path search
-    allowed = set(req.modes) if req.modes else {"walking", "bus", "metro", "minibus", "cycling", "road"}
+    allowed = (
+        set(req.modes) if req.modes else {"walking", "bus", "metro", "minibus", "cycling", "road"}
+    )
     edges = [e for e in edges if e.mode in allowed]
     # Shortest path by travel_time_min (simplified: first path found)
     from collections import defaultdict
+
     adj: dict[str, list[tuple[str, float, float, float, str]]] = defaultdict(list)
     for e in edges:
-        adj[e.from_node].append((e.to_node, e.travel_time_min or 5.0, e.cost or 0, e.carbon_kg or 0, e.mode))
+        adj[e.from_node].append(
+            (e.to_node, e.travel_time_min or 5.0, e.cost or 0, e.carbon_kg or 0, e.mode)
+        )
     best_weight = 1e9
     best_path: list[tuple[str, float, float, float, str]] = []
+
     def dfs(node: str, path: list[tuple[str, float, float, float, str]], visited: set[str]) -> None:
         nonlocal best_weight, best_path
         if node == end_id:
@@ -76,6 +88,7 @@ def plan_routes(req: RouteRequest) -> RouteResponse:
             dfs(to_node, path, visited)
             path.pop()
             visited.discard(to_node)
+
     dfs(start_id, [], {start_id})
     if not best_path:
         # No path found: return explicit fallback with metadata so client knows it is degraded
@@ -119,8 +132,12 @@ def plan_routes(req: RouteRequest) -> RouteResponse:
     )
     return RouteResponse(
         alternatives=[alt],
-        requested_at=datetime.now(timezone.utc),
-        note="Baseline optimizer; full journey planner planned." if not fallback_used else "No path in graph; fallback estimate returned.",
+        requested_at=datetime.now(UTC),
+        note=(
+            "Baseline optimizer; full journey planner planned."
+            if not fallback_used
+            else "No path in graph; fallback estimate returned."
+        ),
         model_type="deterministic_baseline",
         model_maturity="production_baseline",
         data_status=data_status,

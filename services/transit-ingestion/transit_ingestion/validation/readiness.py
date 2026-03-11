@@ -27,7 +27,9 @@ def compute_readiness_report(snapshot: dict) -> TransitReadinessReport:
         missing.append("Exact stop_times/trips not available; timetable routing not supported.")
     stops_without_coords = sum(1 for s in stops if getattr(s, "lat", None) is None)
     if stops_without_coords:
-        missing.append(f"{stops_without_coords} stops lack coordinates; OSM resolution or manual input required.")
+        missing.append(
+            f"{stops_without_coords} stops lack coordinates; OSM resolution or manual input required."
+        )
     missing.append("GTFS Realtime (trip updates, vehicle positions) not available.")
 
     capabilities = {

@@ -7,18 +7,16 @@ This module does not fabricate weather data. If the provider is unavailable, dat
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
-from typing import Optional
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Query
-from pydantic import BaseModel, Field
-
 from iridium_schemas.events import WeatherSnapshot
 from iridium_schemas.provenance import (
     DATA_STATUS_LIVE,
     DATA_STATUS_UNAVAILABLE,
     SourceProvenance,
 )
+from pydantic import BaseModel, Field
 
 router = APIRouter()
 
@@ -32,10 +30,10 @@ class WeatherCurrentResponse(BaseModel):
 
 class WeatherHistoryResponse(BaseModel):
     data_status: str
-    note: Optional[str] = None
-    region_id: Optional[str] = None
-    start_utc: Optional[datetime] = None
-    end_utc: Optional[datetime] = None
+    note: str | None = None
+    region_id: str | None = None
+    start_utc: datetime | None = None
+    end_utc: datetime | None = None
     observations: list[WeatherSnapshot] = Field(default_factory=list)
     source_provenance: SourceProvenance
 
@@ -44,7 +42,7 @@ class WeatherStatusResponse(BaseModel):
     provider_id: str
     source_status: str
     data_status: str
-    note: Optional[str] = None
+    note: str | None = None
     checked_at: datetime
 
 
@@ -61,7 +59,7 @@ def get_current_weather() -> WeatherCurrentResponse:
     prov = result.to_provenance()
     return WeatherCurrentResponse(
         data_status=result.status,
-        fetched_at=result.fetched_at or datetime.now(timezone.utc),
+        fetched_at=result.fetched_at or datetime.now(UTC),
         snapshots=result.snapshots,
         source_provenance=prov,
     )
@@ -77,11 +75,11 @@ def get_current_weather() -> WeatherCurrentResponse:
     ),
 )
 def get_weather_history(
-    region_id: Optional[str] = Query(None, description="City or region identifier (baku, quba)"),
-    start_utc: Optional[datetime] = Query(None, description="Start timestamp (UTC)"),
-    end_utc: Optional[datetime] = Query(None, description="End timestamp (UTC)"),
+    region_id: str | None = Query(None, description="City or region identifier (baku, quba)"),
+    start_utc: datetime | None = Query(None, description="Start timestamp (UTC)"),
+    end_utc: datetime | None = Query(None, description="End timestamp (UTC)"),
 ) -> WeatherHistoryResponse:
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     return WeatherHistoryResponse(
         data_status=DATA_STATUS_UNAVAILABLE,
         note="Weather history storage is not configured in this deployment",
@@ -108,13 +106,14 @@ def get_weather_history(
 def get_weather_status() -> WeatherStatusResponse:
     from weather_ingestion.open_meteo import fetch_weather
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     result = fetch_weather(timeout_seconds=6.0)
     return WeatherStatusResponse(
         provider_id="open_meteo",
         source_status="public_api",
-        data_status=DATA_STATUS_LIVE if result.status == DATA_STATUS_LIVE else DATA_STATUS_UNAVAILABLE,
+        data_status=(
+            DATA_STATUS_LIVE if result.status == DATA_STATUS_LIVE else DATA_STATUS_UNAVAILABLE
+        ),
         note=result.note,
         checked_at=now,
     )
-

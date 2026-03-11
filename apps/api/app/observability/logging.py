@@ -6,10 +6,8 @@ from __future__ import annotations
 
 import logging
 import sys
-from typing import Optional
 
 import structlog
-
 from app.observability.redaction import redact_event_dict
 
 
@@ -42,6 +40,5 @@ def configure_logging(log_level: str = "INFO") -> None:
     )
 
 
-def get_logger(name: Optional[str] = None):
+def get_logger(name: str | None = None):
     return structlog.get_logger(name)
-

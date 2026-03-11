@@ -4,19 +4,19 @@ Uses actual fields: route number, firstPoint, lastPoint, tariff, durationMinuts,
 Deterministic IDs. source_family=public_api, source_status=public_undocumented.
 """
 
-from datetime import datetime, timezone
-from typing import Any, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 from iridium_schemas.transit import (
-    TransitAgency,
-    TransitRoute,
-    TransitRouteVariant,
-    TransitStop,
-    TransitStopSequenceEntry,
-    TransitShapePoint,
-    TransitFarePolicy,
     SourceFamily,
     SourceStatus,
+    TransitAgency,
+    TransitFarePolicy,
+    TransitRoute,
+    TransitRouteVariant,
+    TransitShapePoint,
+    TransitStop,
+    TransitStopSequenceEntry,
 )
 
 PROVIDER_ID = "bakubus_ayna"
@@ -25,7 +25,7 @@ SOURCE_STATUS = SourceStatus.PUBLIC_UNDOCUMENTED.value
 
 
 def _ts() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 def _safe_str(v: Any) -> str:
@@ -34,7 +34,7 @@ def _safe_str(v: Any) -> str:
     return str(v).strip()
 
 
-def _safe_float(v: Any) -> Optional[float]:
+def _safe_float(v: Any) -> float | None:
     if v is None:
         return None
     try:
@@ -45,15 +45,15 @@ def _safe_float(v: Any) -> Optional[float]:
 
 def normalize_bakubus_route(
     raw: Any,
-    fetched_at: Optional[datetime] = None,
+    fetched_at: datetime | None = None,
 ) -> tuple[
-    Optional[TransitAgency],
-    Optional[TransitRoute],
-    Optional[TransitRouteVariant],
+    TransitAgency | None,
+    TransitRoute | None,
+    TransitRouteVariant | None,
     list[TransitStop],
     list[TransitStopSequenceEntry],
     list[TransitShapePoint],
-    Optional[TransitFarePolicy],
+    TransitFarePolicy | None,
 ]:
     """
     Normalize a single getBusById response to canonical entities.
@@ -169,7 +169,7 @@ def normalize_bakubus_route(
                     )
                 )
 
-    fare_policy: Optional[TransitFarePolicy] = None
+    fare_policy: TransitFarePolicy | None = None
     tariff = raw.get("tariff")
     if tariff is not None:
         price = _safe_float(tariff) if isinstance(tariff, (int, float, str)) else None
@@ -189,7 +189,7 @@ def normalize_bakubus_route(
     return (agency, route, variant, stops, stop_sequence, shape_points, fare_policy)
 
 
-def normalize_bus_list(raw_list: Any, fetched_at: Optional[datetime] = None) -> list[dict]:
+def normalize_bus_list(raw_list: Any, fetched_at: datetime | None = None) -> list[dict]:
     """
     Normalize getBusList response to a list of {id, number?, ...} for downstream getBusById.
     Does not invent IDs; uses only present fields.
@@ -200,11 +200,13 @@ def normalize_bus_list(raw_list: Any, fetched_at: Optional[datetime] = None) -> 
         out = []
         for item in raw_list:
             if isinstance(item, dict):
-                out.append({
-                    "id": item.get("id") or item.get("busId") or item.get("number"),
-                    "number": item.get("number"),
-                    "raw": item,
-                })
+                out.append(
+                    {
+                        "id": item.get("id") or item.get("busId") or item.get("number"),
+                        "number": item.get("number"),
+                        "raw": item,
+                    }
+                )
             elif item is not None:
                 out.append({"id": str(item), "number": None, "raw": item})
         return out

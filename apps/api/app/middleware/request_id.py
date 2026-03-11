@@ -6,11 +6,10 @@ from __future__ import annotations
 
 import uuid
 
+from app.observability.logging import get_logger
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import Response
-
-from app.observability.logging import get_logger
 
 
 class RequestIdMiddleware(BaseHTTPMiddleware):
@@ -44,4 +43,3 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
             status_code=response.status_code,
         )
         return response
-

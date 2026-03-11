@@ -5,9 +5,15 @@ Feature schema versioning and definitions. Single source of truth for training a
 FEATURE_SCHEMA_VERSION = "v1"
 
 FEATURE_NAMES = [
-    "target_lag_1", "target_lag_2", "target_lag_3",
-    "rolling_mean_3", "rolling_std_3",
-    "hour_sin", "hour_cos", "dow_sin", "dow_cos",
+    "target_lag_1",
+    "target_lag_2",
+    "target_lag_3",
+    "rolling_mean_3",
+    "rolling_std_3",
+    "hour_sin",
+    "hour_cos",
+    "dow_sin",
+    "dow_cos",
 ]
 
 

@@ -3,7 +3,7 @@ Transit API: providers, routes, stops, network, readiness, GTFS status.
 BakuBus (AYNA) and Baku Metro (official) integrated. No fabricated data.
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Query
 
@@ -12,21 +12,27 @@ router = APIRouter()
 
 def _get_registry():
     from transit_ingestion.registry import get_provider_registry
+
     return get_provider_registry()
 
 
 def _build_snapshot(bakubus_limit: int = 0):
     """Build unified snapshot. Metro always; BakuBus if bakubus_limit > 0 (fetch from AYNA)."""
-    from transit_ingestion.providers.bakumetro_official import build_static_metro_network
-    from transit_ingestion.providers.bakubus_ayna import fetch_bus_list, fetch_bus_by_id, normalize_bakubus_route
     from transit_ingestion.normalization.merge import build_unified_transit_snapshot
+    from transit_ingestion.providers.bakubus_ayna import (
+        fetch_bus_by_id,
+        fetch_bus_list,
+        normalize_bakubus_route,
+    )
+    from transit_ingestion.providers.bakumetro_official import build_static_metro_network
 
-    metro = build_static_metro_network(datetime.now(timezone.utc))
+    metro = build_static_metro_network(datetime.now(UTC))
     bakubus_routes = []
     if bakubus_limit > 0:
         list_result = fetch_bus_list(timeout=15.0, cache_raw=True)
         if list_result.error is None and list_result.data:
             from transit_ingestion.providers.bakubus_ayna.normalize import normalize_bus_list
+
             ids = normalize_bus_list(list_result.data, list_result.fetched_at)
             for item in ids[:bakubus_limit]:
                 bid = item.get("id")
@@ -37,11 +43,17 @@ def _build_snapshot(bakubus_limit: int = 0):
                     ag, r, v, stops, seq, shapes, fp = normalize_bakubus_route(
                         detail.data, detail.fetched_at
                     )
-                    bakubus_routes.append({
-                        "agency": ag, "route": r, "variant": v,
-                        "stops": stops, "stop_sequence": seq, "shape_points": shapes,
-                        "fare_policy": fp,
-                    })
+                    bakubus_routes.append(
+                        {
+                            "agency": ag,
+                            "route": r,
+                            "variant": v,
+                            "stops": stops,
+                            "stop_sequence": seq,
+                            "shape_points": shapes,
+                            "fare_policy": fp,
+                        }
+                    )
     return build_unified_transit_snapshot(
         bakubus_routes=bakubus_routes if bakubus_routes else None,
         bakumetro_network=metro,
@@ -75,7 +87,11 @@ def get_providers():
     summary="Transit routes",
     description="Unified routes from Baku Metro and BakuBus (AYNA). Optional bakubus_limit to fetch up to N bus routes from AYNA.",
 )
-def get_routes(bakubus_limit: int = Query(0, ge=0, le=50, description="Max bus routes to fetch from AYNA (0 = metro only)")):
+def get_routes(
+    bakubus_limit: int = Query(
+        0, ge=0, le=50, description="Max bus routes to fetch from AYNA (0 = metro only)"
+    )
+):
     snapshot = _build_snapshot(bakubus_limit=bakubus_limit)
     routes = snapshot.get("routes") or []
     return {
@@ -146,8 +162,16 @@ def get_partner_routes(
     to_lat: float = Query(..., ge=-90, le=90, description="Destination latitude"),
     to_lon: float = Query(..., ge=-180, le=180, description="Destination longitude"),
 ):
-    from transit_ingestion.providers.twogis_public_transport import get_twogis_status, fetch_route_alternatives as twogis_fetch
-    from transit_ingestion.providers.moovit_partner import get_moovit_config, fetch_moovit_route_alternatives
+    from transit_ingestion.providers.moovit_partner import (
+        fetch_moovit_route_alternatives,
+        get_moovit_config,
+    )
+    from transit_ingestion.providers.twogis_public_transport import (
+        fetch_route_alternatives as twogis_fetch,
+    )
+    from transit_ingestion.providers.twogis_public_transport import (
+        get_twogis_status,
+    )
 
     alternatives = []
     providers_used = []
@@ -197,8 +221,8 @@ def get_partner_routes(
     description="Static stop discovery, route visualization, transfer graph, timetable routing. Honest about missing stop_times.",
 )
 def get_readiness():
-    from transit_ingestion.providers.bakumetro_official import build_static_metro_network
     from transit_ingestion.normalization.merge import build_unified_transit_snapshot
+    from transit_ingestion.providers.bakumetro_official import build_static_metro_network
     from transit_ingestion.validation.readiness import compute_readiness_report
 
     snapshot = build_unified_transit_snapshot(bakumetro_network=build_static_metro_network())
@@ -221,6 +245,7 @@ def get_readiness():
 def get_gtfs_status():
     import os
     from pathlib import Path
+
     from transit_ingestion.gtfs_builder.build import GTFS_BUILD_LABEL
 
     out_dir = os.environ.get("IRIDIUM_GTFS_OUTPUT_DIR", "gtfs_output")
@@ -260,16 +285,21 @@ def _alert_to_dict(a):
     description="Official and observed alerts merged by source priority. Truthful source metadata.",
 )
 def get_alerts():
+    from transit_ingestion.provenance.priority import (
+        get_alert_priority_order,
+        merge_alerts_by_priority,
+    )
     from transit_ingestion.providers.bakubus_official_alerts import fetch_bakubus_alerts
     from transit_ingestion.providers.bakumetro_official_alerts import fetch_metro_alerts
-    from transit_ingestion.provenance.priority import merge_alerts_by_priority, get_alert_priority_order
 
     bus_alerts = fetch_bakubus_alerts(timeout=15.0)
     metro_alerts = fetch_metro_alerts(timeout=15.0)
-    merged = merge_alerts_by_priority([
-        ("bakubus_official_alerts", bus_alerts),
-        ("bakumetro_official_alerts", metro_alerts),
-    ])
+    merged = merge_alerts_by_priority(
+        [
+            ("bakubus_official_alerts", bus_alerts),
+            ("bakumetro_official_alerts", metro_alerts),
+        ]
+    )
     return {
         "alerts": [_alert_to_dict(a) for a in merged],
         "priority_order": get_alert_priority_order(),
@@ -282,7 +312,9 @@ def get_alerts():
     summary="Predicted arrivals",
     description="Stop-level predicted arrivals where available. Public-web observed or licensed; never fake.",
 )
-def get_predicted_arrivals(stop_url: str = Query(None, description="Optional Yandex stop page URL")):
+def get_predicted_arrivals(
+    stop_url: str = Query(None, description="Optional Yandex stop page URL")
+):
     from transit_ingestion.providers.yandex_transport_observed import (
         fetch_yandex_stop_page,
         normalize_yandex_stop_observations,
@@ -323,13 +355,13 @@ def get_predicted_arrivals(stop_url: str = Query(None, description="Optional Yan
     description="Route and stop observations from public-web sources. Truthful source_status.",
 )
 def get_realtime_observations():
-    from transit_ingestion.providers.yandex_transport_observed import (
-        fetch_yandex_stop_page,
-        normalize_yandex_stop_observations,
-    )
     from transit_ingestion.providers.yandex_metro_operational import (
         fetch_yandex_metro_page,
         normalize_yandex_metro_operational,
+    )
+    from transit_ingestion.providers.yandex_transport_observed import (
+        fetch_yandex_stop_page,
+        normalize_yandex_stop_observations,
     )
 
     page = fetch_yandex_stop_page(timeout=8.0)
@@ -416,6 +448,7 @@ def get_provider_priority():
         get_predicted_arrival_priority_order,
         get_route_planning_priority_order,
     )
+
     return {
         "alerts": get_alert_priority_order(),
         "predicted_arrivals": get_predicted_arrival_priority_order(),
@@ -429,19 +462,49 @@ def get_provider_priority():
     description="Truthful status: official, public-web observed, licensed, unavailable.",
 )
 def get_source_status():
-    from transit_ingestion.providers.yandex_traffic_context import get_traffic_context_status
-    from transit_ingestion.providers.twogis_public_transport import get_twogis_status
     from transit_ingestion.providers.moovit_partner import get_moovit_status
+    from transit_ingestion.providers.twogis_public_transport import get_twogis_status
+    from transit_ingestion.providers.yandex_traffic_context import get_traffic_context_status
 
     return {
         "providers": [
-            {"provider_id": "bakubus_official_alerts", "source_family": "official_website", "source_status": "official_alerts_only"},
-            {"provider_id": "bakumetro_official_alerts", "source_family": "official_website", "source_status": "official_alerts_only"},
-            {"provider_id": "yandex_transport_observed", "source_family": "public_web", "source_status": "public_web_observed"},
-            {"provider_id": "yandex_metro_operational", "source_family": "public_web", "source_status": "public_web_operational_context"},
-            {"provider_id": "yandex_traffic_context", "source_family": "public_web_or_licensed", "source_status": get_traffic_context_status()},
-            {"provider_id": "twogis_public_transport", "source_family": "licensed_api", "source_status": "licensed_partner", "configured": get_twogis_status() == "configured"},
-            {"provider_id": "moovit_partner", "source_family": "licensed_api", "source_status": "partner_required", "configured": get_moovit_status() == "available"},
+            {
+                "provider_id": "bakubus_official_alerts",
+                "source_family": "official_website",
+                "source_status": "official_alerts_only",
+            },
+            {
+                "provider_id": "bakumetro_official_alerts",
+                "source_family": "official_website",
+                "source_status": "official_alerts_only",
+            },
+            {
+                "provider_id": "yandex_transport_observed",
+                "source_family": "public_web",
+                "source_status": "public_web_observed",
+            },
+            {
+                "provider_id": "yandex_metro_operational",
+                "source_family": "public_web",
+                "source_status": "public_web_operational_context",
+            },
+            {
+                "provider_id": "yandex_traffic_context",
+                "source_family": "public_web_or_licensed",
+                "source_status": get_traffic_context_status(),
+            },
+            {
+                "provider_id": "twogis_public_transport",
+                "source_family": "licensed_api",
+                "source_status": "licensed_partner",
+                "configured": get_twogis_status() == "configured",
+            },
+            {
+                "provider_id": "moovit_partner",
+                "source_family": "licensed_api",
+                "source_status": "partner_required",
+                "configured": get_moovit_status() == "available",
+            },
         ],
         "note": "Official and public-web sources are not operator GTFS Realtime.",
     }

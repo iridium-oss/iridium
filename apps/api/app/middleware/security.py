@@ -49,4 +49,3 @@ class RequestSizeLimitMiddleware(BaseHTTPMiddleware):
             if size > self._max_body_bytes:
                 return Response(status_code=413)
         return await call_next(request)
-

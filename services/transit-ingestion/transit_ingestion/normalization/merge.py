@@ -3,27 +3,25 @@ Merge BakuBus and Baku Metro normalized data into a single transit snapshot.
 Deterministic ordering; no duplication of agency/route by id.
 """
 
-from datetime import datetime, timezone
-from typing import Optional
+from datetime import UTC, datetime
 
 from iridium_schemas.transit import (
     TransitAgency,
+    TransitFarePolicy,
+    TransitInterchange,
     TransitRoute,
     TransitRouteVariant,
+    TransitServiceWindow,
+    TransitShapePoint,
     TransitStop,
     TransitStopSequenceEntry,
-    TransitShapePoint,
-    TransitInterchange,
-    TransitFarePolicy,
-    TransitServiceWindow,
-    TransitSnapshotMetadata,
 )
 
 
 def build_unified_transit_snapshot(
-    bakubus_routes: Optional[list[dict]] = None,
-    bakumetro_network: Optional[dict] = None,
-    fetched_at: Optional[datetime] = None,
+    bakubus_routes: list[dict] | None = None,
+    bakumetro_network: dict | None = None,
+    fetched_at: datetime | None = None,
 ) -> dict:
     """
     Build one snapshot with agencies, routes, variants, stops, stop_sequences, shapes,
@@ -33,7 +31,7 @@ def build_unified_transit_snapshot(
         build_static_metro_network,
     )
 
-    t = fetched_at or datetime.now(timezone.utc)
+    t = fetched_at or datetime.now(UTC)
     agencies: list[TransitAgency] = []
     routes: list[TransitRoute] = []
     variants: list[TransitRouteVariant] = []

@@ -8,7 +8,10 @@ if str(root) not in sys.path:
     sys.path.insert(0, str(root))
 
 import pytest
-from forecasting.task import ForecastingTaskSpec, ForecastTarget, ForecastGranularity, DEFAULT_TASK_SPEC
+from forecasting.task import (
+    DEFAULT_TASK_SPEC,
+    ForecastingTaskSpec,
+)
 
 
 def test_default_task_spec():

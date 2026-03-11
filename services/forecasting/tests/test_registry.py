@@ -7,7 +7,7 @@ root = Path(__file__).resolve().parents[1]
 if str(root) not in sys.path:
     sys.path.insert(0, str(root))
 
-from forecasting.registry import load_registry_metadata, validate_artifact
+from forecasting.registry import validate_artifact
 
 
 def test_validate_no_metadata():

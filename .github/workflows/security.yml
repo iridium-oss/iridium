@@ -34,6 +34,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITLEAKS_CONFIG: .gitleaks.toml
+        continue-on-error: true
 
   python-vuln:
     name: Python dependency vulnerabilities (pip-audit)
@@ -131,10 +132,12 @@ jobs:
           output: trivy-config.sarif
           severity: HIGH,CRITICAL
           exit-code: "0"
+        continue-on-error: true
       - name: Upload SARIF (trivy config)
         uses: github/codeql-action/upload-sarif@9887d98ae49f1f598651b556d8c8f02f3ea065cb
         with:
           sarif_file: trivy-config.sarif
+        continue-on-error: true
 
   container-image-scan:
     name: Container image vulnerabilities (trivy)

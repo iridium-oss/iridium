@@ -3,8 +3,7 @@ Fetch Yandex Baku public transport / stop pages. Public web only; not official o
 """
 
 from dataclasses import dataclass
-from datetime import datetime, timezone
-from typing import Optional
+from datetime import UTC, datetime
 
 import httpx
 
@@ -21,11 +20,11 @@ class FetchedYandexPage:
     html: str
     fetched_at: datetime
     status_code: int
-    error: Optional[str] = None
+    error: str | None = None
 
 
 def fetch_yandex_stop_page(
-    stop_url: Optional[str] = None,
+    stop_url: str | None = None,
     timeout: float = DEFAULT_TIMEOUT,
 ) -> FetchedYandexPage:
     """
@@ -33,7 +32,7 @@ def fetch_yandex_stop_page(
     Page content may be JS-rendered; parser may get no structured data.
     """
     url = stop_url or YANDEX_BAKU_TRANSPORT_BASE
-    fetched_at = datetime.now(timezone.utc)
+    fetched_at = datetime.now(UTC)
     try:
         r = httpx.get(
             url,

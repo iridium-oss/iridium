@@ -6,11 +6,11 @@ from iridium_schemas.earth_observation import (
 )
 
 from earth_observation.sentinel2.indices.formulas import (
-    get_index_descriptor,
+    MISUSE_WARNING,
+    NDBI_FORMULA,
     NDVI_FORMULA,
     NDWI_FORMULA,
-    NDBI_FORMULA,
-    MISUSE_WARNING,
+    get_index_descriptor,
 )
 
 

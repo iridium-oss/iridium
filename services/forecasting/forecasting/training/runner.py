@@ -6,15 +6,14 @@ from __future__ import annotations
 
 import json
 import logging
-import os
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import numpy as np
 import torch
 
-from ..models.graph_wavenet import GraphWaveNet
 from ..models.dcrnn import DCRNN
+from ..models.graph_wavenet import GraphWaveNet
 from ..task import ForecastingTaskSpec
 
 logger = logging.getLogger(__name__)
@@ -37,10 +36,10 @@ def run_training(
     data_array: np.ndarray,
     support: np.ndarray,
     entity_order: list[str],
-    task_spec: Optional[ForecastingTaskSpec] = None,
-    config: Optional[dict[str, Any]] = None,
+    task_spec: ForecastingTaskSpec | None = None,
+    config: dict[str, Any] | None = None,
     model_family: str = "graph_wavenet",
-    artifact_dir: Optional[Path] = None,
+    artifact_dir: Path | None = None,
 ) -> dict[str, Any]:
     """
     Train model on real data. Saves checkpoint and metadata. Returns training summary.
@@ -65,10 +64,10 @@ def run_training(
     T, N = data_array.shape
     input_len = task_spec.input_window_steps
     horizon = task_spec.horizon_steps
-    if T < input_len + horizon + 10:
+    if input_len + horizon + 10 > T:
         logger.warning("Insufficient timesteps for training; T=%s", T)
         return {"status": "insufficient_data", "T": T, "required": input_len + horizon + 10}
-    if N != support.shape[0]:
+    if support.shape[0] != N:
         return {"status": "mismatch", "message": "support shape does not match data"}
 
     train_sl, val_sl, test_sl = _temporal_split(T, train_ratio, val_ratio, test_ratio)

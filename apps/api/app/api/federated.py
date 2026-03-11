@@ -23,7 +23,13 @@ FEDERATED_CAPABILITIES = {
     "secure_aggregation": False,
     "differential_privacy": False,
     "secure_aggregation_and_dp": False,
-    "partitioning_schemes": ["by_district", "by_provider", "by_source_family", "by_time_block", "synthetic_institution"],
+    "partitioning_schemes": [
+        "by_district",
+        "by_provider",
+        "by_source_family",
+        "by_time_block",
+        "synthetic_institution",
+    ],
     "strategies": ["FedAvg"],
 }
 
@@ -49,7 +55,10 @@ def get_federated_capabilities() -> dict:
 @router.get("/federated/runs", summary="Federated run list")
 def get_federated_runs() -> dict:
     """Return list of run IDs. No run results stored in API; return empty unless artifact store is wired."""
-    return {"runs": [], "note": "Run metadata is stored in federated artifacts; API does not enumerate runs."}
+    return {
+        "runs": [],
+        "note": "Run metadata is stored in federated artifacts; API does not enumerate runs.",
+    }
 
 
 @router.get("/federated/runs/{run_id}", summary="Federated run detail")
@@ -61,7 +70,10 @@ def get_federated_run(run_id: str) -> dict:
 @router.get("/federated/models", summary="Federated model list")
 def get_federated_models() -> dict:
     """Return list of federated model identifiers. No fake models."""
-    return {"models": [], "note": "Federated model artifacts are stored in services/forecasting/federated/artifacts."}
+    return {
+        "models": [],
+        "note": "Federated model artifacts are stored in services/forecasting/federated/artifacts.",
+    }
 
 
 @router.get("/federated/privacy-status", summary="Federated privacy status")

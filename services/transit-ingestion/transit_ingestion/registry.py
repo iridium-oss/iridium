@@ -3,8 +3,7 @@ Transit provider registry. No GTFS is used until a real feed is provided.
 Status: live, permission_required, unavailable, disabled.
 """
 
-from datetime import datetime, timezone
-from typing import Optional
+from datetime import UTC, datetime
 
 from iridium_schemas.provenance import ProviderRegistryEntry
 
@@ -21,8 +20,8 @@ class ProviderStatus:
         self,
         provider_id: str,
         status: str,
-        feed_url: Optional[str] = None,
-        note: Optional[str] = None,
+        feed_url: str | None = None,
+        note: str | None = None,
     ):
         self.provider_id = provider_id
         self.status = status
@@ -35,7 +34,7 @@ class ProviderStatus:
             name=self.provider_id,
             status=self.status,
             feed_url=self.feed_url,
-            updated_at=datetime.now(timezone.utc),
+            updated_at=datetime.now(UTC),
             note=self.note,
         )
 

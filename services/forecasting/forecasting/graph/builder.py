@@ -8,7 +8,7 @@ support matrices. Reproducible and testable; graph metadata is versioned.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Any
 
 import numpy as np
 
@@ -26,7 +26,7 @@ class ForecastGraphMetadata:
 def build_forecast_graph(
     node_ids: list[str],
     edges: list[tuple[str, str]],
-    edge_ids: Optional[list[str]] = None,
+    edge_ids: list[str] | None = None,
     normalize_adj: bool = True,
 ) -> tuple[np.ndarray, np.ndarray, ForecastGraphMetadata]:
     """
@@ -97,7 +97,11 @@ def edges_from_network_edges(
 def node_ids_from_network(nodes: list[Any], edges: list[Any]) -> list[str]:
     """Deduce unique node IDs from nodes list or from edges. Preserves order."""
     if nodes:
-        return [str(getattr(n, "node_id", n.get("node_id") if isinstance(n, dict) else "")) for n in nodes if getattr(n, "node_id", None) or (isinstance(n, dict) and n.get("node_id"))]
+        return [
+            str(getattr(n, "node_id", n.get("node_id") if isinstance(n, dict) else ""))
+            for n in nodes
+            if getattr(n, "node_id", None) or (isinstance(n, dict) and n.get("node_id"))
+        ]
     seen: set[str] = set()
     out: list[str] = []
     for e in edges or []:

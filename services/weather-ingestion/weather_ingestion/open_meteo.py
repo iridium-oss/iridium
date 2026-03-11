@@ -2,11 +2,10 @@
 Open-Meteo API client. Real data only; no synthetic fallback.
 """
 
-from datetime import datetime, timezone
-from typing import Any, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 import httpx
-
 from iridium_schemas.events import WeatherSnapshot
 from iridium_schemas.provenance import DATA_STATUS_LIVE, DATA_STATUS_UNAVAILABLE, SourceProvenance
 
@@ -24,12 +23,12 @@ class WeatherResult:
         self,
         snapshots: list[WeatherSnapshot],
         status: str,
-        fetched_at: Optional[datetime] = None,
-        note: Optional[str] = None,
+        fetched_at: datetime | None = None,
+        note: str | None = None,
     ):
         self.snapshots = snapshots
         self.status = status
-        self.fetched_at = fetched_at or datetime.now(timezone.utc)
+        self.fetched_at = fetched_at or datetime.now(UTC)
         self.note = note
 
     def to_provenance(self) -> SourceProvenance:
@@ -43,7 +42,7 @@ class WeatherResult:
 
 
 def fetch_weather(
-    locations: Optional[list[dict[str, Any]]] = None,
+    locations: list[dict[str, Any]] | None = None,
     timeout_seconds: float = 10.0,
 ) -> WeatherResult:
     """
@@ -52,7 +51,7 @@ def fetch_weather(
     """
     locations = locations or DEFAULT_LOCATIONS
     snapshots: list[WeatherSnapshot] = []
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     for loc in locations:
         lat = loc.get("lat")

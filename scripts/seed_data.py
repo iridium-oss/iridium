@@ -4,7 +4,6 @@ Uses data/synthetic and optionally creates additional fixtures.
 All data is synthetic; no real personal or operational data.
 """
 
-import json
 import sys
 from pathlib import Path
 
@@ -23,6 +22,7 @@ def run_ingestion() -> None:
     sys.path.insert(0, str(REPO_ROOT))
     sys.path.insert(0, str(REPO_ROOT / "services" / "ingestion"))
     from ingestion.pipeline import run_ingestion as do_ingestion
+
     count, errors = do_ingestion(DATA_SAMPLES, DATA_SYNTHETIC)
     print(f"Ingestion: {count} records processed.")
     if errors:

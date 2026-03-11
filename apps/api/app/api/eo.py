@@ -5,7 +5,7 @@ Not realtime traffic or transit. All responses include source status and acquisi
 
 from __future__ import annotations
 
-from datetime import datetime, timezone, timedelta
+from datetime import datetime
 from typing import Any, Optional
 
 from fastapi import APIRouter, Query
@@ -18,18 +18,18 @@ class EOStatusResponse(BaseModel):
     enabled: bool
     data_status: str
     providers_available: list[str] = Field(default_factory=list)
-    note: Optional[str] = None
+    note: str | None = None
 
 
 class EOProviderInfo(BaseModel):
     provider_id: str
     status: str
-    note: Optional[str] = None
+    note: str | None = None
 
 
 class EOProvidersResponse(BaseModel):
     providers: list[EOProviderInfo] = Field(default_factory=list)
-    note: Optional[str] = None
+    note: str | None = None
 
 
 class EOAreaResponse(BaseModel):
@@ -37,11 +37,11 @@ class EOAreaResponse(BaseModel):
 
 
 class EOSceneSearchQuery(BaseModel):
-    bbox: Optional[list[float]] = None
-    preset: Optional[str] = None
-    date_start: Optional[datetime] = None
-    date_end: Optional[datetime] = None
-    cloud_cover_max: Optional[float] = Field(None, ge=0, le=100)
+    bbox: list[float] | None = None
+    preset: str | None = None
+    date_start: datetime | None = None
+    date_end: datetime | None = None
+    cloud_cover_max: float | None = Field(None, ge=0, le=100)
     limit: int = Field(20, ge=1, le=100)
 
 
@@ -57,28 +57,28 @@ class EOLayerResponse(BaseModel):
     layer_id: str
     name: str
     description: str
-    scene_id: Optional[str] = None
+    scene_id: str | None = None
     source_provider: str
     source_status: str
-    acquired_at: Optional[datetime] = None
-    cloud_cover: Optional[float] = None
-    formula_note: Optional[str] = None
-    misuse_warning: Optional[str] = None
-    legend_units: Optional[str] = None
-    min_value: Optional[float] = None
-    max_value: Optional[float] = None
+    acquired_at: datetime | None = None
+    cloud_cover: float | None = None
+    formula_note: str | None = None
+    misuse_warning: str | None = None
+    legend_units: str | None = None
+    min_value: float | None = None
+    max_value: float | None = None
 
 
 class EOProvenanceResponse(BaseModel):
     layer_id: str
     source_provider: str
     source_status: str
-    acquired_at: Optional[datetime] = None
-    processed_at: Optional[datetime] = None
-    cloud_cover: Optional[float] = None
-    confidence_note: Optional[str] = None
-    validation_note: Optional[str] = None
-    misuse_warning: Optional[str] = None
+    acquired_at: datetime | None = None
+    processed_at: datetime | None = None
+    cloud_cover: float | None = None
+    confidence_note: str | None = None
+    validation_note: str | None = None
+    misuse_warning: str | None = None
 
 
 class EOStatsResponse(BaseModel):
@@ -86,15 +86,16 @@ class EOStatsResponse(BaseModel):
     index_id: str
     bbox: list[float]
     status: str
-    note: Optional[str] = None
-    mean: Optional[float] = None
-    min: Optional[float] = None
-    max: Optional[float] = None
+    note: str | None = None
+    mean: float | None = None
+    min: float | None = None
+    max: float | None = None
 
 
 def _get_search():
     try:
         from earth_observation.sentinel2.search.search import search_scenes
+
         return search_scenes
     except ImportError:
         return None
@@ -103,6 +104,7 @@ def _get_search():
 def _get_area_presets():
     try:
         from earth_observation.sentinel2.manifests.areas import get_area_presets
+
         return get_area_presets
     except ImportError:
         return None
@@ -112,7 +114,7 @@ def _get_providers_status():
     try:
         from earth_observation.sentinel2.providers.copernicus_stac import CopernicusStacProvider
         from earth_observation.sentinel2.providers.earth_search_stac import EarthSearchStacProvider
-        from iridium_schemas.earth_observation import EOSourceStatus
+
         cop = CopernicusStacProvider()
         earth = EarthSearchStacProvider()
         return [
@@ -125,8 +127,9 @@ def _get_providers_status():
 
 def _get_scene(scene_id: str):
     try:
-        from earth_observation.sentinel2.providers.earth_search_stac import EarthSearchStacProvider
         from earth_observation.sentinel2.providers.copernicus_stac import CopernicusStacProvider
+        from earth_observation.sentinel2.providers.earth_search_stac import EarthSearchStacProvider
+
         for prov in [CopernicusStacProvider(), EarthSearchStacProvider()]:
             if prov.status().value != "unavailable":
                 scene = prov.get_scene(scene_id)
@@ -137,9 +140,10 @@ def _get_scene(scene_id: str):
     return None
 
 
-def _build_layer_descriptor(scene_id: str, layer_type: str, index_id: Optional[str] = None):
+def _build_layer_descriptor(scene_id: str, layer_type: str, index_id: str | None = None):
     try:
         from earth_observation.sentinel2.processing.layers import get_overlay_descriptor
+
         scene = _get_scene(scene_id)
         if not scene:
             return None
@@ -151,7 +155,9 @@ def _build_layer_descriptor(scene_id: str, layer_type: str, index_id: Optional[s
 def _get_cached_search(bbox, preset, date_start, date_end, cloud_cover_max, limit):
     try:
         from earth_observation.sentinel2.caching.cache import get_cached_search, set_cached_search
+
         from app.core.settings import get_settings
+
         key = (bbox, preset, date_start, date_end, cloud_cover_max, limit)
         ttl = get_settings().eo.search_cache_ttl_seconds
         cached = get_cached_search(key, ttl=ttl)
@@ -183,6 +189,7 @@ def _get_cached_search(bbox, preset, date_start, date_end, cloud_cover_max, limi
 )
 def get_eo_status() -> EOStatusResponse:
     from app.core.settings import get_settings
+
     settings = get_settings()
     if not settings.eo.enabled:
         return EOStatusResponse(
@@ -207,14 +214,12 @@ def get_eo_status() -> EOStatusResponse:
 )
 def get_eo_providers() -> EOProvidersResponse:
     from app.core.settings import get_settings
+
     if not get_settings().eo.enabled:
         return EOProvidersResponse(note="EO disabled.")
     entries = _get_providers_status()
     return EOProvidersResponse(
-        providers=[
-            EOProviderInfo(provider_id=p[0], status=p[1].value, note=None)
-            for p in entries
-        ],
+        providers=[EOProviderInfo(provider_id=p[0], status=p[1].value, note=None) for p in entries],
     )
 
 
@@ -239,14 +244,15 @@ def get_eo_areas() -> EOAreaResponse:
     description="Search by bbox or preset and optional date range and cloud cover. Returns scene metadata with provenance.",
 )
 def search_eo_scenes(
-    bbox: Optional[str] = Query(None, description="Comma-separated minx,miny,maxx,maxy"),
-    preset: Optional[str] = Query(None, description="Area preset id, e.g. baku"),
-    date_start: Optional[datetime] = Query(None),
-    date_end: Optional[datetime] = Query(None),
-    cloud_cover_max: Optional[float] = Query(None, ge=0, le=100),
+    bbox: str | None = Query(None, description="Comma-separated minx,miny,maxx,maxy"),
+    preset: str | None = Query(None, description="Area preset id, e.g. baku"),
+    date_start: datetime | None = Query(None),
+    date_end: datetime | None = Query(None),
+    cloud_cover_max: float | None = Query(None, ge=0, le=100),
     limit: int = Query(20, ge=1, le=100),
 ) -> dict[str, Any]:
     from app.core.settings import get_settings
+
     if not get_settings().eo.enabled:
         return {
             "scenes": [],
@@ -295,11 +301,12 @@ def search_eo_scenes(
 
 @router.get(
     "/eo/scenes/{scene_id}",
-    response_model=Optional[EOSceneResponse],
+    response_model=EOSceneResponse | None,
     summary="Get single EO scene",
 )
-def get_eo_scene(scene_id: str) -> Optional[dict[str, Any]]:
+def get_eo_scene(scene_id: str) -> dict[str, Any] | None:
     from app.core.settings import get_settings
+
     if not get_settings().eo.enabled:
         return None
     scene = _get_scene(scene_id)
@@ -322,6 +329,7 @@ def get_eo_layer_true_color(
     scene_id: str = Query(..., description="Scene id from search"),
 ) -> dict[str, Any]:
     from app.core.settings import get_settings
+
     if not get_settings().eo.enabled:
         return {"error": "EO disabled", "layer_id": "true-color"}
     desc = _build_layer_descriptor(scene_id, "tile")
@@ -349,6 +357,7 @@ def get_eo_layer_ndvi(
     scene_id: str = Query(..., description="Scene id from search"),
 ) -> dict[str, Any]:
     from app.core.settings import get_settings
+
     if not get_settings().eo.enabled:
         return {"error": "EO disabled", "layer_id": "ndvi"}
     desc = _build_layer_descriptor(scene_id, "index", "ndvi")
@@ -380,6 +389,7 @@ def get_eo_layer_ndwi(
     scene_id: str = Query(..., description="Scene id from search"),
 ) -> dict[str, Any]:
     from app.core.settings import get_settings
+
     if not get_settings().eo.enabled:
         return {"error": "EO disabled", "layer_id": "ndwi"}
     desc = _build_layer_descriptor(scene_id, "index", "ndwi")
@@ -411,6 +421,7 @@ def get_eo_layer_ndbi(
     scene_id: str = Query(..., description="Scene id from search"),
 ) -> dict[str, Any]:
     from app.core.settings import get_settings
+
     if not get_settings().eo.enabled:
         return {"error": "EO disabled", "layer_id": "ndbi"}
     desc = _build_layer_descriptor(scene_id, "index", "ndbi")
@@ -444,12 +455,12 @@ def get_eo_stats(
     bbox: str = Query(..., description="minx,miny,maxx,maxy"),
 ) -> dict[str, Any]:
     from app.core.settings import get_settings
+
     if not get_settings().eo.enabled:
         return {"status": "unavailable", "note": "EO disabled."}
     try:
-        from earth_observation.sentinel2.providers.earth_search_stac import EarthSearchStacProvider
-        from earth_observation.sentinel2.providers.copernicus_stac import CopernicusStacProvider
         from earth_observation.sentinel2.processing.stats import compute_aoi_stats_placeholder
+
         scene = _get_scene(scene_id)
         if not scene:
             return {"status": "unavailable", "note": "Scene not found.", "scene_id": scene_id}
@@ -469,14 +480,19 @@ def get_eo_stats(
 )
 def get_eo_provenance(
     scene_id: str = Query(...),
-    layer_id: Optional[str] = Query(None, description="Optional: true-color, ndvi, ndwi, ndbi"),
+    layer_id: str | None = Query(None, description="Optional: true-color, ndvi, ndwi, ndbi"),
 ) -> dict[str, Any]:
     from app.core.settings import get_settings
+
     if not get_settings().eo.enabled:
         return {"source_provider": "none", "source_status": "unavailable", "note": "EO disabled."}
     scene = _get_scene(scene_id)
     if not scene:
-        return {"source_provider": "unknown", "source_status": "unavailable", "note": "Scene not found."}
+        return {
+            "source_provider": "unknown",
+            "source_status": "unavailable",
+            "note": "Scene not found.",
+        }
     m = scene.metadata
     return {
         "scene_id": scene_id,

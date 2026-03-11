@@ -4,13 +4,12 @@ No synthetic traffic in main path.
 """
 
 import os
-from datetime import datetime, timezone
-from typing import Optional
+from datetime import UTC, datetime
 
 from iridium_schemas.provenance import (
+    DATA_STATUS_CONFIGURATION_REQUIRED,
     DATA_STATUS_LIVE,
     DATA_STATUS_RECORDED_REAL,
-    DATA_STATUS_CONFIGURATION_REQUIRED,
     SourceProvenance,
 )
 
@@ -29,7 +28,7 @@ def get_traffic_status() -> SourceProvenance:
         return SourceProvenance(
             source_name="traffic",
             status=DATA_STATUS_CONFIGURATION_REQUIRED,
-            fetched_at=datetime.now(timezone.utc),
+            fetched_at=datetime.now(UTC),
             provider=None,
             note="Traffic provider credentials not configured. Set TRAFFIC_API_KEY or provider-specific key.",
         )
@@ -37,14 +36,14 @@ def get_traffic_status() -> SourceProvenance:
     return SourceProvenance(  # pragma: no cover
         source_name="traffic",
         status=DATA_STATUS_CONFIGURATION_REQUIRED,
-        fetched_at=datetime.now(timezone.utc),
+        fetched_at=datetime.now(UTC),
         provider=os.environ.get("TRAFFIC_PROVIDER", "tomtom"),
         note="Traffic provider adapter not yet implemented. Configure TRAFFIC_PROVIDER and credentials.",
     )
 
 
 def get_segment_speeds(
-    segment_ids: Optional[list[str]] = None,
+    segment_ids: list[str] | None = None,
 ) -> tuple[dict[str, float], SourceProvenance]:
     """
     Return segment_id -> speed_kmh and provenance. When provider is not configured or not implemented,

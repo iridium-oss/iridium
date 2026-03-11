@@ -1,32 +1,32 @@
 """Schema validation tests."""
 
-import pytest
-from datetime import datetime, timezone
-from pydantic import ValidationError
-
 import sys
+from datetime import UTC, datetime
 from pathlib import Path
+
+import pytest
+from pydantic import ValidationError
 
 root = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(root / "packages" / "schemas"))
 sys.path.insert(0, str(root / "services" / "digital-twin"))
 
-from iridium_schemas.events import SensorEvent, IngestionEventBatch
-from iridium_schemas.routing import RouteRequest, RouteResponse
-from iridium_schemas.forecast import CongestionForecastResponse, ForecastSegment
-from iridium_schemas.equity import DistrictScore, MobilityEquityScore
 from iridium_schemas.anomaly import AnomalyEvent
+from iridium_schemas.equity import DistrictScore
+from iridium_schemas.events import IngestionEventBatch, SensorEvent
+from iridium_schemas.forecast import ForecastSegment
+from iridium_schemas.routing import RouteRequest
 
 
 def test_sensor_event_valid():
-    e = SensorEvent(segment_id="e1", timestamp=datetime.now(timezone.utc), speed_kmh=30.0)
+    e = SensorEvent(segment_id="e1", timestamp=datetime.now(UTC), speed_kmh=30.0)
     assert e.segment_id == "e1"
     assert e.speed_kmh == 30.0
 
 
 def test_sensor_event_invalid_speed():
     with pytest.raises(ValidationError):
-        SensorEvent(segment_id="e1", timestamp=datetime.now(timezone.utc), speed_kmh=300)
+        SensorEvent(segment_id="e1", timestamp=datetime.now(UTC), speed_kmh=300)
 
 
 def test_ingestion_batch_empty():
@@ -46,7 +46,7 @@ def test_route_request_invalid_lat():
 
 
 def test_forecast_segment():
-    s = ForecastSegment(segment_id="e1", timestamp=datetime.now(timezone.utc), congestion_score=0.5)
+    s = ForecastSegment(segment_id="e1", timestamp=datetime.now(UTC), congestion_score=0.5)
     assert s.congestion_score == 0.5
 
 
@@ -56,5 +56,7 @@ def test_district_score():
 
 
 def test_anomaly_event():
-    a = AnomalyEvent(anomaly_id="a1", type="incident", severity="high", detected_at=datetime.now(timezone.utc))
+    a = AnomalyEvent(
+        anomaly_id="a1", type="incident", severity="high", detected_at=datetime.now(UTC)
+    )
     assert a.type == "incident"

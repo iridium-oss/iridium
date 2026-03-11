@@ -5,18 +5,17 @@ operating hours and fare info as published. No fabricated timetable or coordinat
 Coordinates to be resolved via OSM with controlled station-name matching; see validation layer.
 """
 
-from datetime import datetime, timezone
-from typing import Optional
+from datetime import UTC, datetime
 
 from iridium_schemas.transit import (
-    TransitAgency,
-    TransitRoute,
-    TransitStop,
-    TransitInterchange,
-    TransitServiceWindow,
-    TransitFarePolicy,
     SourceFamily,
     SourceStatus,
+    TransitAgency,
+    TransitFarePolicy,
+    TransitInterchange,
+    TransitRoute,
+    TransitServiceWindow,
+    TransitStop,
 )
 
 PROVIDER_ID = "bakumetro_official"
@@ -69,10 +68,10 @@ LINE_META = {
 
 
 def _ts() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
-def get_metro_agency(fetched_at: Optional[datetime] = None) -> TransitAgency:
+def get_metro_agency(fetched_at: datetime | None = None) -> TransitAgency:
     t = fetched_at or _ts()
     return TransitAgency(
         agency_id="baku_metro",
@@ -86,7 +85,7 @@ def get_metro_agency(fetched_at: Optional[datetime] = None) -> TransitAgency:
     )
 
 
-def get_metro_lines(fetched_at: Optional[datetime] = None) -> list[TransitRoute]:
+def get_metro_lines(fetched_at: datetime | None = None) -> list[TransitRoute]:
     t = fetched_at or _ts()
     routes = []
     for line_id, meta in LINE_META.items():
@@ -107,7 +106,7 @@ def get_metro_lines(fetched_at: Optional[datetime] = None) -> list[TransitRoute]
     return routes
 
 
-def get_metro_stations(fetched_at: Optional[datetime] = None) -> list[TransitStop]:
+def get_metro_stations(fetched_at: datetime | None = None) -> list[TransitStop]:
     """Station entities without coordinates. Coordinates from OSM resolution."""
     t = fetched_at or _ts()
     seen: set[str] = set()
@@ -140,7 +139,7 @@ def get_metro_stations(fetched_at: Optional[datetime] = None) -> list[TransitSto
     return stops
 
 
-def get_metro_interchanges(fetched_at: Optional[datetime] = None) -> list[TransitInterchange]:
+def get_metro_interchanges(fetched_at: datetime | None = None) -> list[TransitInterchange]:
     t = fetched_at or _ts()
     out = []
     for a, b in INTERCHANGE_PAIRS:
@@ -157,7 +156,7 @@ def get_metro_interchanges(fetched_at: Optional[datetime] = None) -> list[Transi
     return out
 
 
-def get_metro_service_window(fetched_at: Optional[datetime] = None) -> TransitServiceWindow:
+def get_metro_service_window(fetched_at: datetime | None = None) -> TransitServiceWindow:
     """Operating hours from official passenger pages."""
     t = fetched_at or _ts()
     return TransitServiceWindow(
@@ -172,7 +171,7 @@ def get_metro_service_window(fetched_at: Optional[datetime] = None) -> TransitSe
     )
 
 
-def get_metro_fare_policy(fetched_at: Optional[datetime] = None) -> TransitFarePolicy:
+def get_metro_fare_policy(fetched_at: datetime | None = None) -> TransitFarePolicy:
     """Single fare from Baku Metro official fare page. March 2026 baseline: 0.60 AZN."""
     t = fetched_at or _ts()
     return TransitFarePolicy(
@@ -189,7 +188,7 @@ def get_metro_fare_policy(fetched_at: Optional[datetime] = None) -> TransitFareP
 
 
 def build_static_metro_network(
-    fetched_at: Optional[datetime] = None,
+    fetched_at: datetime | None = None,
 ) -> dict:
     """
     Return unified static metro network: agency, routes, stops, interchanges, service, fare.

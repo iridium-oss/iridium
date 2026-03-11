@@ -4,7 +4,6 @@ Public-web operational context only.
 """
 
 import re
-from datetime import datetime, timezone
 
 from iridium_schemas.transit import (
     MetroOperationalNotice,
@@ -14,8 +13,8 @@ from iridium_schemas.transit import (
 )
 
 from transit_ingestion.providers.yandex_metro_operational.fetcher import (
-    FetchedMetroPage,
     PROVIDER_ID,
+    FetchedMetroPage,
 )
 
 SOURCE_FAMILY = SourceFamily.PUBLIC_WEB.value

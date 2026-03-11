@@ -4,18 +4,18 @@ System endpoints: status, data sources, provenance, and unified provider registr
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, HTTPException
 
 from app.config import get_settings
 from app.providers.registry import (
-    get_all_providers,
-    get_provider,
     check_provider_health,
-    verify_provider,
-    get_integrations_status,
+    get_all_providers,
     get_integrations_report,
+    get_integrations_status,
+    get_provider,
+    verify_provider,
 )
 
 router = APIRouter()
@@ -28,7 +28,7 @@ router = APIRouter()
 )
 def get_system_status() -> dict:
     settings = get_settings()
-    now = datetime.now(timezone.utc).isoformat()
+    now = datetime.now(UTC).isoformat()
     return {
         "service": settings.core.app_name,
         "version": settings.core.app_version,
@@ -174,7 +174,9 @@ def list_providers() -> dict:
 def get_provider_by_id(provider_id: str) -> dict:
     p = get_provider(provider_id)
     if not p:
-        raise HTTPException(status_code=404, detail={"error": "not_found", "message": "Unknown provider id"})
+        raise HTTPException(
+            status_code=404, detail={"error": "not_found", "message": "Unknown provider id"}
+        )
     return {
         "id": p.id,
         "display_name": p.display_name,
@@ -208,7 +210,9 @@ def provider_health(provider_id: str) -> dict:
 )
 def provider_verify(provider_id: str) -> dict:
     if not get_provider(provider_id):
-        raise HTTPException(status_code=404, detail={"error": "not_found", "message": "Unknown provider id"})
+        raise HTTPException(
+            status_code=404, detail={"error": "not_found", "message": "Unknown provider id"}
+        )
     validation_status, last_checked_at, message = verify_provider(provider_id)
     return {
         "provider_id": provider_id,
@@ -234,4 +238,3 @@ def integrations_status() -> dict:
 )
 def integrations_report() -> dict:
     return get_integrations_report()
-

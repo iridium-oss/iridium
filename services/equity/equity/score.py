@@ -4,11 +4,10 @@ Real or recorded data only; no synthetic defaults in main path.
 When no data path is configured, returns empty districts with data_status unavailable.
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Optional
 
-from iridium_schemas.equity import MobilityEquityScore, DistrictScore
+from iridium_schemas.equity import DistrictScore, MobilityEquityScore
 
 
 def _load_district_baselines(data_dir: Path) -> list[dict]:
@@ -17,20 +16,21 @@ def _load_district_baselines(data_dir: Path) -> list[dict]:
     if not path.exists():
         return []
     import json
+
     data = json.loads(path.read_text(encoding="utf-8"))
     return data if isinstance(data, list) else data.get("districts", [])
 
 
 def get_equity_scores(
-    district_ids: Optional[list[str]] = None,
-    data_dir: Optional[Path] = None,
+    district_ids: list[str] | None = None,
+    data_dir: Path | None = None,
 ) -> MobilityEquityScore:
     """Compute district-level equity scores from real or recorded data only. No synthetic fallback."""
     rows = _load_district_baselines(data_dir) if data_dir else []
     if not rows:
         return MobilityEquityScore(
             districts=[],
-            generated_at=datetime.now(timezone.utc),
+            generated_at=datetime.now(UTC),
             note="No equity data configured. Set EQUITY_DATA_PATH to a path containing district_scores.json (real or recorded). See docs/fairness.md.",
             data_status="unavailable",
             model_type="deterministic_baseline",
@@ -59,7 +59,7 @@ def get_equity_scores(
         )
     return MobilityEquityScore(
         districts=districts_out,
-        generated_at=datetime.now(timezone.utc),
+        generated_at=datetime.now(UTC),
         note="Derived analytic index; not an official government measurement. See docs/fairness.md.",
         data_status="live",
         model_type="deterministic_baseline",

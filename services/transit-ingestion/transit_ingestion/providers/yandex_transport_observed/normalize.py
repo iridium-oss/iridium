@@ -4,20 +4,19 @@ Public-web observed only. Never labeled as official GTFS Realtime.
 """
 
 import re
-from datetime import datetime, timedelta, timezone
-from typing import Optional
+from datetime import timedelta
 
 from iridium_schemas.transit import (
     PredictedArrival,
-    StopRealtimeStatus,
     RouteRealtimeObservation,
     SourceFamily,
     SourceStatus,
+    StopRealtimeStatus,
 )
 
 from transit_ingestion.providers.yandex_transport_observed.fetcher import (
-    FetchedYandexPage,
     PROVIDER_ID,
+    FetchedYandexPage,
 )
 
 SOURCE_FAMILY = SourceFamily.PUBLIC_WEB.value
@@ -39,7 +38,7 @@ def _extract_arrival_hints(html: str) -> list[dict]:
 def normalize_yandex_stop_observations(
     fetched: FetchedYandexPage,
     stop_id: str = "yandex_observed_stop",
-    route_id: Optional[str] = None,
+    route_id: str | None = None,
 ) -> tuple[list[PredictedArrival], list[StopRealtimeStatus], list[RouteRealtimeObservation]]:
     """
     Normalize fetched Yandex page to canonical realtime entities.

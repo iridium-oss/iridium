@@ -5,7 +5,7 @@ Base interface for forecasting models. Enables registry and unified inference.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Optional
+from typing import Any
 
 import torch
 
@@ -17,8 +17,8 @@ class BaseForecastModel(ABC, torch.nn.Module):
     def forward(
         self,
         x: torch.Tensor,
-        adj: Optional[torch.Tensor] = None,
-        support: Optional[torch.Tensor] = None,
+        adj: torch.Tensor | None = None,
+        support: torch.Tensor | None = None,
         **kwargs: Any,
     ) -> torch.Tensor:
         """

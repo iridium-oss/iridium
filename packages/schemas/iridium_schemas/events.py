@@ -4,7 +4,6 @@ All data is non-personal; GNSS is assumed aggregated or anonymised at source.
 """
 
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -14,21 +13,21 @@ class SensorEvent(BaseModel):
 
     segment_id: str = Field(..., description="Road segment identifier")
     timestamp: datetime
-    speed_kmh: Optional[float] = Field(None, ge=0, le=200)
-    occupancy_pct: Optional[float] = Field(None, ge=0, le=100)
-    flow_count: Optional[int] = Field(None, ge=0)
-    source_id: Optional[str] = None
+    speed_kmh: float | None = Field(None, ge=0, le=200)
+    occupancy_pct: float | None = Field(None, ge=0, le=100)
+    flow_count: int | None = Field(None, ge=0)
+    source_id: str | None = None
 
 
 class GNSSPoint(BaseModel):
     """Aggregated or anonymised GNSS-derived point (no device identity)."""
 
-    segment_id: Optional[str] = None
+    segment_id: str | None = None
     lat: float = Field(..., ge=-90, le=90)
     lon: float = Field(..., ge=-180, le=180)
     timestamp: datetime
-    speed_kmh: Optional[float] = Field(None, ge=0, le=200)
-    count: Optional[int] = Field(None, ge=0, description="Aggregate count if applicable")
+    speed_kmh: float | None = Field(None, ge=0, le=200)
+    count: int | None = Field(None, ge=0, description="Aggregate count if applicable")
 
 
 class WeatherSnapshot(BaseModel):
@@ -36,10 +35,10 @@ class WeatherSnapshot(BaseModel):
 
     timestamp: datetime
     region_id: str = Field(..., description="City or zone identifier")
-    temp_c: Optional[float] = None
-    precipitation_mm: Optional[float] = Field(None, ge=0)
-    visibility_km: Optional[float] = Field(None, ge=0)
-    condition: Optional[str] = None
+    temp_c: float | None = None
+    precipitation_mm: float | None = Field(None, ge=0)
+    visibility_km: float | None = Field(None, ge=0)
+    condition: str | None = None
 
 
 class PublicEventRecord(BaseModel):
@@ -49,8 +48,8 @@ class PublicEventRecord(BaseModel):
     start_time: datetime
     end_time: datetime
     venue_or_zone_id: str
-    capacity: Optional[int] = Field(None, ge=0)
-    event_type: Optional[str] = None
+    capacity: int | None = Field(None, ge=0)
+    event_type: str | None = None
 
 
 class EnergyGridSignal(BaseModel):
@@ -58,8 +57,8 @@ class EnergyGridSignal(BaseModel):
 
     zone_id: str
     timestamp: datetime
-    price_per_kwh: Optional[float] = Field(None, ge=0)
-    capacity_fraction: Optional[float] = Field(None, ge=0, le=1)
+    price_per_kwh: float | None = Field(None, ge=0)
+    capacity_fraction: float | None = Field(None, ge=0, le=1)
 
 
 class IngestionEventBatch(BaseModel):

@@ -5,14 +5,14 @@ Deterministic; no raster I/O in this module (that would be in a separate pipelin
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 from iridium_schemas.earth_observation import (
-    EOScene,
     EOIndexLayer,
-    EOTileLayer,
     EOOverlayDescriptor,
+    EOScene,
     EOSourceStatus,
+    EOTileLayer,
 )
 
 from earth_observation.sentinel2.indices.formulas import get_index_descriptor, true_color_descriptor
@@ -21,8 +21,8 @@ from earth_observation.sentinel2.indices.formulas import get_index_descriptor, t
 def build_index_layer_descriptor(
     scene: EOScene,
     index_id: str,
-    min_val: Optional[float] = None,
-    max_val: Optional[float] = None,
+    min_val: float | None = None,
+    max_val: float | None = None,
 ) -> EOIndexLayer:
     """Build index layer descriptor for ndvi, ndwi, or ndbi from scene metadata."""
     return get_index_descriptor(
@@ -42,7 +42,7 @@ def build_true_color_descriptor(scene: EOScene) -> dict[str, Any]:
 def get_overlay_descriptor(
     scene: EOScene,
     layer_type: str,
-    index_id: Optional[str] = None,
+    index_id: str | None = None,
 ) -> EOOverlayDescriptor:
     """Build full overlay descriptor for UI. layer_type: index or tile; index_id for ndvi/ndwi/ndbi."""
     metadata = scene.metadata

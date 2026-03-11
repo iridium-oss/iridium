@@ -8,8 +8,7 @@ if str(root) not in sys.path:
     sys.path.insert(0, str(root))
 
 import torch
-import numpy as np
-from forecasting.models import GraphWaveNet, DCRNN
+from forecasting.models import DCRNN, GraphWaveNet
 
 
 def test_graph_wavenet_forward():

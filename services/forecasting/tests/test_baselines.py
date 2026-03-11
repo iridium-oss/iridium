@@ -8,7 +8,11 @@ if str(root) not in sys.path:
     sys.path.insert(0, str(root))
 
 import numpy as np
-from forecasting.baselines import persistence_forecast, rolling_mean_forecast, linear_temporal_forecast
+from forecasting.baselines import (
+    linear_temporal_forecast,
+    persistence_forecast,
+    rolling_mean_forecast,
+)
 
 
 def test_persistence():

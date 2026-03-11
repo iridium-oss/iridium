@@ -7,10 +7,10 @@ commented or template badges. Usage: python scripts/verify_badges.py
 import re
 import sys
 from pathlib import Path
-from urllib.parse import urlparse
 
 try:
     import urllib.request
+
     req = urllib.request.Request
     urlopen = urllib.request.urlopen
 except ImportError:

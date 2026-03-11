@@ -5,7 +5,7 @@ Repository-native PyTorch implementation for IRIDIUM forecasting.
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 import torch
 import torch.nn as nn
@@ -89,7 +89,9 @@ class GraphWaveNet(BaseForecastModel):
             self.node_emb1 = nn.Parameter(torch.randn(num_nodes, 10))
             self.node_emb2 = nn.Parameter(torch.randn(10, num_nodes))
 
-        self.skip_layers = nn.ModuleList([nn.Conv1d(hidden_dim, hidden_dim, 1) for _ in range(num_layers)])
+        self.skip_layers = nn.ModuleList(
+            [nn.Conv1d(hidden_dim, hidden_dim, 1) for _ in range(num_layers)]
+        )
         self.end_conv_1 = nn.Conv1d(hidden_dim, 16, 1)
         self.end_conv_2 = nn.Conv1d(16, horizon, 1)
         self.dropout = nn.Dropout(dropout)
@@ -105,12 +107,12 @@ class GraphWaveNet(BaseForecastModel):
     def forward(
         self,
         x: torch.Tensor,
-        adj: Optional[torch.Tensor] = None,
-        support: Optional[torch.Tensor] = None,
+        adj: torch.Tensor | None = None,
+        support: torch.Tensor | None = None,
         **kwargs: Any,
     ) -> torch.Tensor:
         B, T_in, N = x.shape
-        if N != self._num_nodes:
+        if self._num_nodes != N:
             raise ValueError(f"Expected {self._num_nodes} nodes, got {N}")
         x = x.permute(0, 2, 1).reshape(B * N, 1, T_in)
         x = self.start_conv(x)

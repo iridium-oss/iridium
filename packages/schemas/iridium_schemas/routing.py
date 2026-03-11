@@ -3,7 +3,6 @@ Routing API request and response schemas.
 """
 
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -19,21 +18,21 @@ class RouteRequest(BaseModel):
         default_factory=lambda: ["walking", "bus", "metro", "minibus", "cycling"],
         description="Preferred modes",
     )
-    max_transfers: Optional[int] = Field(None, ge=0, le=10)
+    max_transfers: int | None = Field(None, ge=0, le=10)
     optimize: str = Field("time", description="time | cost | carbon")
-    departure_time: Optional[datetime] = None
+    departure_time: datetime | None = None
 
 
 class RouteSegment(BaseModel):
     """Single leg of a route."""
 
     mode: str
-    from_node_id: Optional[str] = None
-    to_node_id: Optional[str] = None
+    from_node_id: str | None = None
+    to_node_id: str | None = None
     duration_min: float = Field(..., ge=0)
-    cost: Optional[float] = Field(None, ge=0)
-    carbon_kg: Optional[float] = Field(None, ge=0)
-    description: Optional[str] = None
+    cost: float | None = Field(None, ge=0)
+    carbon_kg: float | None = Field(None, ge=0)
+    description: str | None = None
 
 
 class RouteAlternative(BaseModel):
@@ -41,12 +40,12 @@ class RouteAlternative(BaseModel):
 
     segments: list[RouteSegment] = Field(default_factory=list)
     total_duration_min: float = Field(..., ge=0)
-    total_cost: Optional[float] = Field(None, ge=0)
-    total_carbon_kg: Optional[float] = Field(None, ge=0)
+    total_cost: float | None = Field(None, ge=0)
+    total_carbon_kg: float | None = Field(None, ge=0)
     transfer_count: int = Field(0, ge=0)
-    score_time: Optional[float] = None
-    score_cost: Optional[float] = None
-    score_carbon: Optional[float] = None
+    score_time: float | None = None
+    score_cost: float | None = None
+    score_carbon: float | None = None
 
 
 class RouteResponse(BaseModel):
@@ -54,16 +53,16 @@ class RouteResponse(BaseModel):
 
     alternatives: list[RouteAlternative] = Field(default_factory=list)
     requested_at: datetime = Field(default_factory=datetime.utcnow)
-    note: Optional[str] = Field(None, description="e.g. baseline optimizer")
-    model_type: Optional[str] = Field(
+    note: str | None = Field(None, description="e.g. baseline optimizer")
+    model_type: str | None = Field(
         None,
         description="deterministic_baseline | rule_baseline",
     )
-    model_maturity: Optional[str] = Field(
+    model_maturity: str | None = Field(
         None,
         description="production_baseline | experimental | inactive",
     )
-    data_status: Optional[str] = Field(
+    data_status: str | None = Field(
         None,
         description="live | unavailable | configuration_required when network not loaded.",
     )
