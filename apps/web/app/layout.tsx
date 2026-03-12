@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import "@fontsource-variable/google-sans";
-import "./globals.css";
+// import "@fontsource-variable/google-sans";
+ import "./globals.css";
 import { DisclaimerBanner } from "@/components/layout/DisclaimerBanner";
 import { SkipLink } from "@/components/layout/SkipLink";
 
@@ -22,6 +22,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
+    
     <html lang="en">
       <head>
         <link

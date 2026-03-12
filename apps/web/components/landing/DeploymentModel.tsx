@@ -1,5 +1,4 @@
 "use client";
-
 import { motion } from "framer-motion";
 import { Icon } from "@/components/ui/Icon";
 
@@ -73,7 +72,7 @@ export function DeploymentModel() {
               className="rounded-xl border border-surface-border bg-surface-card/80 p-6"
             >
               <div className="flex items-center gap-2">
-                <Icon name="dns" size={22} className="text-accent-luminous shrink-0" />
+                <Icon name="dns" size={24} className="text-accent-luminous shrink-0" />
                 <h3 className="font-medium text-text-primary">{item.title}</h3>
               </div>
               <p className="mt-3 text-sm text-text-secondary">{item.description}</p>
