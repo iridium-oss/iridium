@@ -13,9 +13,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class FederatedConfig(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="IRIDIUM_FL_", extra="ignore")
 
-    data_dir: Path | None = Field(
-        None, description="Directory with partition manifests and data"
-    )
+    data_dir: Path | None = Field(None, description="Directory with partition manifests and data")
     artifacts_dir: Path = Field(
         Path("artifacts"), description="Where to save checkpoints and metrics"
     )

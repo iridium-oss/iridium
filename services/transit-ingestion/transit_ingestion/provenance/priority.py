@@ -5,7 +5,6 @@ Predicted arrivals: official feed first, then public web observed, then licensed
 Route planning: official/OTP first, then 2GIS, Moovit, Yandex licensed.
 """
 
-
 # Alert priority: 1 = highest.
 ALERT_PRIORITY_ORDER = [
     "bakubus_official_alerts",

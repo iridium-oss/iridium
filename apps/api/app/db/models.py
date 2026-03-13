@@ -149,12 +149,8 @@ class OfficialAlert(Base):
     affected_station_id: Mapped[str | None] = mapped_column(String, nullable=True)
     alert_category: Mapped[str | None] = mapped_column(String, nullable=True)
     severity: Mapped[str | None] = mapped_column(String, nullable=True)
-    effective_start: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
-    effective_end: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
+    effective_start: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    effective_end: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     source_url: Mapped[str | None] = mapped_column(String, nullable=True)
     source_provider: Mapped[str] = mapped_column(String, nullable=False)

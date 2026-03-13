@@ -2,7 +2,6 @@
 Equity score endpoint. Real or recorded data only; no synthetic path.
 """
 
-
 from equity.score import get_equity_scores
 from fastapi import APIRouter, Query
 

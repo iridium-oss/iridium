@@ -76,9 +76,7 @@ def load_partition_manifest(partition_id: str, manifests_dir: Path) -> Partition
     return PartitionManifest.model_validate(data)
 
 
-def load_partition_data(
-    partition_id: str, data_dir: Path
-) -> tuple[np.ndarray, np.ndarray] | None:
+def load_partition_data(partition_id: str, data_dir: Path) -> tuple[np.ndarray, np.ndarray] | None:
     """Load (x, y) for a partition. Returns None if missing or insufficient."""
     path = data_dir / f"{partition_id}_data.npz"
     if not path.exists():

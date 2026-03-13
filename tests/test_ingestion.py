@@ -16,9 +16,7 @@ from iridium_schemas.events import GNSSPoint, IngestionEventBatch, SensorEvent
 
 def test_validate_batch_ok():
     batch = IngestionEventBatch(
-        sensor_events=[
-            SensorEvent(segment_id="e1", timestamp=datetime.now(UTC), speed_kmh=30.0)
-        ]
+        sensor_events=[SensorEvent(segment_id="e1", timestamp=datetime.now(UTC), speed_kmh=30.0)]
     )
     ok, errors = validate_batch(batch)
     assert ok is True

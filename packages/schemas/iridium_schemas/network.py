@@ -15,9 +15,7 @@ class NetworkNode(BaseModel):
     lat: float | None = Field(None, ge=-90, le=90)
     lon: float | None = Field(None, ge=-180, le=180)
     name: str | None = None
-    mode: str | None = Field(
-        None, description="bus | metro | minibus | walking | cycling | road"
-    )
+    mode: str | None = Field(None, description="bus | metro | minibus | walking | cycling | road")
     metadata: dict = Field(default_factory=dict)
 
 

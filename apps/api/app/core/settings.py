@@ -233,9 +233,7 @@ class EarthObservationSettings(BaseSettings):
 class GoMapSettings(BaseSettings):
     model_config = SettingsConfigDict(extra="ignore")
 
-    api_key: SecretStr | None = Field(
-        None, description="GoMap API key when integration is enabled"
-    )
+    api_key: SecretStr | None = Field(None, description="GoMap API key when integration is enabled")
     base_url: str = Field("", description="GoMap API base URL when set")
     allowed_server_ip: str | None = Field(
         None, description="Optional server IP allowlist for GoMap"
