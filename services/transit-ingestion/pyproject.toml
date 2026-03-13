@@ -14,4 +14,4 @@ dependencies = [
 
 [tool.setuptools.packages.find]
 where = ["."]
-packages = ["transit_ingestion"]
+include = ["transit_ingestion*"]

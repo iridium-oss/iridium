@@ -10,4 +10,5 @@ dependencies = ["iridium-schemas", "psycopg2-binary>=2.9", "pyosmium>=3.6"]
 
 [tool.setuptools.packages.find]
 where = ["."]
-packages = ["network_import"]
+include = ["network_import*"]
+

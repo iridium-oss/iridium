@@ -10,4 +10,5 @@ dependencies = ["iridium-schemas", "pydantic>=2.5.0"]
 
 [tool.setuptools.packages.find]
 where = ["."]
-packages = ["traffic_provider"]
+include = ["traffic_provider*"]
+
