@@ -10,4 +10,4 @@ dependencies = ["iridium-schemas", "pydantic>=2.5.0"]
 
 [tool.setuptools.packages.find]
 where = ["."]
-packages = ["digital_twin"]
+include = ["digital_twin*"]
