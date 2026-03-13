@@ -9,6 +9,6 @@ description = "Shared data contracts and Pydantic schemas for IRIDIUM"
 requires-python = ">=3.12"
 dependencies = ["pydantic>=2.5.0"]
 
-[tool.setuptools]
+[tool.setuptools.packages.find]
+where = ["."]
 include = ["iridium_schemas*"]
-
